@@ -1,0 +1,138 @@
+/* ============================================================
+    DESIGN TOKENS
+    ============================================================
+    All design decisions live here as CSS custom properties.
+    Naming convention: --{category}-{variant}
+    Categories:
+    color-*       → raw palette (brand, neutral, semantic)
+    layout-*      → structural measurements (widths, heights)
+    radius-*      → border-radius scale
+    shadow-*      → box-shadow scale
+    transition-*  → animation timing
+    font-*        → typography tokens
+    ============================================================ */
+:root {
+/* ── Layout dimensions ──────────────────────────────────── */
+--layout-cu_sidebar-width: 256px;
+--layout-cu_sidebar-collapsed-width: 72px;
+--layout-cu_topbar-height: 66px;
+--tabs-h: 48px;
+
+/* ── Brand colors ───────────────────────────────────────── */
+--color-brand-navy: #0b263e; /* Primary brand, used for hero gradients */
+--color-brand-navy-hover: #123a5c; /* Primary brand, used for hero gradients */
+--color-brand-gold: #958049; /* CTA buttons, active link text */
+--color-brand-gold-hover: #A8904A; /* Gold on hover */
+
+
+/* ── Neutral / surface colors ───────────────────────────── */
+--color-surface-page: #F8F8F8; /* Page background */
+--color-surface-subtle: #f1f0e8; /* Hover backgrounds, secondary surfaces */
+--color-surface-inset: #F8F8F8; /*  inner wells, inputs, or filled container backgrounds */
+--color-surface-gold-pale: #F5F0E8; /*  inner wells, inputs, or filled container backgrounds */
+--color-surface-cu_topbar: #ffffff; /* cu_topbar background */
+--color-surface-white: #ffffff; /* Cards, dropdowns */
+--gold-pale:   #F5F0E8; /* Bill */
+
+/* ── Text colors ────────────────────────────────────────── */
+--color-text-primary: #291704; /* Default body text */
+--color-text-secondary: #71717a; /* Labels, helper text */
+--color-text-muted: rgba(41, 23, 4, 0.8); /* cu_sidebar nav text */
+--color-text-inverse: #f1f5f9; /* Text on dark surfaces */
+
+/* ── Border colors ──────────────────────────────────────── */
+--color-border: #e5e7eb; /* cu_sidebar, cu_topbar, card borders */
+--color-border-hover: #f1f0e8; /* Borders on interactive hover states */
+--gold-border: #D4C49A;
+--color-divider: #ededed; /* Hairline inside a filled control (pill dividers) */
+
+/* ── Form fields ───────────────────────────────────────── */
+--field-h: 48px; /* Inputs, selects, pills, primary buttons */
+--field-radius: 16px; /* Matches --radius-lg, kept separate so field shape can move alone */
+--field-gap: 18px; /* Column gap between fields on one row */
+--color-text-placeholder: #bdbcb0; /* Empty input / select text */
+--focus-ring-gold: 0 0 0 3px rgba(149, 128, 73, 0.15); /* Focus ring on a field */
+--focus-ring-navy: 0 0 0 3px rgba(11, 38, 62, 0.28); /* Focus ring on a navy CTA */
+
+/* ── Semantic / status colors ───────────────────────────── */
+--color-status-danger: #dc2626; /* Destructive actions (logout, delete) */
+--color-status-danger-bg: #fef2f2; /* Danger item hover background */
+--color-status-danger-hover: #fef2f2;
+--color-status-success: #06890e; /* Positive values (credit balance) */
+--color-status-warning: #b45309; /* Non-blocking warnings (toasts, hints) */
+--color-status-warning-bg: #fffbeb; /* Warning item background */
+--color-status-notification: #256bc1; /* Notification badge dot */
+--color-link: #416791; /* Notification badge dot */
+
+/* ── Avatar gradient ─────────────────────────────────────
+    Split into two stops for easier theming                  */
+--color-avatar-gradient-from: #f5f0e8;
+--color-avatar-gradient-to: #d4c49a;
+
+/* ── Radius scale ────────────────────────────────────────── */
+--radius-xs: 6px; /* Buttons */
+--radius-sm: 8px; /* small elements */
+--radius-md: 12px; /* Cards, nav items */
+--radius-lg: 16px; /* Larger cards */
+--radius-full: 999px; /* Circles (avatar) */
+
+/* ── Shadow scale ────────────────────────────────────────── */
+--shadow-sm: 0 1px 2px rgba(12, 37, 63, 0.15);
+--shadow-md:
+    0 4px 12px rgba(12, 37, 63, 0.15), 0 2px 4px rgba(12, 37, 63, 0.1);
+--shadow-lg: 0 10px 40px rgba(12, 37, 63, 0.2);
+--shadow-pop: 0 18px 44px rgba(34, 30, 27, .18), 0 0 0 1px rgba(34, 30, 27, .05); /* Detached popups: select2 panel, flatpickr calendar, modal tooltip */
+
+/* ── Animation ───────────────────────────────────────────── */
+--transition-base: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+--transition-fast: 0.15s ease;
+
+/* ── Typography ──────────────────────────────────────────── */
+--font-body: "IBM Plex Sans", sans-serif;
+--font-heading: "IBM Plex Serif", serif;
+}
+
+/* Bootstrap re-declares body's font-family  */
+html:root {
+    --bs-font-sans-serif: var(--font-body);
+}
+
+/* ============================================================
+    FONTS
+    ============================================================ */
+@font-face {
+    font-family: 'IBM Plex Sans';
+    src: url('../fonts/IBM_Plex_Sans/IBMPlexSansVar-Roman.woff2') format('woff2');
+    font-weight: 100 700;
+    font-stretch: 85% 100%;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'IBM Plex Serif';
+    src: url('../fonts/IBM_Plex_Serif/IBMPlexSerif-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap; /* Critical for performance */
+}
+
+/* ============================================================
+    RESET & BASE
+    ============================================================ */
+*,
+*::before,
+*::after {
+box-sizing: border-box;
+margin: 0;
+padding: 0;
+}
+
+body {
+font-family: var(--font-body);
+background: var(--color-surface-page);
+color: var(--color-text-primary);
+min-height: 100vh;
+overflow-x: hidden;
+}
+

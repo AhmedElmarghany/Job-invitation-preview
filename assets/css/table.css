@@ -1,0 +1,1048 @@
+/* ─────────────────────────────── Outter Wrapper ─────────────────────────────── */
+.wrapper {
+    font-family: var(--font-body);
+    margin: 0 auto;
+}
+
+.table-wrap{
+    margin: 4px 10px;
+}
+
+
+@media (min-width: 768px) and (max-width: 991px) {
+    body.rp-sidebar-collapsed .table-wrap {
+        /* width: calc( 98% - var(--layout-cu_sidebar-collapsed-width) ); */
+        width: 98%;
+    }
+
+    body:not(.rp-sidebar-collapsed)  .table-wrap {
+        /* width: calc( 98% - var(--layout-cu_sidebar-width) ); */
+        width: 98%;
+    }
+}
+
+/* ─────────────────────────────── Table ─────────────────────────────── */
+#new-customized-table {
+    border-spacing: 0 !important;
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: separate;
+    margin-bottom: 4rem;
+}
+
+#new-customized-table thead th {
+    position: relative;
+    border: 0px;
+    user-select: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 14px !important;
+    padding: 10px 14px !important;
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    text-align: left;
+    letter-spacing: .3px;
+    background-color: var(--color-surface-inset);
+}
+#new-customized-table thead th.active {
+    color: var(--color-text-primary);
+}
+#new-customized-table thead th:first-child {
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+}
+
+#new-customized-table thead th:not([style*="display: none;"]):not(:has(~ th:not([style*="display: none;"]))) {
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+/* Add right Shadow for latest sticky column when scroll */
+.table-wrap.scrolled-x #new-customized-table .sticky-col:not([style*="display: none"]):not(
+    :has(~ .sticky-col:not([style*="display: none"]))
+){
+    /* this clip-path is used just to wrap the shadow that appears when scroll */
+    clip-path: inset(0.5px -70px 0.5px 0px);
+    box-shadow: 10px 0 20px 10px rgba(0, 0, 0, 0.15);
+}
+#new-customized-table tbody td {
+    padding: 6px 10px !important;
+    border: 0px;
+    border-bottom: 1px solid var(--color-border);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    height: 20px;
+    color: var(--color-text-primary);
+    background: var(--color-surface-white);
+    vertical-align: middle;
+}
+#new-customized-table tbody td.col-source,
+#new-customized-table tbody td.has-popover{
+    text-overflow: ellipsis;
+    overflow: visible;
+}
+
+#new-customized-table td a.button {
+    margin: 0 !important;
+    padding: 3px 5px !important;
+    width: 5rem;
+    text-align: center;
+    font-size: 12px !important;
+}
+#new-customized-table .userButton {
+    margin: 0 !important;
+    padding: 5px 5px !important;
+    background: #0d253f !important;
+    font-size: 12px !important;
+    width: 5rem;
+    text-align: center;
+}
+
+.sort-icons {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+    font-size: 8px;
+    color: #918151;
+    margin-bottom: -2px;
+}
+
+tr:nth-child(even) .sticky-col {
+    background-color: var(--color-surface-inset);
+}
+
+/* Odd rows inside sticky columns */
+tr:nth-child(odd) .sticky-col {
+    background-color: var(--color-surface-white);
+}
+
+tr:nth-child(even) td {
+    background-color: var(--color-surface-inset) !important;
+}
+
+tr:hover{
+    background-color: var(--color-surface-subtle) !important;
+}
+
+tbody tr:hover td.sticky-col,
+#new-customized-table tr:nth-child(even):hover td.col-name,
+#new-customized-table tr:nth-child(even):hover td.col-id,
+#new-customized-table tr:nth-child(even):hover td:first-child, 
+#new-customized-table tr:nth-child(even):hover td:nth-child(2),
+tbody tr:nth-child(even):hover .sticky-col,
+tbody tr:nth-child(odd):hover .sticky-col,
+tr:nth-child(even):hover td,
+tr:hover td {
+    background-color: var(--color-surface-subtle) !important;
+}
+#new-customized-table tr.rp-subrow:nth-child(even):hover td:first-child {
+    background-color: var(--color-surface-inset) !important;
+}
+tr.rp-subrow:hover td {
+    background-color: var(--color-surface-inset) !important;
+}
+
+/* ─────────────────────────────── Add Background For The Selected Row ─────────────────────────────── */
+tr:has(input:checked),
+tr:has(input:checked) td {
+    background-color: var(--color-surface-gold-pale) !important;
+}
+/* ─────────────────────────────── Drag indicator ─────────────────────────────── */
+th.dragging {
+    opacity: 0.6
+}
+
+#new-customized-table th.drop-target,
+table.emails-customized-table th.drop-target,
+table.projects-customized-table th.drop-target,
+table.credit-notes-customized-table th.drop-target,
+table.tm-customized-table th.drop-target,
+table.glossary-customized-table th.drop-target,
+table.qa-profile-customized-table th.drop-target,
+table.resources-customized-table th.drop-target,
+table.resource-projects-customized-table th.drop-target,
+table.tasks-customized-table th.drop-target,
+table[data-table] th.drop-target {
+    outline: 2px dashed var(--color-link, rgba(59, 130, 246, 0.5));
+    outline-offset: -2px;
+}
+/* Make header cells draggable by showing a grab cursor */
+#new-customized-table th .label {
+    cursor: grab;
+    display: inline-block;
+    padding-right: 8px
+}
+
+/* ─────────────────────────────── Resizer ─────────────────────────────── */
+.resizer {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 10px;
+    cursor: col-resize
+}
+
+.resizer:after {
+    content: '';
+    position: absolute;
+    flex-shrink: 0;
+    right: 0px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 22px;
+    min-width: 2px;
+    width: 2px;
+    max-width: 5.5px;
+    box-sizing: border-box;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-width: 0 1px 0 1px;
+}
+
+#new-customized-table th.col-payment {
+    width: max-content;
+    min-width: 100%;
+}
+
+/* ─────────────────────────────── Select column ─────────────────────────────── */
+#new-customized-table th.col-select #select_all {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 4px !important;
+    border: 1.5px solid var(--color-text-secondary);
+    background: var(--color-surface-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all var(--transition-fast);
+    margin: 0;
+    cursor: pointer;
+    position: relative;
+    top: unset;
+}
+
+#new-customized-table th.col-select #select_all:checked {
+    background: var(--color-brand-gold);
+    border-color: var(--color-brand-gold);
+}
+
+/* Checkmark inside input box */
+#new-customized-table th.col-select #select_all:checked::after {
+    content: '';
+    display: block;
+    width: 5px;
+    height: 9px;
+    border: 2px solid #fff;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg) translate(-1px, -1px);
+    position: absolute;
+}
+
+#new-customized-table th.col-select .label {
+    padding: 0;
+}
+
+/* Checkmark inside input box */
+#new-customized-table td.col-select input:checked::after {
+    content: '';
+    display: block;
+    width: 5px;
+    height: 9px;
+    border: 2px solid #fff;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg) translate(-1px, -1px);
+    position: absolute;
+}
+
+/* ========== Make the whole area clickable ========== */
+/* Ensure the TD has relative positioning */
+#new-customized-table td.col-select {
+  position: relative;
+  padding: 0;
+}
+/* The TD becomes the container */
+td.col-select {
+  position: relative;
+  padding: 0;
+}
+
+/* The input fills the TD but its default look is removed */
+td.col-select input {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  margin: 0;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Drawing the custom checkbox square */
+td.col-select input::before {
+  content: '';
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--color-text-secondary);
+  border-radius: 4px;
+  background: white;
+}
+
+/* Styling for the checked state */
+td.col-select input:checked::before {
+  background-color: var(--color-brand-gold);
+  border-color: var(--color-brand-gold);
+}
+
+#new-customized-table tbody td {
+  position: relative;
+  padding: 6px 10px;
+  display: table-cell;
+}
+
+#new-customized-table td.col-select input {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  margin: 0px;
+  cursor: pointer;
+  border-radius: 4px !important;
+  appearance: none;
+  -webkit-appearance: none;
+  opacity: 1;
+  z-index: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+  background-color: transparent;
+  /* background: var(--color-surface-white); */
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+/* ─────────────────────────────── Centered column ─────────────────────────────── */
+.col-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ─────────────────────────────── ID column ─────────────────────────────── */
+#new-customized-table td.col-id a {
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--color-link);
+    text-decoration: none;
+}
+
+#new-customized-table td.col-id:hover a {
+    text-decoration: underline;
+}
+
+#new-customized-table span.id-td {
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--color-brand-gold);
+}
+
+/* ─────────────────────────────── Link Cell (Same as ID) ─────────────────────────────── */
+#new-customized-table td.link-td a {
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--color-link);
+    text-decoration: none;
+}
+
+#new-customized-table td.link-td a:hover {
+    text-decoration: underline;
+}
+
+/* ─────────────────────────────── Progress bar ─────────────────────────────── */
+#new-customized-table .progress-widget {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 80px;
+    font-family: var(--font-body);
+}
+
+#new-customized-table .progress-widget__label {
+  display: flex;
+  justify-content: flex-end;
+}
+
+#new-customized-table .progress-widget__pct {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+#new-customized-table .progress-widget__bar {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  overflow: hidden;
+  appearance: none;
+  filter: none;
+  -webkit-appearance: none;
+}
+
+/* Track (unfilled portion) */
+#new-customized-table .progress-widget__bar::-webkit-progress-bar {
+  background-color: #E6E2D8;
+  border-radius: 999px;
+}
+#new-customized-table .progress-widget__bar {
+  background-color: #E6E2D8; /* Firefox track */
+  border: none;
+}
+
+/* Fill (filled portion) */
+#new-customized-table .progress-widget__bar::-webkit-progress-value {
+  background-color: var(--color-brand-gold);
+  border-radius: 999px;
+  transition: none;
+}
+#new-customized-table .progress-widget__bar::-moz-progress-bar {
+  background-color: var(--color-brand-gold);
+  border-radius: 999px;
+}
+
+/* ─────────────────────────────── Languages pair ─────────────────────────────── */
+.lang-cell-wrap { position: relative; }
+.lang-wrap { display: flex; align-items: center; gap: 5px; }
+.lang-pair { display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 500; }
+.lang-arrow { font-size: 10px; width: 12px; height: 16px; }
+.lang-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 1px;
+    padding: 0px 4px;
+    border-radius: 99px;
+    font-size: 14px;
+    font-weight: 400;
+    background: #F1F0E8;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    transition: background var(--transition-fast), color var(--transition-fast);
+    user-select: none;
+    align-self: flex-end;
+}
+.lang-more svg{color: var(--color-text-secondary);}
+.lang-more:hover { background: var(--color-brand-gold); color: var(--color-surface-white); }
+.lang-more:hover svg{color: var(--color-surface-white);}
+
+/* Expanded extra pairs */
+.lang-extra { display: flex; flex-direction: column; gap: 3px; margin-top: 4px; }
+.lang-extra .lang-pair { font-size: 12px; color: var(--color-text-secondary); }
+.lang-cell-wrap { position: relative; }
+
+/* Tooltip/popover for extra langs */
+.lang-popover {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: 100;
+    background: var(--color-surface-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-lg);
+    padding: 4px 12px 4px;
+    min-width: 140px;
+    gap: 5px;
+    flex-direction: column;
+    align-items: flex-start; 
+}
+.lang-popover.open { display: flex; }
+.lang-popover.open > .lang-pair{ flex-direction: column; align-items: flex-start; }
+.lang-popover .lang-pair { padding: 3px 0; width: 100%; }
+.lang-popover .lang-pair + .lang-pair { border-top: 1px solid var(--color-border); }
+
+/* ─────────────────────────────── Popover ─────────────────────────────── */
+.cell-first-item {
+  margin-right: 4px;
+  font-size: 14px;
+}
+
+.popover-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 1px;
+    padding: 0px 4px;
+    border-radius: 99px;
+    font-size: 14px;
+    font-weight: 400;
+    background: #F1F0E8;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    transition: background var(--transition-fast), color var(--transition-fast);
+    user-select: none;
+    align-self: flex-end;
+}
+.popover-trigger svg{color: var(--color-text-secondary);}
+.popover-trigger:hover { background: var(--color-brand-gold); color: var(--color-surface-white); }
+.popover-trigger:hover svg{color: var(--color-surface-white);}
+
+/* Tooltip/popover for extra Content */
+.popover-panel {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 100;
+    background: var(--color-surface-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-lg);
+    padding: 4px 12px 4px;
+    gap: 5px;
+    flex-direction: column;
+    align-items: flex-start; 
+}
+
+.popover-content { display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 500; }
+.popover-panel.open { display: flex; width: max-content; }
+.popover-panel.open > .popover-content{ flex-direction: column; align-items: flex-start; }
+.popover-panel .popover-content { padding: 6px 12px; width: 100%; }
+.popover-panel .popover-content + .popover-content { border-top: 1px solid var(--color-border); }
+
+.popover-content-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+
+/* ─────────────────────────────── Count ─────────────────────────────── */
+.count-row-value{
+    color: var(--color-text-primary);
+    font-weight: 500;
+}
+.count-row-unit{
+    color: var(--color-text-secondary);
+}
+
+/* ─────────────────────────────── Price Cell ─────────────────────────────── */
+#new-customized-table td.right-aligned-td {
+    text-align: right;
+}
+
+/* ─────────────────────────────── Price ─────────────────────────────── */
+#new-customized-table .price-row-value{
+    color: var(--color-text-primary);
+    font-weight: 500;
+}
+#new-customized-table .price-row-unit{
+    color: var(--color-text-secondary);
+}
+
+/* ─────────────────────────────── Main & Sub text ─────────────────────────────── */
+#new-customized-table .td-text-main{
+    color: var(--color-text-primary);
+}
+#new-customized-table .td-text-sub{
+    color: var(--color-text-secondary);
+    font-weight: 500;
+}
+
+/* ─────────────────────────────── Empty Row ─────────────────────────────── */
+/* Use this empty row With "—" as a text */
+#new-customized-table .empty-cell {
+    color: var(--color-text-secondary);
+    font-size: 14px;
+}
+#new-customized-table .empty-row {
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    text-align: center;
+}
+
+/* ─────────────────────────────── Due Date ─────────────────────────────── */
+#new-customized-table tbody .col-due-date{
+    color: #8A0F0F;
+}
+#new-customized-table tbody .col-due-date-time{
+    color: #DC2626;
+    font-weight: 500;
+}
+
+/* ─────────────────────────────── Actions ─────────────────────────────── */
+#new-customized-table tbody td.actions-cell {
+    overflow: visible;
+}
+
+.actions-wrap {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    justify-content: flex-start;
+}
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    border: none;
+    border-radius: var(--radius-xs);
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 12px;
+    transition: background var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
+    padding: 6px 10px;
+    white-space: nowrap;
+}
+
+.btn-action svg {
+    flex-shrink: 0;
+}
+
+/* View Details - icon only */
+.btn-view {
+    background: var(--color-surface-white);
+    height: 30px;
+    width: 30px;
+    padding: 0px;
+    border: 1px solid var(--color-border);
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    box-sizing: border-box;
+    color: var(--color-text-secondary); /* Sets base icon color via currentColor */
+}
+/* View Details - Eye icon button*/
+.btn-view:hover {
+    background: var(--color-surface-subtle);
+    border-color: var(--color-text-primary);
+    text-decoration: none;
+    color: var(--color-text-primary);
+}
+
+/* Cancel - icon only */
+.btn-cancel {
+    background: var(--color-surface-white);
+    color: var(--color-status-danger);
+    height: 30px;
+    width: 30px;
+    padding: 0;
+    border: 1px solid var(--color-border);
+}
+.btn-cancel:hover {
+    background: var(--color-status-danger-bg);
+    border-color: var(--color-status-danger);
+}
+
+/* Pay Now */
+.actions-wrap .btn-pay {
+    /* Critical additions for anchor-to-button conversion */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none; /* Prevents default link underline */
+    box-sizing: border-box; /* Ensures padding doesn't alter the 28px height */
+
+    /* Your original styles */
+    height: 28px;
+    padding: 0 10px;
+    background: var(--color-brand-gold);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-surface-white);
+    font-family: var(--font-body);
+    white-space: nowrap;
+    transition: background var(--transition-fast), transform var(--transition-fast);
+}
+
+.actions-wrap .btn-pay:hover {
+    text-decoration: none;
+    color: var(--color-surface-page);
+    background: var(--color-brand-gold-hover);
+    box-shadow: var(--shadow-md);
+}
+
+.actions-wrap .btn-pay:active {
+    transform: scale(0.96);
+}
+
+/* Placeholder spacer so actions stay aligned */
+.btn-spacer {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+}
+
+/* ─────────────────────────────── refund-badge ─────────────────────────────── */
+#new-customized-table .refund-badge {
+    text-decoration: none;
+    background: #6c757d;
+    color: #E5E7EB;
+    font-size: 12px;
+    padding: 1px 5px;
+    border-radius: 99px;
+    margin: 0 2px;
+    font-weight: 500;
+}
+
+/* ─────────────────────────────── Payment Proof Column ─────────────────────────────── */
+.icon-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px;
+    font-size: 14px;
+    text-decoration: none;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+
+.icon-link-icon {
+    font-size: 14px;
+    color: var(--color-link);
+    flex-shrink: 0;
+}
+
+.icon-link-name {
+    color: var(--color-link);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+.icon-link-external {
+    font-size: 14px;
+    color: var(--color-text-primary);
+    flex-shrink: 0;
+}
+
+.icon-link-inline {
+    max-width: none;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* ─────────────────────────────── Filler column ─────────────────────────────── */
+/* <col class="col-filler"> is the last column of every table that has one. It holds no
+   data: its only job is to soak up the width the real columns leave over, so a table
+   narrower than its scroll area still spans it, and to take up nothing at all once the
+   real columns already overflow.
+
+   normalizeStickyTableWidths() in tables/table-columns-ordering.js measures the slack
+   and writes the exact px width inline, plus .is-filler-collapsed when there is none.
+   The rules here are the before-JS fallback and the guarantee that a collapsed filler
+   really is 0 wide. */
+#new-customized-table colgroup > col.col-filler,
+.emails-customized-table colgroup > col.col-filler {
+    width: auto;
+    min-width: 0;
+    max-width: none;
+}
+
+#new-customized-table colgroup > col.col-filler.is-filler-collapsed,
+.emails-customized-table colgroup > col.col-filler.is-filler-collapsed {
+    width: 0 !important;
+    min-width: 0 !important;
+    max-width: 0 !important;
+}
+
+/* The filler's own cells are always empty, so they get no padding and no side borders:
+   those are what would otherwise hold the column a couple of dozen pixels wide after it
+   collapses. The bottom border stays, so the row separator runs the full table width. */
+#new-customized-table th.col-filler-cell,
+#new-customized-table td.col-filler-cell,
+.emails-customized-table th.col-filler-cell,
+.emails-customized-table td.col-filler-cell {
+    padding: 0 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    overflow: hidden !important;
+}
+
+/* ─────────────────────────────── Balance Due ( Under the table ) ─────────────────────────────── */
+.balance-bar {
+  position: sticky;
+  left: 0px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 12px 48px;
+  border-top: 1.5px solid var(--gold-border);
+  background: var(--color-surface-gold-pale);
+}
+
+.balance-label {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-brand-gold);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.balance-divider {
+  width: 1px;
+  height: 16px;
+  background: var(--gold-border);
+}
+
+.balance-amount {
+  font-family: var(--font-heading);
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .balance-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 10px 14px;
+  }
+  .balance-divider { display: none; }
+}
+
+/* ─────────────────────────────── more styles ─────────────────────────────── */
+.info {
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 8px
+}
+
+.small {
+    font-size: 12px;
+    color: #666;
+    margin-top: 8px
+}
+/* Make columns minimum size */
+.col {
+    min-width: 60px
+}
+
+tr:hover td {
+    background-color: var(--color-surface-subtle) !important;
+}
+
+
+/* ─────────────────────────────── Tooltip ─────────────────────────────── */
+.tooltip-wrap {
+    position: relative;
+    display: inline-flex
+}
+
+.tooltip-wrap .tooltip {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-surface-subtle);
+    color: var(--color-text-primary);
+    border-radius: 6px;
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+    z-index: 100;
+    border: 1px solid var(--color-border);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 5px 10px;
+    white-space: nowrap;
+    pointer-events: none;
+    box-shadow: var(--shadow-md);
+    transition: opacity var(--transition-fast);
+}
+
+.tooltip-wrap:hover .tooltip {
+    opacity: 1
+}
+
+.tooltip-wrap-below {
+    position: relative;
+    display: inline-flex
+}
+
+.tooltip-wrap-below .tooltip {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-surface-subtle);
+    color: var(--color-text-primary);
+    border-radius: 6px;
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+    z-index: 100;
+    border: 1px solid var(--color-border);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 5px 10px;
+    white-space: nowrap;
+    pointer-events: none;
+    box-shadow: var(--shadow-md);
+    transition: opacity var(--transition-fast);
+}
+
+.tooltip-wrap-below:hover .tooltip {
+    opacity: 1
+}
+
+    
+
+/* ─────────────────────────────── Sticky header ─────────────────────────────── */
+.table-wrap {
+    overflow: auto;
+}
+
+/* Sticky header: the wrap's height is the viewport minus topbar, page head,
+   toolbar and pagination bar, so only the rows scroll. */
+#rp-invitations-table .table-wrap {
+    max-height: calc(100vh - var(--layout-cu_topbar-height) - 53px - 53px - 57px);
+}
+
+
+/* All header cells stick to the top */
+#new-customized-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: var(--color-surface-inset);
+}
+
+#new-customized-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+
+/* ─────────────────────────────── For Auto fit ─────────────────────────────── */
+/* ==========================================================================
+   1. MEASUREMENT MODE
+   Applied for a few microseconds to one column's cells while measuring.
+   Its only job is to defeat the things that would clip the content and make
+   the measurement come out too small.
+   ========================================================================== */
+
+.autofit-measuring,
+.autofit-measuring * {
+    white-space: nowrap !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    max-width: none !important;
+}
+
+/* If your .resizer is position:absolute (the usual case) it contributes 0 to
+   the header width and you can ignore this. If it is in-flow, do NOT hide it,
+   or the header label will end up sitting underneath the drag handle. */
+
+
+/* ==========================================================================
+   2. NO MORE OVERLAP
+   A cell that is narrower than its content must CLIP, not spill into its
+   neighbour. table-layout:fixed alone does not do this: overflow defaults to
+   visible, which is exactly what you are seeing.
+   ========================================================================== */
+
+#new-customized-table,
+.emails-customized-table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+#new-customized-table th,
+#new-customized-table td,
+.emails-customized-table th,
+.emails-customized-table td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Cells that host floating UI must not clip it. Add .allow-overflow to the
+   <th>/<td> instead of writing style="overflow: visible" inline. */
+#new-customized-table .allow-overflow,
+#new-customized-table td.has-popover,
+#new-customized-table td.actions-cell,
+.emails-customized-table .allow-overflow,
+.emails-customized-table td.has-popover,
+.emails-customized-table td.actions-cell {
+    overflow: visible;
+}
+
+/* ...but their text still needs to clip. Wrap the visible text of such a cell
+   in <span class="cell-clip">…</span>. The popover panel stays a direct child
+   of the <td>, so it escapes the clip and still floats freely. */
+.cell-clip {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* ==========================================================================
+   3. PROGRESS COLUMN
+   The percentage was disappearing because nothing stopped the column from
+   being sized below the widget. Belt and braces: a CSS floor here, plus
+   data-width-min / data-autofit="off" on the <col>.
+   ========================================================================== */
+
+.col-progress .progress-widget {
+    min-width: 92px;
+}
+
+.col-progress .progress-widget__pct {
+    white-space: nowrap;
+}
+
+/* ─────────────────────────────── Ordered plan ─────────────────────────────── */
+/* An accepted quote's order was generated from exactly one plan's price. Without
+   a marker the plan columns sit side by side with nothing to say which of them
+   the customer is actually being held to.
+   No background tint on the cell: `tr:nth-child(even) td` sets one with
+   !important, so a tint would show on odd rows only. The badge carries its own
+   background, so it survives the striping and the row hover. */
+
+#new-customized-table td.plan-ordered .price-row-unit {
+    font-weight: 600;
+}
+#new-customized-table .plan-ordered-tag {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 999px;
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    /* Not --color-status-success (#06890e): on this pale green it reaches only
+       4.4:1, and at 10px the badge is not "large text", so it would miss the
+       4.5:1 floor. This is the next step down the same green, at 4.8:1. */
+    color: #15803d;
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1.6;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}

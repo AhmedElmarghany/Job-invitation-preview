@@ -1,0 +1,164 @@
+/* ─────────────────────────────────────────────
+   CU Pagination  —  pagination_bar.css
+   Include this file in your Django base template templates\accounting\tables\pagination-bar.html
+   ───────────────────────────────────────────── */
+
+
+/* ── Pagination bar ── */
+.cu-pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface-white);
+  flex-shrink: 0;
+  gap: 12px;
+}
+
+/* ── Left: records-per-page ── */
+.cu-page-size-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.cu-page-size-label {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  font-family: var(--font-body);
+}
+
+.cu-page-size-select {
+  height: 32px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xs);
+  background: var(--color-surface-white);
+  padding: 0 28px 0 10px;
+  font-size: 12px;
+  font-family: var(--font-body);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2371717a' viewBox='0 0 256 256'%3E%3Cpath d='M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  transition: all var(--transition-fast);
+  outline: none;
+}
+
+.cu-page-size-select:hover,
+.cu-page-size-select:focus {
+  border-color: var(--color-border-hover);
+  background-color: var(--color-surface-subtle);
+  color: var(--color-text-primary);
+}
+
+/* ── Center: showing info ── */
+.cu-page-info {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  font-family: var(--font-body);
+}
+
+.cu-page-info strong {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+/* ── Right: page nav ── */
+.cu-page-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cu-page-nav-btn {
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xs);
+  background: var(--color-surface-white);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  transition: all var(--transition-fast);
+  font-family: var(--font-body);
+  padding: 0;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.cu-page-nav-btn:hover:not(:disabled) {
+  border-color: var(--color-border-hover);
+  background: var(--color-surface-subtle);
+  color: var(--color-text-primary);
+}
+
+.cu-page-nav-btn.active {
+  background: var(--color-brand-gold);
+  border-color: var(--color-brand-gold);
+  color: #fff;
+  font-weight: 600;
+}
+
+.cu-page-nav-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.cu-page-ellipsis {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  padding: 0 4px;
+  line-height: 30px;
+  font-family: var(--font-body);
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .cu-pagination-bar {
+    flex-wrap: wrap;
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .cu-page-size-wrap {
+    order: 0;
+  }
+
+  .cu-page-info {
+    order: 1;
+    flex: 1;
+    text-align: right;
+  }
+
+  .cu-page-nav {
+    order: 2;
+    flex: 1;
+    justify-content: center;
+  }
+}
+@media (min-width: 768px) and (max-width: 991px) {
+    body.rp-sidebar-collapsed .cu-pagination-bar {
+        /* width: calc( 100% - var(--layout-cu_sidebar-collapsed-width) ); */
+        width: 100%;
+    }
+
+    body:not(.rp-sidebar-collapsed)  .cu-pagination-bar {
+        width: calc( 100% - var(--layout-cu_sidebar-width) );
+    }
+}
+/* 
+.cu-page-ellipsis {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 8px;
+} */

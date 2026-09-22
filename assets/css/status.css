@@ -1,0 +1,183 @@
+/* ─────────────────────────────── Status Pill ─────────────────────────────── */
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 8px 1px 6px;
+    border-radius: 99px;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    line-height: 1.5;
+    background-color: var(--pill-bg);
+    color: var(--pill-color);
+}
+
+/* ─────────────────────────────── Status Option ( For select2 options ) ─────────────────────────────── */
+.status-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    border-radius: 99px;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    line-height: 1.5;
+    
+    color: var(--pill-color);
+}
+
+/* ─────────────────────────────── Status Dot ─────────────────────────────── */
+.status-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background-color: var(--pill-color);
+}
+
+/* ─────────────────────────────── Status separator ─────────────────────────────── */
+.status-separator {
+    color: var(--pill-color);
+    font-weight: 300;
+    font-size: 12px;
+    line-height: 1;
+}
+
+/* ─────────────────────────────── Variants ─────────────────────────────── */
+.status-draft {
+    --pill-bg: #E5E7EB;
+    --pill-color: #374151;
+}
+
+.status-sent {
+    --pill-bg: #CFFAFE;
+    --pill-color: #0F766E;
+}
+
+.status-viewed {
+    --pill-bg: #CFFAFE;
+    --pill-color: #0F766E;
+}
+
+.status-paid {
+    --pill-bg: #dbeafebd;
+    --pill-color: #1647DB;
+}
+
+.status-partiallyPaid {
+    --pill-bg: #ECFCCB;
+    --pill-color: #4D7C0F;
+}
+
+.status-partially {
+    --pill-bg: #ECFCCB;
+    --pill-color: #4D7C0F;
+}
+
+.status-overdue {
+    --pill-bg: #ffe3e3d0;
+    --pill-color: #DC2626;
+}        
+
+.status-unpaid {
+    --pill-bg: #ffe3e3d0;
+    --pill-color: #DC2626;
+}        
+
+.status-processing {
+    --pill-bg: #FEF3C7;
+    --pill-color: #B45309;
+}
+
+.status-canceled {
+    --pill-bg: #FFB7B766;
+    --pill-color: #8A0F0F;
+}
+
+/* Quote status C. Same treatment as .status-canceled, named for its label. */
+.status-declined {
+    --pill-bg: #FFB7B766;
+    --pill-color: #8A0F0F;
+}        
+
+.status-void {
+    --pill-bg: #FFB7B766;
+    --pill-color: #8A0F0F;
+}        
+
+.status-settled {
+    --pill-bg: #dbeafebd;
+    --pill-color: #1647DB;
+}    
+
+.status-outstanding {
+    --pill-bg: #ffe3e3d0;
+    --pill-color: #DC2626;
+}        
+
+.status-partiallySettled {
+    --pill-bg: #ECFCCB;
+    --pill-color: #4D7C0F;
+}
+
+.status-refunded {
+    --pill-bg: #dbeafebd;
+    --pill-color: #1647DB;
+}
+
+.status-partiallyRefunded {
+    --pill-bg: #ECFCCB;
+    --pill-color: #4D7C0F;
+}
+
+.status-accounted {
+    --pill-bg: #F3E8FF;
+    --pill-color: #7E22CE;
+}
+
+.status-accepted {
+    --pill-bg: #dbeafebd;
+    --pill-color: #1647DB;   
+}
+
+.status-completed {
+    --pill-bg: #dbeafebd;
+    --pill-color: #1647DB;   
+}
+
+.status-delivered {
+    --pill-bg: #dbeafebd;
+    --pill-color: #1647DB;   
+}
+
+.status-inProgress {
+    --pill-bg: #FEF3C7;
+    --pill-color: #B45309;
+}
+
+.status-rejected {
+    --pill-bg: #FFB7B766;
+    --pill-color: #8A0F0F;
+}
+
+.status-edited {
+    --pill-bg: #F3E8FF;
+    --pill-color: #7E22CE;
+}
+
+.status-new {
+    --pill-bg: #CFFAFE;
+    --pill-color: #0F766E;   
+}
+
+.status-pending {
+    --pill-bg: #eee4c4b0;
+    --pill-color: #6e5c2a;
+}
+
+.status-onCredit {
+    --pill-color: #C86363;
+    color: var(--pill-color);
+}

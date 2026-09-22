@@ -1,0 +1,398 @@
+/* ============================================================
+   BLOCK: rp-sidebar
+   Fixed navigation rail. Three states:
+   expanded (desktop default) · collapsed (icon rail) · drawer (mobile)
+   ============================================================ */
+.rp-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: var(--layout-cu_sidebar-width);
+    background: var(--color-surface-inset);
+    border-right: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+    overflow: hidden;
+    transition:
+        width var(--transition-base),
+        transform var(--transition-base);
+}
+
+.rp-sidebar--collapsed {
+    width: var(--layout-cu_sidebar-collapsed-width);
+}
+
+@media (max-width: 767px) {
+    .rp-sidebar {
+        width: var(--layout-cu_sidebar-width) !important;
+        transform: translateX(-100%);
+    }
+
+    .rp-sidebar--open {
+        transform: translateX(0);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .rp-sidebar__nav-item-tooltip {
+        display: none !important;
+    }
+}
+
+/* ── Header: logo + collapse toggle ──────────────────────── */
+.rp-sidebar__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 0 16px;
+    min-height: var(--layout-cu_topbar-height);
+    border-bottom: 1px solid var(--color-border);
+    flex-shrink: 0;
+}
+
+.rp-sidebar__logo {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    line-height: 0;
+}
+
+.rp-sidebar__logo-image {
+    max-width: 104px;
+    max-height: 46px;
+    transition: max-width var(--transition-base);
+}
+
+/* Collapsed: the logo takes the toggle's slot, centred in the rail.
+   Expanding again happens from the topbar button. */
+.rp-sidebar--collapsed .rp-sidebar__header {
+    justify-content: center;
+    padding: 0 8px;
+}
+
+.rp-sidebar--collapsed .rp-sidebar__logo-image {
+    max-width: 52px;
+    max-height: 34px;
+}
+
+.rp-sidebar--collapsed .rp-sidebar__collapse-btn {
+    display: none;
+}
+
+.rp-sidebar__collapse-btn {
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xs);
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    color: var(--color-text-muted);
+    transition:
+        background var(--transition-base),
+        border-color var(--transition-base),
+        color var(--transition-base);
+}
+
+.rp-sidebar__collapse-btn:hover {
+    background: var(--color-surface-subtle);
+    border-color: var(--color-border-hover);
+    color: var(--color-text-primary);
+}
+
+.rp-sidebar__collapse-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ── Nav ─────────────────────────────────────────────────── */
+.rp-sidebar__nav {
+    flex: 1;
+    padding: 12px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.rp-sidebar__nav-section-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(113, 113, 122, 0.8);
+    padding: 10px 10px 6px;
+    white-space: nowrap;
+}
+
+.rp-sidebar--collapsed .rp-sidebar__nav-section-label {
+    display: none;
+}
+
+/* ── Nav item ────────────────────────────────────────────── */
+.rp-sidebar__nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 10px;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: var(--color-text-muted);
+    font-size: 15px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    position: relative;
+    transition:
+        background var(--transition-base),
+        color var(--transition-base),
+        padding var(--transition-base);
+}
+
+.rp-sidebar__nav-item:hover {
+    background: var(--color-surface-subtle);
+    color: var(--color-brand-navy);
+    text-decoration: none;
+}
+
+.rp-sidebar__nav-item--active {
+    background: var(--color-surface-subtle);
+}
+
+/* Gold marker on the active item */
+.rp-sidebar__nav-item--active::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 20%;
+    bottom: 20%;
+    width: 3.5px;
+    background: var(--color-brand-navy-hover);
+    border-radius: 0 999px 999px 0;
+}
+
+.rp-sidebar__nav-item--active,
+.rp-sidebar__nav-item--active .rp-sidebar__nav-item-label {
+    color: var(--color-brand-navy);
+}
+
+.rp-sidebar--collapsed .rp-sidebar__nav-item {
+    justify-content: center;
+    padding: 10px 0;
+    gap: 0;
+}
+
+
+/* Two weights are stacked on top of each other and one is always
+   hidden: outline while the item is inactive, solid once it is the
+   page you are on. */
+.rp-sidebar__nav-item-icon {
+    position: relative;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rp-sidebar__nav-item-icon svg {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    transition: opacity var(--transition-fast);
+}
+
+.rp-sidebar__nav-item-icon--filled {
+    opacity: 0;
+}
+
+.rp-sidebar__nav-item--active .rp-sidebar__nav-item-icon--outline {
+    opacity: 0;
+}
+
+.rp-sidebar__nav-item--active .rp-sidebar__nav-item-icon--filled {
+    opacity: 1;
+}
+
+
+.rp-sidebar__nav-item-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rp-sidebar--collapsed .rp-sidebar__nav-item-label {
+    display: none;
+}
+
+/* ── Count badge (Invitations) ───────────────────────────── */
+.rp-sidebar__nav-item-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 21px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 99px;
+    background: var(--color-brand-navy);
+    color: var(--color-text-inverse);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+/* Collapsed: the badge shrinks to a dot pinned on the icon */
+.rp-sidebar--collapsed .rp-sidebar__nav-item-badge {
+    position: absolute;
+    top: 5px;
+    right: -8px;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px;
+    font-size: 12px;
+    border: 1.5px solid var(--color-surface-inset);
+}
+
+/* ── Tooltip (collapsed only) ────────────────────────────────
+   position: fixed, not absolute: the rail clips its overflow and
+   the nav scrolls, so an absolute tooltip would be cut off. A
+   fixed box is laid out against the viewport and escapes both. */
+.rp-sidebar__nav-item-tooltip {
+    position: fixed;
+    left: calc(var(--layout-cu_sidebar-collapsed-width) + 8px);
+    background: var(--color-surface-subtle);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-primary);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 7px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 1200;
+    box-shadow: var(--shadow-sm);
+    transition: opacity var(--transition-fast);
+}
+
+.rp-sidebar--collapsed .rp-sidebar__nav-item:hover .rp-sidebar__nav-item-tooltip,
+.rp-sidebar--collapsed .rp-sidebar__nav-item:focus-visible .rp-sidebar__nav-item-tooltip {
+    opacity: 1;
+}
+
+/* ── Footer: professional profile + account ──────────────── */
+.rp-sidebar__footer {
+    padding: 10px 10px 14px;
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+.rp-sidebar__footer .rp-sidebar__nav-item {
+    font-size: 14px;
+}
+
+/* ── Account row ─────────────────────────────────────────── */
+.rp-sidebar__account {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 4px;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    cursor: pointer;
+    position: relative;
+    transition: background var(--transition-base);
+}
+
+.rp-sidebar__account:hover {
+    background: var(--color-surface-subtle);
+    text-decoration: none;
+}
+
+.rp-sidebar__account--active {
+    background: var(--color-surface-subtle);
+}
+
+.rp-sidebar__account--active::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 20%;
+    bottom: 20%;
+    width: 3.5px;
+    background: var(--color-brand-gold);
+    border-radius: 0 999px 999px 0;
+}
+
+.rp-sidebar__account-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    flex-shrink: 0;
+    background: var(--color-surface-subtle);
+    border: 1px solid var(--color-border);
+}
+
+.rp-sidebar__account-text {
+    min-width: 0;
+    line-height: 1.25;
+}
+
+.rp-sidebar__account-name {
+    display: block;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rp-sidebar__account-role {
+    display: block;
+    font-size: 11.5px;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rp-sidebar--collapsed .rp-sidebar__account {
+    justify-content: center;
+    padding: 8px 0;
+    gap: 0;
+}
+
+.rp-sidebar--collapsed .rp-sidebar__account-text {
+    display: none;
+}
+
+/* ── Mobile scrim ────────────────────────────────────────── */
+.rp-sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(11, 38, 62, 0.45);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    z-index: 999;
+}
+
+.rp-sidebar-overlay--visible {
+    display: block;
+}

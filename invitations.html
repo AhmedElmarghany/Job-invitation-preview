@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Job Invitations · Resource Portal</title>
+  <meta name="description" content="Redesign preview of the AGATO resource portal — Job Invitations.">
+  <link rel="icon" href="assets/img/logo.png">
+
+  <link rel="stylesheet" href="assets/css/variables.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/sidebar.css">
+  <link rel="stylesheet" href="assets/css/topbar.css">
+  <link rel="stylesheet" href="assets/css/toolbar.css">
+  <link rel="stylesheet" href="assets/css/table.css">
+  <link rel="stylesheet" href="assets/css/status.css">
+  <link rel="stylesheet" href="assets/css/pagination.css">
+  <link rel="stylesheet" href="assets/css/columns-modal.css">
+  <link rel="stylesheet" href="assets/css/logout-modal.css">
+  <link rel="stylesheet" href="assets/css/invitations.css">
+</head>
+<body>
+
+  <!-- Sidebar + topbar + modals are injected here by assets/js/layout.js -->
+  <div id="rp-layout" data-page="invitations" data-title="Job Invitations"></div>
+
+  <main class="rp-page">
+
+    <section id="rp-invitations-table">
+
+      <!-- Status filter -->
+      <div class="rp-page-head" style="display: none;">
+        <div class="rp-segmented" id="rpFilters" role="group" aria-label="Filter invitations by status"></div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="dashboard_toolbar-row">
+        <div class="dashboard_toolbar-search-wrap">
+          <span data-rp-icon="search"></span>
+          <input
+            class="dashboard_toolbar-search-input"
+            id="search-input"
+            type="text"
+            placeholder="Search by Job Id, Project Name or Service Type"
+            aria-label="Search invitations"
+            autocomplete="off">
+          <kbd class="rp-kbd">/</kbd>
+          <button class="rp-clear-search" id="rpClearSearch" type="button" aria-label="Clear search">
+            <span data-rp-icon="close"></span>
+          </button>
+        </div>
+
+        <div class="dashboard_toolbar-divider"></div>
+
+        <button class="dashboard_toolbar-btn" id="rpColumnsBtn" type="button" title="Choose columns">
+          <span data-rp-icon="columns"></span>
+          <span class="text-label">Columns</span>
+        </button>
+
+        <button class="dashboard_toolbar-btn" id="rpResetBtn" type="button" title="Reset the demo data" style="display: none;">
+          <span data-rp-icon="reset"></span>
+          <span class="text-label">Reset demo</span>
+        </button>
+      </div>
+
+      <!-- Table -->
+      <div class="wrapper">
+        <div class="table-wrap" id="scrollContainer">
+          <table id="new-customized-table" class="table" data-table="rp-job-invitations">
+            <colgroup></colgroup>
+            <thead><tr></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="cu-pagination-bar" id="rpPagination"></div>
+      </div>
+
+    </section>
+  </main>
+
+  <script src="assets/js/icons.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script src="assets/js/columns-modal.js"></script>
+  <script src="assets/js/invitations.js"></script>
+</body>
+</html>
