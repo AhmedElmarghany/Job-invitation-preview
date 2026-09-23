@@ -46,6 +46,7 @@
 #new-customized-table tbody tr.rp-row.is-expanded > td {
     background-color: var(--color-surface-subtle) !important;
     border-bottom-color: transparent;
+    border-bottom-width: 0;
 }
 
 /* Marks which row the open panel belongs to — same accent the
@@ -311,7 +312,7 @@ tr.rp-subrow:hover {
    ============================================================ */
 #new-customized-table tbody tr.rp-subrow > td {
     padding: 0 !important;
-    background: var(--color-surface-inset) !important;
+    background: var(--color-surface-subtle) !important;
     border-bottom: 1px solid var(--color-border);
     /* table.css clips and nowraps every cell; the panel must not be */
     white-space: normal;
@@ -329,11 +330,15 @@ tr.rp-subrow.is-hidden {
    width keeps Accept in view without scrolling to find it.
    --rp-detail-w is the scroll container's clientWidth, written by JS
    so the scrollbar is excluded. */
+/* The inset navy bar continues the one on the open row's ID cell, so
+   row and panel read as one block. On .rp-detail, not the <td>, so it
+   stays pinned while the table scrolls sideways. */
 .rp-detail {
     position: sticky;
     left: 0;
     width: var(--rp-detail-w, 100%);
     padding: 18px 16px 24px;
+    box-shadow: inset 3px 0 0 var(--color-brand-navy);
     animation: rp-detail-in 0.2s ease;
 }
 
@@ -441,10 +446,6 @@ tr.rp-subrow.is-hidden {
     border-radius: 50%;
     background: currentColor;
     opacity: 0.5;
-    flex: 0 0 auto;
-}
-
-.rp-panel__tags {
     flex: 0 0 auto;
 }
 
@@ -604,29 +605,83 @@ tr.rp-subrow.is-hidden {
     color: var(--color-brand-navy);
 }
 
-/* ── Files: one compact row each ─────────────────────────── */
+/* Title on the left, the section's one bulk action on the right */
+.rp-sec__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.rp-sec__head .rp-sec__title {
+    margin: 0;
+}
+
+.rp-sec__action {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 26px;
+    padding: 0 9px;
+    border: none;
+    border-radius: var(--radius-xs);
+    background: var(--color-surface-white);
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--color-brand-navy);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.rp-sec__action svg {
+    width: 13px;
+    height: 13px;
+}
+
+.rp-sec__action:hover:not(:disabled) {
+    background: var(--color-surface-subtle);
+    border-color: var(--color-border-hover);
+}
+
+.rp-sec__action:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+/* ── Files: one full-width row each, so the ends line up ─── */
 .rp-files {
     list-style: none;
     margin: 0;
     padding: 0;
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 6px;
 }
 
 .rp-file {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: 8px;
-    max-width: 100%;
+    width: 100%;
     padding: 5px 6px 5px 10px;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-full);
     background: var(--color-surface-inset);
+    font-family: var(--font-body);
+    text-align: left;
+    color: inherit;
     transition: border-color var(--transition-fast), background var(--transition-fast);
 }
 
-.rp-file:hover {
+button.rp-file {
+    cursor: pointer;
+}
+
+button.rp-file:hover {
     border-color: var(--color-border-hover);
     background: var(--color-surface-subtle);
 }
@@ -635,10 +690,11 @@ tr.rp-subrow.is-hidden {
     width: 16px;
     height: 16px;
     flex: 0 0 auto;
-    color: var(--color-brand-navy);
+    color: var(--color-text-primary);
 }
 
 .rp-file__name {
+    flex: 1 1 auto;
     min-width: 0;
     font-size: 14px;
     font-weight: 400;
@@ -648,17 +704,15 @@ tr.rp-subrow.is-hidden {
     text-overflow: ellipsis;
 }
 
-.rp-file__size,
-.rp-file__lockhint {
+/* Fixed width, right-aligned, so sizes line up down the list */
+.rp-file__size {
     flex: 0 0 auto;
+    min-width: 50px;
+    text-align: right;
     font-size: 13px;
+    font-variant-numeric: tabular-nums;
     color: var(--color-text-secondary);
     white-space: nowrap;
-}
-
-.rp-file__lockhint {
-    padding-right: 6px;
-    font-style: italic;
 }
 
 /* Gold as the secondary accent: the one tag on the row. */
@@ -682,12 +736,9 @@ tr.rp-subrow.is-hidden {
     justify-content: center;
     width: 26px;
     height: 26px;
-    padding: 0;
-    border: 0;
     border-radius: var(--radius-full);
     background: var(--color-surface-white);
     color: var(--color-text-secondary);
-    cursor: pointer;
     transition: color var(--transition-fast), background var(--transition-fast);
 }
 
@@ -696,7 +747,8 @@ tr.rp-subrow.is-hidden {
     height: 14px;
 }
 
-.rp-file__dl:hover {
+button.rp-file:hover .rp-file__dl,
+button.rp-file:focus-visible .rp-file__dl {
     background: var(--color-brand-navy);
     color: var(--color-surface-white);
 }
@@ -790,22 +842,24 @@ tr.rp-subrow.is-hidden {
     color: var(--color-text-secondary);
 }
 
+/* Its own line inside .rp-offer__top: price, then this, then the countdown */
 .rp-offer__meta {
+    flex: 1 1 100%;
     display: flex;
     align-items: center;
     flex-wrap: wrap;
     gap: 6px;
-    margin: 6px 0 0;
+    margin: 4px 0 0;
     font-size: 12px;
     color: var(--color-text-secondary);
 }
 
-/* ── Countdown, inline with the label ────────────────────── */
+/* ── Countdown, right-aligned under the meta line ────────── */
 .rp-countdown {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    margin-left: auto;
+    margin: 8px 0 0 auto;
     padding: 2px 9px;
     border-radius: var(--radius-full);
     background: var(--color-surface-subtle);

@@ -166,61 +166,61 @@ body.rp-sidebar-collapsed .rp-topbar__expand-btn {
 .rp-availability {
     display: inline-flex;
     align-items: center;
-    gap: 7px;
-    height: 38px;
-    padding: 0 12px 0 10px;
+    gap: 6px;
+    height: 32px;
+    padding: 0 9px 0 11px;
     border-radius: 99px;
     border: 1px solid var(--av-border);
     background: var(--av-bg);
     color: var(--av-color);
     font-family: var(--font-body);
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.1px;
     cursor: pointer;
     white-space: nowrap;
     transition:
         background var(--transition-fast),
         border-color var(--transition-fast),
-        box-shadow var(--transition-fast);
+        box-shadow var(--transition-fast),
+        transform var(--transition-fast);
 }
 
+/* Deepen the tint instead of a grey drop shadow, which muddied the colour */
 .rp-availability:hover {
-    box-shadow: var(--shadow-sm);
-    border-color: var(--av-color);
+    background: var(--av-bg-hover);
+    border-color: var(--av-dot);
+}
+
+.rp-availability:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--av-ring);
 }
 
 .rp-availability:active {
-    transform: scale(0.98);
+    transform: scale(0.97);
 }
 
-/* The dot is the state; a soft halo makes "Available" read as live */
+/* A status light: solid core plus a soft ring in the same colour */
 .rp-availability__dot {
     position: relative;
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
-    background: var(--av-color);
+    background: var(--av-dot);
     flex-shrink: 0;
-}
-
-.rp-availability--AV .rp-availability__dot::after {
-    content: "";
-    position: absolute;
-    inset: -3px;
-    border-radius: 50%;
-    border: 1px solid var(--av-color);
-    opacity: 0.45;
-    animation: rp-av-pulse 2s ease-out infinite;
 }
 
 @keyframes rp-av-pulse {
     0% {
-        transform: scale(0.7);
-        opacity: 0.6;
+        transform: scale(0.6);
+        opacity: 0.35;
     }
 
+    70%,
     100% {
-        transform: scale(1.5);
+        transform: scale(1.9);
         opacity: 0;
     }
 }
@@ -232,31 +232,43 @@ body.rp-sidebar-collapsed .rp-topbar__expand-btn {
 }
 
 .rp-availability__caret {
-    width: 13px;
-    height: 13px;
-    opacity: 0.7;
+    width: 12px;
+    height: 12px;
+    margin-left: -1px;
+    opacity: 0.6;
 }
 
-/* State variants */
+/* State variants — --av-color is the text, --av-dot the light */
 .rp-availability--AV {
     --av-color: #0f766e;
-    --av-bg: #ecfdf5;
-    --av-border: #b6e6d8;
+    --av-dot: #10a37f;
+    --av-bg: #effbf6;
+    --av-bg-hover: #e1f6ec;
+    --av-border: #c3eadb;
+    --av-ring: rgba(16, 163, 127, 0.18);
 }
 
 .rp-availability--BS {
     --av-color: #b45309;
-    --av-bg: #fffbeb;
-    --av-border: #f2ddad;
+    --av-dot: #e08a1e;
+    --av-bg: #fffaeb;
+    --av-bg-hover: #fef1d2;
+    --av-border: #f3dfae;
+    --av-ring: rgba(224, 138, 30, 0.2);
 }
 
+/* Darker text than the dot so the label keeps its contrast on grey */
 .rp-availability--NA {
-    --av-color: #6b7280;
+    --av-color: #52525b;
+    --av-dot: #a1a1aa;
     --av-bg: #f4f4f5;
-    --av-border: #e0e0e4;
+    --av-bg-hover: #ebebed;
+    --av-border: #e2e2e6;
+    --av-ring: rgba(161, 161, 170, 0.25);
 }
 
-/* Below 900px the label goes; the dot alone still reads as state */
+/* Below 900px the label goes; the dot alone still reads as state,
+   and the button squares up to match the icon buttons beside it. */
 @media (max-width: 900px) {
     .rp-availability__label,
     .rp-availability__caret {
@@ -265,9 +277,17 @@ body.rp-sidebar-collapsed .rp-topbar__expand-btn {
 
     .rp-availability {
         width: 38px;
+        height: 38px;
         padding: 0;
         justify-content: center;
         border-radius: var(--radius-xs);
+    }
+}
+
+@media (max-width: 600px) {
+    .rp-availability {
+        width: 34px;
+        height: 34px;
     }
 }
 

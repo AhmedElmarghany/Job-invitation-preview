@@ -313,24 +313,16 @@
         if (row.status === "new") {
             return (
                 '<div class="rp-row-actions">' +
-                '<button class="rp-btn rp-btn--accept" type="button" data-action="accept">' +
-                icon("check") +
-                "Accept</button>" +
-                '<button class="rp-btn rp-btn--decline" type="button" data-action="decline">' +
-                icon("close") +
-                "Decline</button></div>"
+                '<button class="rp-btn rp-btn--accept" type="button" data-action="accept">Accept</button>' +
+                '<button class="rp-btn rp-btn--decline" type="button" data-action="decline">Decline</button></div>'
             );
         }
 
         if (row.status === "bid_requested") {
             return (
                 '<div class="rp-row-actions">' +
-                '<button class="rp-btn rp-btn--bid" type="button" data-action="open-bid">' +
-                icon("bid") +
-                "Place bid</button>" +
-                '<button class="rp-btn rp-btn--decline" type="button" data-action="decline">' +
-                icon("close") +
-                "Decline</button></div>"
+                '<button class="rp-btn rp-btn--bid" type="button" data-action="open-bid">Place bid</button>' +
+                '<button class="rp-btn rp-btn--decline" type="button" data-action="decline">Decline</button></div>'
             );
         }
 
@@ -376,7 +368,7 @@
         return (
             '<header class="rp-panel__head">' +
             '<span class="rp-panel__mark">' +
-            icon(type.icon) +
+            icon(type.icon, null, { variant: "active" }) +
             "</span>" +
             '<div class="rp-panel__titles">' +
             '<h3 class="rp-panel__title">' +
@@ -389,9 +381,6 @@
             '<span class="rp-dot"></span>' +
             escapeHtml(row.specialty) +
             "</p></div>" +
-            '<span class="rp-panel__tags">' +
-            statusPill(row) +
-            "</span>" +
             "</header>"
         );
     }
@@ -450,41 +439,66 @@
     function filesSection(row) {
         if (!row.files || !row.files.length) return "";
 
+        var downloadable = row.files.filter(function (file) {
+            return !file.locked;
+        }).length;
+
         var items = row.files
             .map(function (file) {
-                return (
-                    '<li class="rp-file' +
-                    (file.locked ? " rp-file--locked" : "") +
-                    '">' +
-                    icon(file.locked ? "lock" : "file") +
+                var inner =
+                    icon("file") +
                     '<span class="rp-file__name">' +
                     escapeHtml(file.name) +
-                    "</span>" +
-                    '<span class="rp-file__size">' +
-                    file.size +
                     "</span>" +
                     '<span class="rp-file__tag">' +
                     file.tag +
                     "</span>" +
-                    (file.locked
-                        ? '<span class="rp-file__lockhint">unlocks on assignment</span>'
-                        : '<button class="rp-file__dl" type="button" data-demo="File download" aria-label="Download ' +
-                          escapeHtml(file.name) +
-                          '">' +
-                          icon("download") +
-                          "</button>") +
-                    "</li>"
+                    '<span class="rp-file__size">' +
+                    file.size +
+                    "</span>";
+
+                /* The whole row is the download control, so the icon at
+                   its end is a visual cue, not a second nested button. */
+                if (file.locked) {
+                    return (
+                        '<li><div class="rp-file rp-file--locked" title="Unlocks once the job is assigned to you">' +
+                        inner +
+                        '<span class="rp-file__dl" aria-label="Locked until assignment">' +
+                        icon("lock") +
+                        "</span></div></li>"
+                    );
+                }
+
+                return (
+                    '<li><button class="rp-file" type="button" data-demo="File download" aria-label="Download ' +
+                    escapeHtml(file.name) +
+                    ", " +
+                    file.tag +
+                    ", " +
+                    file.size +
+                    '">' +
+                    inner +
+                    '<span class="rp-file__dl">' +
+                    icon("download") +
+                    "</span></button></li>"
                 );
             })
             .join("");
 
         return (
             '<section class="rp-sec">' +
+            '<div class="rp-sec__head">' +
             '<h4 class="rp-sec__title">' +
             icon("folder") +
             "Files<span class=\"rp-sec__count\">" +
             row.files.length +
             "</span></h4>" +
+            '<button class="rp-sec__action" type="button" data-demo="Download all"' +
+            (downloadable ? "" : " disabled") +
+            ">" +
+            icon("download") +
+            "Download all</button>" +
+            "</div>" +
             '<ul class="rp-files">' +
             items +
             "</ul></section>"
@@ -576,17 +590,15 @@
             '<div class="rp-offer">' +
             '<div class="rp-offer__top">' +
             head +
-            countdownMarkup(row) +
-            "</div>" +
             '<p class="rp-offer__meta">' +
             escapeHtml(row.rate) +
             '<span class="rp-dot"></span>' +
             number(row.count.value) +
             " " +
             row.count.unit +
-            '<span class="rp-dot"></span>due ' +
-            fmtDate(row.deadline) +
             "</p>" +
+            countdownMarkup(row) +
+            "</div>" +
             paymentAlert(row) +
             offerActions(row) +
             "</div>"
