@@ -1,14 +1,11 @@
 /* ============================================================
    BLOCK: rp-topbar
-   Fixed bar across the content area. Its left edge tracks the
-   sidebar width.
+   Scrolls away with the page content instead of staying pinned,
+   so the table below gets the full viewport height to work with.
    ============================================================ */
 .rp-topbar {
-    position: fixed;
-    top: 0;
-    left: var(--layout-cu_sidebar-width);
-    right: 0;
     height: var(--layout-cu_topbar-height);
+    flex-shrink: 0;
     background: var(--color-surface-cu_topbar);
     border-bottom: 1px solid var(--color-border);
     display: flex;
@@ -17,16 +14,10 @@
     gap: 12px;
     padding: 0 18px;
     z-index: 900;
-    transition: left var(--transition-base);
-}
-
-body.rp-sidebar-collapsed .rp-topbar {
-    left: var(--layout-cu_sidebar-collapsed-width);
 }
 
 @media (max-width: 767px) {
     .rp-topbar {
-        left: 0 !important;
         padding: 0 12px;
     }
 }

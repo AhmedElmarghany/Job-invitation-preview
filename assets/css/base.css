@@ -1,13 +1,12 @@
 /* ============================================================
    BASE — app shell for the Resource Portal preview
-   Sidebar is fixed on the left, topbar fixed on top; the body
-   is padded out of their way so page content never sits under
-   either one.
+   Sidebar is fixed on the left; the body is padded out of its
+   way so page content never sits under it. The topbar scrolls
+   with the page, so it needs no such offset.
    ============================================================ */
 
 body {
     padding-left: var(--layout-cu_sidebar-width);
-    padding-top: var(--layout-cu_topbar-height);
     transition: padding-left var(--transition-base);
 }
 

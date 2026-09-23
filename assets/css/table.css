@@ -912,23 +912,14 @@ tr:hover td {
 
     
 
-/* ─────────────────────────────── Sticky header ─────────────────────────────── */
+/* ─────────────────────────────── Table scroll ─────────────────────────────── */
+/* Horizontal only — the page itself scrolls vertically now, so the
+   topbar, toolbar and pagination bar scroll away with the table. */
 .table-wrap {
-    overflow: auto;
+    overflow-x: auto;
 }
 
-/* Sticky header: the wrap's height is the viewport minus topbar, page head,
-   toolbar and pagination bar, so only the rows scroll. */
-#rp-invitations-table .table-wrap {
-    max-height: calc(100vh - var(--layout-cu_topbar-height) - 53px - 53px - 57px);
-}
-
-
-/* All header cells stick to the top */
 #new-customized-table thead th {
-  position: sticky;
-  top: 0;
-  z-index: 10;
   background-color: var(--color-surface-inset);
 }
 

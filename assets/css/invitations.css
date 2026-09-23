@@ -7,12 +7,13 @@
 /* min-width: 0 all the way down. Without it the automatic minimum
    size of a column-flex item lets the scroll container grow to the
    table's full width, and the table never gets its own scrollbar —
-   it just overflows the page instead. */
+   it just overflows the page instead. min-height is left at auto
+   (not 0) so the table grows with its content and the page scrolls
+   instead of clipping the table to the viewport. */
 #rp-invitations-table {
     display: flex;
     flex-direction: column;
     flex: 1;
-    min-height: 0;
     min-width: 0;
 }
 
@@ -20,7 +21,6 @@
     display: flex;
     flex-direction: column;
     flex: 1;
-    min-height: 0;
     min-width: 0;
     width: 100%;
     background: var(--color-surface-white);
@@ -333,7 +333,7 @@ tr.rp-subrow.is-hidden {
     position: sticky;
     left: 0;
     width: var(--rp-detail-w, 100%);
-    padding: 14px 16px 18px;
+    padding: 18px 16px 24px;
     animation: rp-detail-in 0.2s ease;
 }
 

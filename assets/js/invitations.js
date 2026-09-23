@@ -761,20 +761,9 @@
         hideIdleNoteToggles(els.tbody);
     }
 
-    /* The rows scroll, the header and pagination bar do not. Measured
-       rather than hard-coded so the banner, toolbar or filter row can
-       change height without stranding the pagination below the fold. */
+    /* The table grows with its content and the page scrolls, so this
+       only keeps the detail-row width in sync — no height is imposed. */
     function syncTableHeight() {
-        /* A tab rendered while hidden reports 0 for everything; leave the
-           last good values alone and let the ResizeObserver catch up. */
-        if (!global.innerHeight) return;
-
-        /* Document-relative, so a page that happens to be scrolled does
-           not feed back into the height it is given. */
-        var top = els.scroll.getBoundingClientRect().top + (global.scrollY || 0);
-        var footer = els.pagination.offsetHeight || 57;
-        els.scroll.style.maxHeight = Math.max(240, global.innerHeight - top - footer - 10) + "px";
-
         syncDetailWidth();
 
         /* Measured again next frame: whether a scrollbar appears at all
