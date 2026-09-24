@@ -27,10 +27,9 @@
 
     var FILTERS = [
         { key: "all", label: "All" },
-        { key: "action", label: "Needs action", match: ["new", "bid_requested"] },
-        { key: "submitted", label: "Bid submitted", match: ["bid_submitted"] },
-        { key: "accepted", label: "Accepted", match: ["accepted"] },
-        { key: "closed", label: "Closed", match: ["declined", "expired"] }
+        { key: "new_invite", label: "New invite", match: ["new_invite"] },
+        { key: "new_bid", label: "New Bid", match: ["new_bid"] },
+        { key: "bid_sent", label: "Bid Sent", match: ["bid_sent"] }
     ];
 
     var state = {
@@ -109,8 +108,9 @@
 
     /* ── Derived bits ────────────────────────────────────── */
 
+    /* Still waiting on the resource — Bid Sent is waiting on the PM instead. */
     function isOpen(row) {
-        return row.status === "new" || row.status === "bid_requested";
+        return row.status === "new_invite" || row.status === "new_bid";
     }
 
     function timeLeftChip(date) {
@@ -310,7 +310,7 @@
     }
 
     function rowActionsMarkup(row) {
-        if (row.status === "new") {
+        if (row.status === "new_invite") {
             return (
                 '<div class="rp-row-actions">' +
                 '<button class="rp-btn rp-btn--accept" type="button" data-action="accept">Accept</button>' +
@@ -318,7 +318,7 @@
             );
         }
 
-        if (row.status === "bid_requested") {
+        if (row.status === "new_bid") {
             return (
                 '<div class="rp-row-actions">' +
                 '<button class="rp-btn rp-btn--bid" type="button" data-action="open-bid">Place bid</button>' +
@@ -326,22 +326,7 @@
             );
         }
 
-        if (row.status === "bid_submitted") {
-            return (
-                '<div class="rp-row-actions"><span class="rp-row-actions__done">Waiting on the PM</span></div>'
-            );
-        }
-
-        if (row.status === "accepted") {
-            return (
-                '<div class="rp-row-actions">' +
-                '<button class="rp-btn" type="button" data-demo="The Jobs page">' +
-                icon("view") +
-                "Open job</button></div>"
-            );
-        }
-
-        return '<div class="rp-row-actions"><span class="rp-row-actions__done">No action left</span></div>';
+        return '<div class="rp-row-actions"><span class="rp-row-actions__done">Waiting on the PM</span></div>';
     }
 
     /* ── Expanded panel ──────────────────────────────────────
@@ -512,7 +497,7 @@
             '<section class="rp-sec">' +
             '<h4 class="rp-sec__title">' +
             icon("list-todo") +
-            "Instructions</h4>" +
+            "Comments From Customer</h4>" +
             '<p class="rp-note is-clamped" data-note>' +
             escapeHtml(row.notes) +
             "</p>" +
@@ -577,7 +562,7 @@
                   money(row.bid.suggestedMax) +
                   "</p>"
                 : '<span class="rp-offer__label">' +
-                  (row.status === "bid_submitted" ? "Your bid" : "Your payout") +
+                  (row.status === "bid_sent" ? "Your bid" : "Your payout") +
                   "</span>" +
                   '<p class="rp-offer__amount">' +
                   row.currencyCode +
@@ -606,7 +591,7 @@
     }
 
     function offerActions(row) {
-        if (row.status === "new") {
+        if (row.status === "new_invite") {
             var blocked = !!row.paymentMethodMissing;
             return (
                 '<div class="rp-offer__actions">' +
@@ -620,7 +605,7 @@
             );
         }
 
-        if (row.status === "bid_requested") {
+        if (row.status === "new_bid") {
             return (
                 '<form class="rp-bid" data-bid-form>' +
                 '<span class="rp-bid__field">' +
@@ -639,40 +624,10 @@
             );
         }
 
-        if (row.status === "bid_submitted") {
-            return (
-                '<p class="rp-resolved">' +
-                icon("hourglass") +
-                "<span>Submitted — the project manager is comparing bids.</span></p>"
-            );
-        }
-
-        if (row.status === "accepted") {
-            return (
-                '<div class="rp-offer__actions">' +
-                '<button class="rp-cta rp-cta--primary" type="button" data-demo="The Jobs page">' +
-                icon("view") +
-                "Open in Jobs</button></div>" +
-                '<p class="rp-resolved rp-resolved--ok">' +
-                icon("success") +
-                "<span>Accepted — files are unlocked on your Jobs page.</span></p>"
-            );
-        }
-
-        if (row.status === "declined") {
-            return (
-                '<p class="rp-resolved rp-resolved--bad">' +
-                icon("error") +
-                "<span>" +
-                escapeHtml(row.declineReason || "You declined this invitation.") +
-                "</span></p>"
-            );
-        }
-
         return (
             '<p class="rp-resolved">' +
-            icon("alert") +
-            "<span>Expired — it went to another resource.</span></p>"
+            icon("hourglass") +
+            "<span>Submitted — the project manager is comparing bids.</span></p>"
         );
     }
 
@@ -1032,26 +987,32 @@
 
     /* ── Actions ─────────────────────────────────────────── */
 
+    /* There is no accepted or declined status here, the same way the real
+       table has none: the invitation is deactivated and drops off the list. */
+    function dropRow(row) {
+        var at = rows.indexOf(row);
+        if (at > -1) rows.splice(at, 1);
+        delete state.expanded[row.id];
+        refreshAfterAction(null);
+    }
+
     function accept(row) {
         if (row.paymentMethodMissing) {
             RP.toast("Add a payment method before accepting this invitation.", "danger");
             return;
         }
 
-        row.status = "accepted";
         RP.toast(row.id + " accepted — it is now on your Jobs page.", "success");
-        refreshAfterAction(row);
+        dropRow(row);
     }
 
     function decline(row) {
-        row.status = "declined";
-        row.declineReason = "Declined from the invitations list.";
         RP.toast(row.id + " declined.", "danger");
-        refreshAfterAction(row);
+        dropRow(row);
     }
 
     function submitBid(row, amount) {
-        row.status = "bid_submitted";
+        row.status = "bid_sent";
         row.amount = amount;
         row.usd = Math.round(amount * 0.6073 * 100) / 100;
         RP.toast("Bid of " + row.currencyCode + " " + money(amount) + " submitted for " + row.id + ".", "success");
@@ -1062,7 +1023,7 @@
         RP.USER.invitationCount = rows.filter(isOpen).length;
         updateSidebarBadge();
         render();
-        if (state.expanded[row.id]) toggleRow(row.id, true);
+        if (row && state.expanded[row.id]) toggleRow(row.id, true);
     }
 
     function updateSidebarBadge() {

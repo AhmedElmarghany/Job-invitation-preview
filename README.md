@@ -109,6 +109,17 @@ The sidebar and topbar need no edits — they are generated from `NAV` and `RP.U
   and `.column-toggle`, so the existing `customize_columns_modal.js` works unchanged.
 - The table keeps `id="new-customized-table"`, `.sticky-col`, `.col-*`, `.col-filler` and the
   `.resizer` handles, so `tables/table-columns-ordering.js` should attach with no changes.
+- Row statuses are the three the real table can show, in `RP.STATUS` (`assets/js/data.js`):
+
+  | Status | Comes from | Pill (`status.css`) |
+  | --- | --- | --- |
+  | New invite | `show_job_status_using_bid_or_invite`, job status `RQ` | `.status-new` — teal |
+  | New Bid | `bid_status_badge`, not quoted yet | `.status-processing` — amber |
+  | Bid Sent | `bid_status_badge`, `is_quoted` | `.status-edited` — purple |
+
+  Teal, amber and purple sit ~100°+ apart on the hue wheel, so the three tell apart without
+  reading them. There is no accepted, declined or expired state: the real list drops the row once
+  the invitation is deactivated, and the preview does the same.
 - The availability dropdown is `templates/partials/_work_status_modal.html` redesigned: same three
   statuses (`Translator.WORK_STATUS_OPTIONS`), same descriptions, the optional note, Save / Cancel.
   It keeps `#ChangeWorkStatusPost`, `name="work_status"`, `name="work_status_description"`,
