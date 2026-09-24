@@ -1,0 +1,859 @@
+/* ============================================================
+   BLOCK: ws-dropdown
+   partials/_work_status_modal.html as a dropdown under the pill:
+   status, period, working days, working hours, note, Save.
+   --av-* (the status colours) are declared in topbar.css, next to
+   the pill variants, so pill, tiles and preview always match.
+   ============================================================ */
+.ws-dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    z-index: 1100;
+    width: 440px;
+    max-width: calc(100vw - 24px);
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-white);
+    box-shadow: var(--shadow-lg);
+    font-family: var(--font-body);
+    animation: rp-dropdown-enter 0.18s ease;
+}
+
+.ws-dropdown[hidden] {
+    display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ws-dropdown {
+        animation: none;
+    }
+}
+
+/* A phone hangs the panel off the whole topbar, not the square pill */
+@media (max-width: 600px) {
+    .rp-topbar {
+        position: relative;
+    }
+
+    .rp-av {
+        position: static;
+    }
+
+    .ws-dropdown {
+        top: calc(100% + 6px);
+        left: 12px;
+        right: 12px;
+        width: auto;
+        max-width: none;
+    }
+}
+
+/* Only the form scrolls; the summary and Save stay in reach */
+.ws-form {
+    display: flex;
+    flex-direction: column;
+    max-height: var(--ws-max-h, calc(100vh - 90px));
+}
+
+.ws-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+/* ── Head ────────────────────────────────────────────────── */
+.ws-dropdown-head {
+    padding: 16px 18px 0;
+}
+
+.ws-dropdown-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--color-text-primary);
+}
+
+.ws-dropdown-hint {
+    margin: 4px 0 0;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--color-text-secondary);
+}
+
+/* ── Sections ────────────────────────────────────────────── */
+.ws-dropdown-body {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 16px 18px 18px;
+}
+
+.ws-section {
+    min-width: 0;
+}
+
+.ws-section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-height: 24px;
+    margin-bottom: 8px;
+}
+
+.ws-section-title {
+    font-size: 12.5px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--color-text-primary);
+}
+
+.ws-section-aside {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+/* ── Status: three tinted tiles ──────────────────────────── */
+.ws-options {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+}
+
+.ws-option {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 42px;
+    margin: 0;
+    padding: 6px 8px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-white);
+    text-align: center;
+    cursor: pointer;
+    transition:
+        background var(--transition-fast),
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast);
+}
+
+.ws-option:hover {
+    border-color: #d8d6cc;
+    background: var(--color-surface-inset);
+}
+
+.ws-option input[type="radio"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* The pill's status light; its ring only appears once picked */
+.ws-option-dot {
+    flex: 0 0 auto;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--av-dot);
+    transition: box-shadow var(--transition-fast);
+}
+
+.ws-option-name {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.25;
+    color: var(--color-text-secondary);
+    transition: color var(--transition-fast);
+}
+
+.ws-option:has(input:checked) {
+    border-color: var(--av-dot);
+    background: var(--av-bg);
+}
+
+.ws-option:has(input:checked):hover {
+    background: var(--av-bg-hover);
+}
+
+.ws-option:has(input:checked) .ws-option-name {
+    font-weight: 600;
+    color: var(--av-color);
+}
+
+.ws-option:has(input:checked) .ws-option-dot {
+    box-shadow: 0 0 0 3px var(--av-ring);
+}
+
+.ws-option:has(input:focus-visible) {
+    border-color: var(--av-dot);
+    box-shadow: 0 0 0 3px var(--av-ring);
+}
+
+/* A step darker than --color-text-secondary, which drops under 4.5:1 on the tints */
+.ws-status-desc {
+    margin: 8px 2px 0;
+    font-size: 12.5px;
+    line-height: 1.45;
+    color: #65656e;
+}
+
+/* ── Period ──────────────────────────────────────────────── */
+/* The page's segmented filter (.rp-segmented), full width */
+.ws-presets {
+    display: flex;
+    gap: 2px;
+    padding: 3px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-inset);
+}
+
+.ws-preset {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 28px;
+    padding: 0 6px;
+    border: 0;
+    border-radius: var(--radius-xs);
+    background: transparent;
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+        background var(--transition-fast),
+        color var(--transition-fast),
+        box-shadow var(--transition-fast);
+}
+
+.ws-preset:hover {
+    background: var(--color-surface-subtle);
+    color: var(--color-text-primary);
+}
+
+.ws-preset[aria-pressed="true"] {
+    background: var(--color-surface-white);
+    color: var(--color-text-primary);
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+}
+
+.ws-preset:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-navy);
+}
+
+.ws-range {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 16px minmax(0, 1fr);
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.ws-range-arrow {
+    display: flex;
+    justify-content: center;
+    color: var(--color-text-secondary);
+}
+
+.ws-range-arrow svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* "From" / "To" sit inside the field box, so the pair costs one row */
+.ws-date {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    height: 38px;
+    margin: 0;
+    padding-left: 11px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-inset);
+    cursor: text;
+    transition:
+        border-color var(--transition-fast),
+        background var(--transition-fast),
+        box-shadow var(--transition-fast);
+}
+
+.ws-date:hover {
+    border-color: #d8d6cc;
+}
+
+.ws-date:focus-within {
+    border-color: var(--gold-border);
+    background: var(--color-surface-white);
+    box-shadow: var(--focus-ring-gold);
+}
+
+.ws-date-label {
+    flex: 0 0 auto;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+}
+
+.ws-date input {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 100%;
+    padding: 0 8px 0 7px;
+    border: 0;
+    background: transparent;
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.ws-date input:focus {
+    outline: none;
+}
+
+@media (max-width: 420px) {
+    .ws-range {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .ws-range-arrow {
+        display: none;
+    }
+}
+
+/* ── Shared field skin (note, dates, times) ──────────────── */
+.ws-input {
+    width: 100%;
+    min-width: 0;
+    height: 38px;
+    padding: 0 11px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-inset);
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+    transition:
+        border-color var(--transition-fast),
+        background var(--transition-fast),
+        box-shadow var(--transition-fast);
+}
+
+/* Same placeholder treatment as the toolbar's search field */
+.ws-input::placeholder {
+    color: var(--color-text-secondary);
+    opacity: 0.85;
+}
+
+.ws-input:hover {
+    border-color: #d8d6cc;
+}
+
+.ws-input:focus {
+    outline: none;
+    border-color: var(--gold-border);
+    background: var(--color-surface-white);
+    box-shadow: var(--focus-ring-gold);
+}
+
+/* The native picker glyph is black by default and louder than the text */
+.ws-input::-webkit-calendar-picker-indicator,
+.ws-date input::-webkit-calendar-picker-indicator {
+    opacity: 0.5;
+    cursor: pointer;
+    transition: opacity var(--transition-fast);
+}
+
+.ws-input:hover::-webkit-calendar-picker-indicator,
+.ws-input:focus::-webkit-calendar-picker-indicator,
+.ws-date:hover input::-webkit-calendar-picker-indicator,
+.ws-date:focus-within input::-webkit-calendar-picker-indicator {
+    opacity: 0.85;
+}
+
+/* ── Working days ────────────────────────────────────────── */
+.ws-quick {
+    display: flex;
+    gap: 2px;
+    margin-right: -6px;
+}
+
+.ws-quick-btn {
+    height: 24px;
+    padding: 0 7px;
+    border: 0;
+    border-radius: var(--radius-xs);
+    background: transparent;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-link);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.ws-quick-btn:hover {
+    background: var(--color-surface-subtle);
+    color: var(--color-brand-navy);
+}
+
+.ws-quick-btn[aria-pressed="true"] {
+    background: var(--color-surface-subtle);
+    color: var(--color-brand-navy);
+    font-weight: 600;
+}
+
+.ws-quick-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-navy);
+}
+
+/* One card: the toggles, and the period laid out in the same seven columns */
+.ws-week {
+    padding: 8px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-inset);
+}
+
+.ws-days,
+.ws-cal-week {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 4px;
+}
+
+.ws-day {
+    position: relative;
+    display: block;
+    margin: 0;
+    cursor: pointer;
+}
+
+.ws-day input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.ws-day-name {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 32px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xs);
+    background: var(--color-surface-white);
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    user-select: none;
+    transition:
+        background var(--transition-fast),
+        border-color var(--transition-fast),
+        color var(--transition-fast),
+        box-shadow var(--transition-fast);
+}
+
+.ws-day:hover .ws-day-name {
+    border-color: #cfccc0;
+    color: var(--color-text-primary);
+}
+
+/* Navy, like every other "on" control in the portal */
+.ws-day input:checked + .ws-day-name {
+    border-color: var(--color-brand-navy);
+    background: var(--color-brand-navy);
+    color: #fff;
+}
+
+.ws-day:hover input:checked + .ws-day-name {
+    border-color: var(--color-brand-navy-hover);
+    background: var(--color-brand-navy-hover);
+}
+
+.ws-day input:focus-visible + .ws-day-name {
+    box-shadow: var(--focus-ring-navy);
+}
+
+/* ── The period, drawn under the toggles ─────────────────── */
+.ws-cal {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed #dcdad2;
+}
+
+.ws-cal:empty {
+    display: none;
+}
+
+.ws-cal-day {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    height: 28px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-xs);
+    font-size: 12px;
+    font-weight: 500;
+    color: #b6b5bb;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.ws-cal-day small {
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+/* In the period and a working day: this is where the status lands */
+.ws-cal-day.is-applied {
+    border-color: var(--av-border);
+    background: var(--av-bg);
+    color: var(--av-color);
+    font-weight: 600;
+}
+
+/* In the period but a day off: hatched, so it reads as "skipped" */
+.ws-cal-day.is-off,
+.ws-cal-key::before {
+    border: 1px dashed #d6d4cb;
+    background: repeating-linear-gradient(-45deg, transparent 0 4px, rgba(41, 23, 4, 0.06) 4px 5px);
+    color: var(--color-text-secondary);
+}
+
+.ws-cal-day.is-today::after {
+    content: "";
+    position: absolute;
+    bottom: 3px;
+    left: 50%;
+    width: 4px;
+    height: 4px;
+    margin-left: -2px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.ws-cal-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 2px;
+    font-size: 11.5px;
+    color: var(--color-text-secondary);
+}
+
+.ws-cal-key {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+}
+
+.ws-cal-key::before {
+    content: "";
+    width: 14px;
+    height: 11px;
+    border-radius: 3px;
+}
+
+/* ── Working hours ───────────────────────────────────────── */
+.ws-hours {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ws-time {
+    flex: 0 1 124px;
+}
+
+.ws-hours-dash {
+    color: var(--color-text-secondary);
+}
+
+.ws-hours-total {
+    margin-left: auto;
+    padding-left: 4px;
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+/* The zone is a compact picker beside the title: hours are "in" it */
+.ws-tz {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    margin: 0;
+}
+
+.ws-tz-select {
+    max-width: 210px;
+    height: 28px;
+    padding: 0 26px 0 29px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    background: var(--color-surface-white);
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    text-overflow: ellipsis;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    field-sizing: content;
+    transition: border-color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.ws-tz-select:hover {
+    border-color: #d8d6cc;
+    background: var(--color-surface-inset);
+}
+
+.ws-tz-select:focus {
+    outline: none;
+    border-color: var(--gold-border);
+    box-shadow: var(--focus-ring-gold);
+}
+
+.ws-tz-globe,
+.ws-tz-caret {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-secondary);
+    pointer-events: none;
+}
+
+.ws-tz-globe {
+    left: 10px;
+    width: 14px;
+    height: 14px;
+    color: var(--color-brand-gold);
+}
+
+.ws-tz-caret {
+    right: 9px;
+    width: 12px;
+    height: 12px;
+}
+
+.ws-help {
+    margin: 7px 2px 0;
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--color-text-secondary);
+}
+
+/* ── Note ────────────────────────────────────────────────── */
+.ws-field {
+    display: block;
+    margin: 0;
+}
+
+.ws-field-label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.ws-optional {
+    font-weight: 400;
+    color: var(--color-text-secondary);
+}
+
+/* ── Summary: what Save will do, in the status's colour ──── */
+.ws-summary {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    padding: 11px 18px;
+    border-top: 1px solid var(--av-border);
+    background: var(--av-bg);
+    transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.ws-summary:empty {
+    display: none;
+}
+
+.ws-summary-dot {
+    flex: 0 0 auto;
+    width: 8px;
+    height: 8px;
+    margin: 6px 0 0 1px;
+    border-radius: 50%;
+    background: var(--av-dot);
+    box-shadow: 0 0 0 3px var(--av-ring);
+}
+
+.ws-summary-text {
+    min-width: 0;
+}
+
+.ws-summary-main {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.45;
+    color: var(--color-text-primary);
+}
+
+.ws-summary-main strong {
+    font-weight: 600;
+    color: var(--av-color);
+}
+
+.ws-summary-sub {
+    margin: 1px 0 0;
+    font-size: 12px;
+    line-height: 1.45;
+    color: #65656e;
+}
+
+.ws-summary.is-warning {
+    border-top-color: #f3dfae;
+    background: var(--color-status-warning-bg);
+}
+
+.ws-summary-icon {
+    flex: 0 0 auto;
+    display: flex;
+    margin-top: 1px;
+    color: var(--color-status-warning);
+}
+
+.ws-summary-icon svg {
+    width: 17px;
+    height: 17px;
+}
+
+/* ── Save / Cancel ───────────────────────────────────────── */
+.ws-dropdown-foot {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 12px 18px;
+    border-top: 1px solid var(--color-border);
+    background: var(--color-surface-inset);
+}
+
+.ws-btn {
+    height: 34px;
+    padding: 0 16px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    transition:
+        background var(--transition-fast),
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast),
+        opacity var(--transition-fast);
+}
+
+.ws-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-navy);
+}
+
+.ws-btn--ghost {
+    border-color: var(--color-border);
+    background: var(--color-surface-white);
+    color: var(--color-text-primary);
+}
+
+.ws-btn--ghost:hover {
+    background: var(--color-surface-subtle);
+}
+
+/* Navy: the committing control, as in the expanded row's Accept */
+.ws-btn--primary {
+    min-width: 84px;
+    background: var(--color-brand-navy);
+    color: #fff;
+}
+
+.ws-btn--primary:hover:not(:disabled) {
+    background: var(--color-brand-navy-hover);
+}
+
+.ws-btn--primary:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+/* ── Narrow phones ───────────────────────────────────────── */
+@media (max-width: 420px) {
+    .ws-dropdown-head,
+    .ws-dropdown-body,
+    .ws-summary,
+    .ws-dropdown-foot {
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+    .ws-option {
+        flex-direction: column;
+        gap: 5px;
+        min-height: 52px;
+    }
+
+    .ws-preset {
+        font-size: 12px;
+        padding: 0 4px;
+    }
+
+    .ws-section-head:has(.ws-quick) {
+        flex-wrap: wrap;
+        row-gap: 4px;
+    }
+
+    .ws-dropdown-foot .ws-btn {
+        flex: 1 1 0;
+    }
+}

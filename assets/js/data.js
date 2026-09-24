@@ -15,7 +15,18 @@
         resourceId: "R-10482",
         partnerSince: "March 2021",
         photo: "assets/img/placeholder-headshot.png",
-        availability: "AV",
+        /* work_status + ResourceDailyWorkSchedule + Profile.timezone.
+           No period means "Available from now on"; "" timezone = the device's. */
+        availability: {
+            status: "AV",
+            note: "",
+            from: null,
+            to: null,
+            days: ["monday", "tuesday", "wednesday", "thursday", "friday"],
+            start: "09:00",
+            end: "17:00",
+            timezone: ""
+        },
         currency: "NZD",
         balance: "1,284.60",
         balanceUsd: "778.35",

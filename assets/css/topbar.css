@@ -161,7 +161,7 @@ body.rp-sidebar-collapsed .rp-topbar__expand-btn {
    BLOCK: rp-availability
    Replaces the old text + pencil. The state is the control:
    one tinted pill that names the state, carries its colour and
-   opens the availability dropdown (ws-dropdown, below).
+   opens the availability dropdown (ws-dropdown, availability.css).
    ============================================================ */
 .rp-av {
     position: relative;
@@ -252,10 +252,17 @@ body.rp-sidebar-collapsed .rp-topbar__expand-btn {
     transform: rotate(180deg);
 }
 
+/* "until 25 Sept" once a Busy / Not Available period is saved */
+.rp-availability__until {
+    font-weight: 500;
+    opacity: 0.78;
+}
+
 /* State variants — --av-color is the text, --av-dot the light. The
-   dropdown's option rows share them, so pill and option always match. */
+   dropdown's tiles and its tone (ws-tone--*) share them. */
 .rp-availability--AV,
-.ws-option--AV {
+.ws-option--AV,
+.ws-tone--AV {
     --av-color: #0f766e;
     --av-dot: #10a37f;
     --av-bg: #effbf6;
@@ -265,7 +272,8 @@ body.rp-sidebar-collapsed .rp-topbar__expand-btn {
 }
 
 .rp-availability--BS,
-.ws-option--BS {
+.ws-option--BS,
+.ws-tone--BS {
     --av-color: #b45309;
     --av-dot: #e08a1e;
     --av-bg: #fffaeb;
@@ -276,7 +284,8 @@ body.rp-sidebar-collapsed .rp-topbar__expand-btn {
 
 /* Darker text than the dot so the label keeps its contrast on grey */
 .rp-availability--NA,
-.ws-option--NA {
+.ws-option--NA,
+.ws-tone--NA {
     --av-color: #52525b;
     --av-dot: #a1a1aa;
     --av-bg: #f4f4f5;
@@ -307,296 +316,6 @@ body.rp-sidebar-collapsed .rp-topbar__expand-btn {
         width: 34px;
         height: 34px;
     }
-}
-
-/* ============================================================
-   BLOCK: ws-dropdown
-   partials/_work_status_modal.html turned into a dropdown under
-   the pill: same statuses, note and Save / Cancel, same ws-* names.
-   ============================================================ */
-.ws-dropdown {
-    position: absolute;
-    top: calc(100% + 10px);
-    right: 0;
-    z-index: 1100;
-    width: 360px;
-    max-width: calc(100vw - 24px);
-    overflow: hidden;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    background: var(--color-surface-white);
-    box-shadow: var(--shadow-lg);
-    font-family: var(--font-body);
-    animation: rp-dropdown-enter 0.18s ease;
-}
-
-.ws-dropdown[hidden] {
-    display: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .ws-dropdown {
-        animation: none;
-    }
-}
-
-/* A phone hangs the panel off the whole topbar, not the square pill */
-@media (max-width: 600px) {
-    .rp-topbar {
-        position: relative;
-    }
-
-    .rp-av {
-        position: static;
-    }
-
-    .ws-dropdown {
-        top: calc(100% + 6px);
-        left: 12px;
-        right: 12px;
-        width: auto;
-        max-width: none;
-    }
-}
-
-.ws-dropdown-head {
-    padding: 16px 18px 2px;
-}
-
-.ws-dropdown-title {
-    margin: 0;
-    font-size: 15px;
-    font-weight: 600;
-    line-height: 1.3;
-    color: var(--color-text-primary);
-}
-
-.ws-dropdown-hint {
-    margin: 4px 0 0;
-    font-size: 12.5px;
-    line-height: 1.5;
-    color: var(--color-text-secondary);
-}
-
-.ws-dropdown-body {
-    padding: 12px 10px 16px;
-}
-
-.ws-options {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-/* The whole row is the hit target — a bare radio is hard to hit */
-.ws-option {
-    position: relative;
-    display: grid;
-    grid-template-columns: 8px minmax(0, 1fr) 18px;
-    align-items: start;
-    column-gap: 13px;
-    margin: 0;
-    padding: 11px 12px 11px 15px;
-    border: 1px solid transparent;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition:
-        background var(--transition-fast),
-        border-color var(--transition-fast),
-        box-shadow var(--transition-fast);
-}
-
-.ws-option:hover {
-    background: var(--color-surface-inset);
-}
-
-.ws-option input[type="radio"] {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    margin: 0;
-    opacity: 0;
-    pointer-events: none;
-}
-
-/* The pill's status light: solid core with a soft ring in its colour */
-.ws-option-dot {
-    width: 8px;
-    height: 8px;
-    margin-top: 5px;
-    border-radius: 50%;
-    background: var(--av-dot);
-    box-shadow: 0 0 0 3px var(--av-ring);
-}
-
-.ws-option-text {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 0;
-}
-
-.ws-option-name {
-    font-size: 13.5px;
-    font-weight: 600;
-    line-height: 1.35;
-    color: var(--color-text-primary);
-}
-
-/* A step darker than --color-text-secondary: that grey drops under
-   4.5:1 on the selected rows' tints */
-.ws-option-desc {
-    font-size: 12.5px;
-    line-height: 1.45;
-    color: #65656e;
-}
-
-/* An empty ring until picked, then filled in the status colour */
-.ws-option-tick {
-    display: grid;
-    place-items: center;
-    width: 18px;
-    height: 18px;
-    margin-top: 1px;
-    border-radius: 50%;
-    box-shadow: inset 0 0 0 1.5px #8f8f98;
-    color: #fff;
-    transition: background var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.ws-option-tick svg {
-    width: 12px;
-    height: 12px;
-    stroke-width: 3;
-    opacity: 0;
-    transition: opacity var(--transition-fast);
-}
-
-.ws-option:has(input:checked) {
-    border-color: var(--av-border);
-    background: var(--av-bg);
-}
-
-.ws-option:has(input:checked):hover {
-    background: var(--av-bg-hover);
-}
-
-.ws-option:has(input:checked) .ws-option-tick {
-    background: var(--av-color);
-    box-shadow: none;
-}
-
-.ws-option:has(input:checked) .ws-option-tick svg {
-    opacity: 1;
-}
-
-.ws-option:has(input:focus-visible) {
-    border-color: var(--av-dot);
-    box-shadow: 0 0 0 3px var(--av-ring);
-}
-
-/* ── Note ────────────────────────────────────────────────── */
-.ws-field {
-    display: block;
-    margin: 14px 8px 0;
-}
-
-.ws-field-label {
-    display: block;
-    margin-bottom: 6px;
-    font-size: 12.5px;
-    font-weight: 600;
-    color: var(--color-text-primary);
-}
-
-.ws-optional {
-    font-weight: 400;
-    color: var(--color-text-secondary);
-}
-
-.ws-field input {
-    width: 100%;
-    height: 38px;
-    padding: 0 12px;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-sm);
-    background: var(--color-surface-inset);
-    font-family: var(--font-body);
-    font-size: 13.5px;
-    color: var(--color-text-primary);
-    transition:
-        border-color var(--transition-fast),
-        background var(--transition-fast),
-        box-shadow var(--transition-fast);
-}
-
-/* Same placeholder treatment as the toolbar's search field */
-.ws-field input::placeholder {
-    color: var(--color-text-secondary);
-    opacity: 0.85;
-}
-
-.ws-field input:hover {
-    border-color: #d8d6cc;
-}
-
-.ws-field input:focus {
-    outline: none;
-    border-color: var(--gold-border);
-    background: var(--color-surface-white);
-    box-shadow: var(--focus-ring-gold);
-}
-
-/* ── Save / Cancel ───────────────────────────────────────── */
-.ws-dropdown-foot {
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-    padding: 12px 18px;
-    border-top: 1px solid var(--color-border);
-    background: var(--color-surface-inset);
-}
-
-.ws-btn {
-    height: 34px;
-    padding: 0 16px;
-    border: 1px solid transparent;
-    border-radius: var(--radius-sm);
-    font-family: var(--font-body);
-    font-size: 13px;
-    font-weight: 600;
-    line-height: 1;
-    cursor: pointer;
-    transition:
-        background var(--transition-fast),
-        border-color var(--transition-fast),
-        box-shadow var(--transition-fast);
-}
-
-.ws-btn:focus-visible {
-    outline: none;
-    box-shadow: var(--focus-ring-navy);
-}
-
-.ws-btn--ghost {
-    border-color: var(--color-border);
-    background: var(--color-surface-white);
-    color: var(--color-text-primary);
-}
-
-.ws-btn--ghost:hover {
-    background: var(--color-surface-subtle);
-}
-
-/* Navy: the committing control, as in the expanded row's Accept */
-.ws-btn--primary {
-    min-width: 84px;
-    background: var(--color-brand-navy);
-    color: #fff;
-}
-
-.ws-btn--primary:hover {
-    background: var(--color-brand-navy-hover);
 }
 
 /* ============================================================
