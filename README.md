@@ -57,7 +57,7 @@ resource portal preview/
     │   ├── variables.css       design tokens — copied from config/static/css/variables.css
     │   ├── base.css            app shell, icons, toasts, segmented filter, placeholders
     │   ├── sidebar.css         rp-sidebar
-    │   ├── topbar.css          rp-topbar, availability pill, profile menu
+    │   ├── topbar.css          rp-topbar, availability pill + dropdown, profile menu
     │   ├── toolbar.css         copied from config/static/css/cu_table_toolbar.css
     │   ├── table.css           copied from config/static/tables/table.css
     │   ├── status.css          copied from config/static/css/status.css
@@ -109,6 +109,13 @@ The sidebar and topbar need no edits — they are generated from `NAV` and `RP.U
   and `.column-toggle`, so the existing `customize_columns_modal.js` works unchanged.
 - The table keeps `id="new-customized-table"`, `.sticky-col`, `.col-*`, `.col-filler` and the
   `.resizer` handles, so `tables/table-columns-ordering.js` should attach with no changes.
+- The availability dropdown is `templates/partials/_work_status_modal.html` redesigned: same three
+  statuses (`Translator.WORK_STATUS_OPTIONS`), same descriptions, the optional note, Save / Cancel.
+  It keeps `#ChangeWorkStatusPost`, `name="work_status"`, `name="work_status_description"`,
+  `#submit_change_status` and the `ws-option*` / `ws-field*` / `ws-btn*` classes, so
+  `submitWorkStatus()` binds as before. What changes is the container (`.ws-dropdown`, anchored
+  under the pill, no backdrop or scroll lock) — add back the CSRF token and the two hidden inputs.
+  In the preview it is UI only: Save shows a toast and every close resets the form.
 
 ---
 
@@ -164,5 +171,6 @@ opening or collapsing the sidebar moves that line by 184px, which a viewport que
 | Key | Does |
 | --- | --- |
 | `/` | Jump to the search field |
-| `Esc` | Leave the search field, close any modal or the mobile drawer |
+| `Esc` | Leave the search field, close any modal, the availability dropdown or the mobile drawer |
 | `Enter` | Submit a bid, when the bid field has focus |
+| `↑` / `↓` | Move between statuses in the availability dropdown |

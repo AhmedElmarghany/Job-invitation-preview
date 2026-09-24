@@ -1,7 +1,7 @@
 /* ============================================================
-   LAYOUT — sidebar, topbar, profile menu, logout + availability
-   modals. Rendered once here and mounted into #rp-layout so the
-   six portal pages never drift apart.
+   LAYOUT — sidebar, topbar, profile menu, availability dropdown
+   and logout modal. Rendered once here and mounted into #rp-layout
+   so the six portal pages never drift apart.
 
    A page opts in with:
    <div id="rp-layout" data-page="invitations" data-title="Job Invitations"></div>
@@ -27,10 +27,12 @@
         { key: "professional", label: "Professional Profile", icon: "professional-profile", href: "professional-profile.html" }
     ];
 
+    /* Translator.WORK_STATUS_OPTIONS, with the descriptions from
+       partials/_work_status_modal.html word for word. */
     var AVAILABILITY = {
-        AV: { label: "Available", note: "You are being considered for new invitations." },
+        AV: { label: "Available", note: "You will be considered for new job invitations." },
         BS: { label: "Busy", note: "Working at capacity — fewer invitations will come your way." },
-        NA: { label: "Not Available", note: "You will not be sent new job invitations." }
+        NA: { label: "Not Available", note: "You will not be sent new job invitations at all." }
     };
 
     function isMobile() {
@@ -140,8 +142,6 @@
     }
 
     function topbarMarkup(title, user) {
-        var av = AVAILABILITY[user.availability];
-
         return (
             '<header class="rp-topbar" id="rpTopbar">' +
             '<div class="rp-topbar__left">' +
@@ -169,20 +169,81 @@
             "</span>" +
             "</button>" +
             '<span class="rp-topbar__divider"></span>' +
-            '<button class="rp-availability rp-availability--' +
-            user.availability +
-            '" id="rpAvailabilityBtn" type="button" title="Change your availability — currently ' +
-            av.label +
-            '">' +
-            '<span class="rp-availability__dot"></span>' +
-            '<span class="rp-availability__label">' +
-            av.label +
-            "</span>" +
-            icon("chevron-down", "rp-availability__caret") +
-            "</button>" +
+            availabilityMarkup(user) +
             profileMarkup(user) +
             "</div>" +
             "</header>"
+        );
+    }
+
+    /* partials/_work_status_modal.html as a dropdown. Form id, field names
+       and ws-* classes are kept so the markup ports back as a copy. */
+    function availabilityMarkup(user) {
+        var current = AVAILABILITY[user.availability];
+
+        var options = Object.keys(AVAILABILITY)
+            .map(function (key) {
+                return (
+                    '<label class="ws-option ws-option--' +
+                    key +
+                    '">' +
+                    '<input type="radio" name="work_status" value="' +
+                    key +
+                    '"' +
+                    (key === user.availability ? " checked" : "") +
+                    ">" +
+                    '<span class="ws-option-dot" aria-hidden="true"></span>' +
+                    '<span class="ws-option-text">' +
+                    '<span class="ws-option-name">' +
+                    AVAILABILITY[key].label +
+                    "</span>" +
+                    '<span class="ws-option-desc">' +
+                    AVAILABILITY[key].note +
+                    "</span>" +
+                    "</span>" +
+                    '<span class="ws-option-tick" aria-hidden="true">' +
+                    icon("check") +
+                    "</span>" +
+                    "</label>"
+                );
+            })
+            .join("");
+
+        return (
+            '<div class="rp-av" id="rpAv">' +
+            '<button class="rp-availability rp-availability--' +
+            user.availability +
+            '" id="rpAvailabilityBtn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="WorkStatusDropdown" title="Change your availability — currently ' +
+            current.label +
+            '">' +
+            '<span class="rp-availability__dot"></span>' +
+            '<span class="rp-availability__label">' +
+            current.label +
+            "</span>" +
+            icon("chevron-down", "rp-availability__caret") +
+            "</button>" +
+            '<div class="ws-dropdown" id="WorkStatusDropdown" role="dialog" aria-labelledby="wsDropdownTitle" hidden>' +
+            '<form id="ChangeWorkStatusPost" method="post">' +
+            '<div class="ws-dropdown-head">' +
+            '<h2 class="ws-dropdown-title" id="wsDropdownTitle">Update availability</h2>' +
+            '<p class="ws-dropdown-hint">This is what project managers see when they are looking for a resource.</p>' +
+            "</div>" +
+            '<div class="ws-dropdown-body">' +
+            '<div class="ws-options" role="radiogroup" aria-labelledby="wsDropdownTitle">' +
+            options +
+            "</div>" +
+            '<label class="ws-field">' +
+            '<span class="ws-field-label">Note <span class="ws-optional">(optional)</span></span>' +
+            '<input type="text" name="work_status_description" maxlength="255" placeholder="e.g. Back on Monday" autocomplete="off">' +
+            "</label>" +
+            "</div>" +
+            '<div class="ws-dropdown-foot">' +
+            '<button type="button" class="ws-btn ws-btn--ghost" data-ws-cancel>Cancel</button>' +
+            '<button type="submit" class="ws-btn ws-btn--primary" id="submit_change_status">Save</button>' +
+            "</div>" +
+            "</form>" +
+            "</div>" +
+            "</div>"
         );
     }
 
@@ -278,28 +339,6 @@
         );
     }
 
-    /* Placeholder: the real contents arrive later. */
-    function availabilityModalMarkup(user) {
-        return (
-            '<div class="rp-modal-backdrop" id="rpAvailabilityBackdrop" role="dialog" aria-modal="true" aria-labelledby="rpAvailabilityTitle">' +
-            '<div class="rp-modal">' +
-            '<div class="rp-modal__icon">' +
-            icon("availability") +
-            "</div>" +
-            '<h2 class="rp-modal__title" id="rpAvailabilityTitle">Update availability</h2>' +
-            '<p class="rp-modal__body">You are currently <strong>' +
-            AVAILABILITY[user.availability].label +
-            "</strong>. " +
-            AVAILABILITY[user.availability].note +
-            "<br><br>The contents of this modal are still to be defined — this placeholder only shows where it opens from.</p>" +
-            '<div class="rp-modal__actions">' +
-            '<button class="rp-modal__btn" type="button" data-rp-modal-close>Close</button>' +
-            "</div>" +
-            "</div>" +
-            "</div>"
-        );
-    }
-
     /* ── Behaviour ───────────────────────────────────────── */
 
     function mount() {
@@ -310,11 +349,7 @@
         var page = host.dataset.page || "";
         var title = host.dataset.title || "Dashboard";
 
-        host.innerHTML =
-            sidebarMarkup(page, user) +
-            topbarMarkup(title, user) +
-            logoutModalMarkup() +
-            availabilityModalMarkup(user);
+        host.innerHTML = sidebarMarkup(page, user) + topbarMarkup(title, user) + logoutModalMarkup();
 
         if (!document.querySelector(".rp-toast-stack")) {
             var stack = document.createElement("div");
@@ -326,7 +361,7 @@
         wireSidebar();
         wireProfile();
         wireLogoutModal();
-        wireAvailabilityModal();
+        wireAvailabilityDropdown();
         wireDemoStubs();
     }
 
@@ -483,26 +518,57 @@
         backdrop.setAttribute("aria-hidden", "true");
     }
 
-    function wireAvailabilityModal() {
-        var backdrop = document.getElementById("rpAvailabilityBackdrop");
+    /* UI only, nothing is saved: every close resets the form, so reopening never shows a stale pick. */
+    function wireAvailabilityDropdown() {
+        var wrap = document.getElementById("rpAv");
         var btn = document.getElementById("rpAvailabilityBtn");
+        var dropdown = document.getElementById("WorkStatusDropdown");
+        var form = document.getElementById("ChangeWorkStatusPost");
 
-        function close() {
-            backdrop.classList.remove("is-open");
-            document.body.classList.remove("rp-no-scroll");
+        function open() {
+            dropdown.hidden = false;
+            wrap.classList.add("is-open");
+            btn.setAttribute("aria-expanded", "true");
+            var checked = form.querySelector('input[name="work_status"]:checked');
+            if (checked) checked.focus({ preventScroll: true });
+        }
+
+        function close(returnFocus) {
+            if (dropdown.hidden) return;
+            dropdown.hidden = true;
+            wrap.classList.remove("is-open");
+            btn.setAttribute("aria-expanded", "false");
+            form.reset();
+            if (returnFocus) btn.focus();
         }
 
         btn.addEventListener("click", function () {
-            backdrop.classList.add("is-open");
-            document.body.classList.add("rp-no-scroll");
+            if (dropdown.hidden) open();
+            else close(false);
         });
 
-        backdrop.addEventListener("click", function (e) {
-            if (e.target === backdrop || e.target.closest("[data-rp-modal-close]")) close();
+        form.querySelector("[data-ws-cancel]").addEventListener("click", function () {
+            close(true);
         });
+
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+            close(true);
+            RP.toast("Saving availability is not part of this preview yet.", "info");
+        });
+
+        /* Capture phase: the profile trigger stops propagation, and opening
+           that menu must still close this one. */
+        document.addEventListener(
+            "click",
+            function (e) {
+                if (!wrap.contains(e.target)) close(false);
+            },
+            true
+        );
 
         document.addEventListener("keydown", function (e) {
-            if (e.key === "Escape") close();
+            if (e.key === "Escape" && !dropdown.hidden) close(true);
         });
     }
 

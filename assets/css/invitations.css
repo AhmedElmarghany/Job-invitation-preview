@@ -32,11 +32,16 @@
     margin: 0;
 } */
 
-/* Zebra striping is off here: every record is two <tr>s (row +
-   detail), so nth-child would stripe the pairs, not the records. */
+/* Striped per record, as the original table: #fff odd, #F8F8F8 even.
+   Each record is a row plus its detail <tr>, so only .rp-row is counted. */
 #new-customized-table tbody tr > td,
 #new-customized-table tbody tr:nth-child(even) > td {
     background-color: var(--color-surface-white) !important;
+}
+
+/* Same specificity as the hover and expanded rules below, which win on order */
+#new-customized-table tbody tr:nth-child(even of .rp-row) > td {
+    background-color: var(--color-surface-inset) !important;
 }
 
 #new-customized-table tbody tr.rp-row:hover > td {
@@ -126,6 +131,9 @@ tr.rp-subrow:hover {
     cursor: pointer;
     flex-shrink: 0;
     transition: background var(--transition-fast), color var(--transition-fast);
+}
+#new-customized-table tbody tr:nth-child(even of .rp-row) .rp-expand-btn {
+    background-color: var(--color-surface-white);
 }
 
 .rp-expand-btn svg {

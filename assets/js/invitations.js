@@ -38,7 +38,7 @@
         filter: "all",
         sort: { key: "invitedAt", dir: "desc" },
         page: 1,
-        perPage: 10,
+        perPage: 27,
         expanded: {}
     };
 
