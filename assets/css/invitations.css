@@ -152,8 +152,8 @@ tr.rp-subrow:hover {
 }
 
 .rp-row.is-expanded .rp-expand-btn {
-    background: var(--color-brand-navy);
-    color: var(--color-surface-white);
+    background: var(--color-brand-navy) !important;
+    color: var(--color-surface-white) !important;
 }
 
 .rp-job-id {
