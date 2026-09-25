@@ -1,0 +1,316 @@
+/* ============================================================
+   PAGE: My Jobs
+   The table chrome in the first half is the same chrome the
+   Invitations page uses; it is copied rather than moved so that
+   page keeps rendering from its own file, untouched. Everything
+   else on this page — progress, deadline, status, actions,
+   pagination, toolbar — is already styled by the copied
+   table.css / status.css / toolbar.css and adds nothing here.
+   ============================================================ */
+
+/* min-width: 0 all the way down, or the scroll container grows to
+   the table's full width and the table never gets its own scrollbar. */
+#rp-jobs-table {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+}
+
+#rp-jobs-table .wrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+    background: var(--color-surface-white);
+}
+
+/* ── Row striping ────────────────────────────────────────── */
+/* #fff odd, #F8F8F8 even — counted over .rp-row only. */
+#new-customized-table tbody tr > td,
+#new-customized-table tbody tr:nth-child(even) > td {
+    background-color: var(--color-surface-white) !important;
+}
+
+#new-customized-table tbody tr:nth-child(even of .rp-row) > td {
+    background-color: var(--color-surface-inset) !important;
+}
+
+#new-customized-table tbody tr.rp-row:hover > td {
+    background-color: var(--color-surface-subtle) !important;
+}
+
+/* Sticky columns: offsets are written by JS so they survive a resize */
+#new-customized-table .sticky-col {
+    position: sticky;
+    z-index: 5;
+}
+
+#new-customized-table thead th.sticky-col {
+    z-index: 11;
+}
+
+/* ── Job id ──────────────────────────────────────────────── */
+.rp-job-id {
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--color-link);
+    text-decoration: none;
+}
+
+.rp-job-id:hover {
+    text-decoration: underline;
+}
+
+/* ── Languages ───────────────────────────────────────────── */
+.rp-langs {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13.5px;
+    font-weight: 500;
+}
+
+.rp-langs svg {
+    width: 12px;
+    height: 12px;
+    color: var(--color-text-secondary);
+}
+
+/* ── Waiting jobs ────────────────────────────────────────── */
+/* job_ready = NR: nothing to work on yet, so the progress column
+   would otherwise read as a resource who has not started. */
+.rp-not-ready {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+}
+
+.rp-not-ready svg {
+    width: 13px;
+    height: 13px;
+}
+
+/* ── Job slip ────────────────────────────────────────────── */
+.rp-slip svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
+#new-customized-table tbody td.rp-empty-cell {
+    padding: 0 !important;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    border-bottom: 0;
+}
+
+/* Pinned to the visible width, or it centres itself in the full
+   column run instead of in what is on screen. */
+#new-customized-table tbody td.rp-empty-cell .rp-empty {
+    position: sticky;
+    left: 0;
+    width: var(--rp-detail-w, 100%);
+}
+
+.rp-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 56px 24px;
+    text-align: center;
+}
+
+.rp-empty__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-subtle);
+    color: var(--color-brand-gold);
+    margin-bottom: 4px;
+}
+
+.rp-empty__icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.rp-empty__title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.rp-empty__note {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    max-width: 380px;
+    line-height: 1.6;
+}
+
+.rp-empty__action {
+    margin-top: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 30px;
+    padding: 0 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xs);
+    background: var(--color-surface-white);
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    cursor: pointer;
+}
+
+.rp-empty__action svg {
+    width: 13px;
+    height: 13px;
+}
+
+.rp-empty__action:hover {
+    background: var(--color-surface-subtle);
+}
+
+/* ============================================================
+   SORTING ICON — templates/partials/_sorting_icon.html
+   Both chevrons always show. Unsorted, the .order-icon pair reads
+   muted; once a column is sorted its pair swaps in, where one path
+   is currentColor (navy, the active direction).
+   ============================================================ */
+.rp-sort {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 5px;
+    color: #c2c0b6;
+    vertical-align: middle;
+}
+
+.rp-sort .sorting-icon {
+    width: 14px;
+    height: 14px;
+}
+
+.sorting-icon .down-triangle-icon,
+.sorting-icon .up-triangle-icon {
+    display: none;
+}
+
+th.is-asc .sorting-icon .order-icon,
+th.is-desc .sorting-icon .order-icon {
+    display: none;
+}
+
+th.is-asc .sorting-icon .up-triangle-icon,
+th.is-desc .sorting-icon .down-triangle-icon {
+    display: inline;
+}
+
+th.is-sorted .rp-sort {
+    color: var(--color-brand-navy);
+}
+
+th.is-sorted .label {
+    color: var(--color-text-primary);
+    font-weight: 600;
+}
+
+#new-customized-table thead th.order_by {
+    cursor: pointer;
+}
+
+#new-customized-table thead th.order_by:hover .label {
+    color: var(--color-text-primary);
+}
+
+/* ── Header cell layout ──────────────────────────────────── */
+#new-customized-table thead th .th-inner {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+
+#new-customized-table thead th .label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ── Toolbar extras ──────────────────────────────────────── */
+.dashboard_toolbar-row .rp-clear-search {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--color-surface-subtle);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+}
+
+.dashboard_toolbar-row .rp-clear-search.is-visible {
+    display: flex;
+}
+
+.dashboard_toolbar-row .rp-clear-search svg {
+    width: 12px;
+    height: 12px;
+    position: static;
+    transform: none;
+}
+
+/* The search icon inside the wrap is positioned by toolbar.css;
+   keep the clear button out of that rule's reach. */
+.dashboard_toolbar-search-wrap {
+    display: flex;
+    align-items: center;
+}
+
+/* Keyboard hint inside the search field */
+.rp-kbd {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 1px 6px;
+    border: 1px solid var(--color-border);
+    border-bottom-width: 2px;
+    border-right-width: 2px;
+    border-radius: 5px;
+    background: var(--color-surface-white);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    pointer-events: none;
+}
+
+.dashboard_toolbar-search-wrap:focus-within .rp-kbd,
+.dashboard_toolbar-search-wrap:has(.rp-clear-search.is-visible) .rp-kbd {
+    display: none;
+}
+
+@media (max-width: 767px) {
+    .rp-kbd {
+        display: none;
+    }
+}

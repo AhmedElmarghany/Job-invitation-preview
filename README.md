@@ -34,8 +34,8 @@ Nothing inside the folder refers to the folder name, so renaming is safe.
 | Page | State |
 | --- | --- |
 | `invitations.html` | **Built.** Job Invitations — the full page. |
+| `jobs.html` | **Built.** My Jobs — Active / Waiting / Completed in one page. |
 | `dashboard.html` | Placeholder |
-| `jobs.html` | Placeholder |
 | `earnings.html` | Placeholder |
 | `professional-profile.html` | Placeholder |
 | `account.html` | Placeholder |
@@ -50,7 +50,8 @@ by all six pages, so a new page only needs its own content.
 ```
 resource portal preview/
 ├── index.html                  redirect → invitations.html
-├── invitations.html            the built page
+├── invitations.html            built page
+├── jobs.html                   built page
 ├── dashboard.html …            placeholders, one per sidebar entry
 └── assets/
     ├── css/
@@ -65,32 +66,81 @@ resource portal preview/
     │   ├── pagination.css      copied from config/static/css/pagination-bar.css
     │   ├── columns-modal.css   copied from config/static/css/customize_columns_modal.css
     │   ├── logout-modal.css    copied from config/static/css/logoutModal.css
-    │   └── invitations.css     page-specific: rows, expanded panel, offer card
+    │   ├── navigation-tabs.css copied from config/static/css/navigation-tabs.css
+    │   ├── invitations.css     page-specific: rows, expanded panel, offer card
+    │   └── jobs.css            page-specific: table chrome, waiting/slip cells
     ├── js/
     │   ├── icons.js            inline Lucide set — RP.icon('name')
     │   ├── data.js             the dummy records and the signed-in resource
     │   ├── layout.js           renders sidebar + topbar + modals into #rp-layout
     │   ├── availability.js     the availability pill + dropdown (dummy logic)
     │   ├── columns-modal.js    reusable "Customize Columns" modal
-    │   └── invitations.js      table render, search, sort, expand, paginate
+    │   ├── navigation-tabs.js  copied from config/static/js/navigation-tabs.js
+    │   ├── invitations.js      table render, search, sort, expand, paginate
+    │   └── jobs.js             tabs, per-tab columns, search, sort, paginate
     ├── fonts/                  IBM Plex Sans + Serif (woff2)
     └── img/                    logo.png, placeholder-headshot.png
 ```
 
 ### Copied vs. written
 
-The five CSS files marked *copied* are byte-for-byte from the project, except that
+The CSS and JS files marked *copied* are byte-for-byte from the project, except that
 `cu_sidebar-is-collapsed` was renamed to `rp-sidebar-collapsed` and the per-page
 `max-height` rules in `table.css` were replaced with one for this table. If those files change
-in the project, re-copy them.
+in the project, re-copy them. `navigation-tabs.css` also leaves behind `.page-content`, the
+global scrollbar reset and `scroll-behavior`, none of which belong to the tab strip;
+`navigation-tabs.js` finds its strip by class instead of by id, so a page can hold more than
+one, and re-measures when the buttons are written in by the page's script.
+
+`jobs.css` repeats, rather than shares, the row striping, sort icon, empty state and toolbar
+rules that `invitations.css` also carries. That is deliberate: the Invitations design is signed
+off and its file is not to be reopened. When both pages are ported to Django these rules belong
+in one stylesheet, not two.
 
 `variables.css` is a copy too — it is the one file to re-sync if the tokens move.
 
 ---
 
+## My Jobs
+
+One page, three tabs, and the page never reloads: `jobs.html` replaces the `trJobAssignments` /
+`trJobWaiting` / `trJobCompleted` tabs the resource dashboard reaches through `?tab=`.
+
+The strip is the customer Orders nav — `navigation-tabs.css`, unchanged, so the underline, the
+hover and the badge are the ones already shipping. It is navy throughout: the plain
+`navigation-tabs.css` already paints the badge navy, it is only the `.scoped` twin that paints it
+gold. Each tab carries an icon and a live count:
+
+| Tab | Icon | Is | Comes from |
+| --- | --- | --- | --- |
+| Active jobs | `circle-play` (Lucide) | Running now | `job_ready = RE`, job status `AS` / `PR` |
+| Waiting jobs | `hourglass` (Lucide) | Assigned, files not released | `job_ready = NR` |
+| Completed jobs | `circle-check` (Lucide) | Delivered and on its way to a bill | status `CL` `AP` `DL` `ST` `BL` |
+
+**Columns change with the tab**, as `my_jobs.html` does on `trJobCompleted`: Active and Waiting
+share one set, Completed adds **Bill ID**, **Status**, **Delivered At** and **Job Slip**. Each tab
+also keeps its own Customize Columns choice (`rp_jobs_columns_<tab>`), so hiding Bill ID on
+Completed does not touch the other two. The modal is rebuilt on every tab change, which is what
+`ColumnsModal.destroy()` was added for.
+
+Three cells are borrowed rather than designed:
+
+- **Progress** is `customer_orders.html`'s widget verbatim — `.progress-widget`, percentage above,
+  bar below — already styled in the copied `table.css`. On Waiting it is replaced by a muted
+  "Not ready": there is nothing to be a percentage of yet.
+- **Deadline** wears the Due Date colours from the orders table (`.col-due-date` /
+  `.col-due-date-time`), so it is red on every row, not only the late ones.
+- **Job Slip** and **Actions** use `table.css`'s own `.btn-view` / `.actions-wrap` / `.tooltip-wrap`.
+
+Rows do not expand. The job is already accepted, so there is no offer to read and no decision to
+make — the Job ID and the eye button both go to the job page. In the preview they raise a toast
+saying so.
+
+---
+
 ## Adding the next page
 
-1. Copy a placeholder page (e.g. `jobs.html`) and set `data-page` / `data-title` on `#rp-layout`.
+1. Copy a placeholder page (e.g. `earnings.html`) and set `data-page` / `data-title` on `#rp-layout`.
    `data-page` must match the `key` in `NAV` inside `assets/js/layout.js` for the active state to
    light up.
 2. Add its stylesheet under `assets/css/` and its script under `assets/js/`.

@@ -1,0 +1,176 @@
+/* ============================================================
+   NAVIGATION TABS
+   Copied from config/static/css/navigation-tabs.css — the same
+   component the customer Orders table wears. Three edits:
+   `cu_sidebar-is-collapsed` is renamed `rp-sidebar-collapsed`,
+   the global scrollbar reset is dropped so the preview keeps its
+   own, and `.page-content` is left behind — it belongs to a page
+   this folder does not have.
+   ============================================================ */
+.navigation-tabs {
+  display: flex;
+  align-items: stretch;
+  height: var(--tabs-h);
+  background: var(--color-surface-white);
+  border-bottom: 1px solid var(--color-border);
+  position: relative;
+  width: unset;
+  float: unset;
+}
+
+.navigation-tabs-inner {
+  display: flex;
+  align-items: stretch;
+  padding: 0 12px;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  position: relative;
+  z-index: 1;
+  flex: 1;
+}
+.navigation-tabs-inner::-webkit-scrollbar { display: none; }
+.navigation-tabs-inner.is-dragging { cursor: grabbing; }
+
+.navigation-tabs-link {
+  font-family: var(--font-body);
+  display: flex; align-items: center; gap: 7px;
+  padding: 0 14px !important;
+  margin: 0;
+  top: 0px;
+  font-size: 13.5px !important;
+  font-weight: 400 !important;
+  color: var(--color-text-secondary) !important;
+  text-decoration: none !important;
+  white-space: nowrap;
+  position: relative;
+  border: none; background: none;
+  transition: color var(--transition-base);
+  outline: none;
+  cursor: pointer !important;
+  flex-shrink: 0;
+}
+.navigation-tabs-link::after {
+  content: '';
+  position: absolute; bottom: 0px; left: 14px; right: 14px;
+  height: 2px;
+  background: var(--color-brand-navy);
+  border-radius: 2px 2px 0 0;
+  transform: scaleX(0);
+  transition: transform .22s cubic-bezier(.4,0,.2,1);
+}
+.navigation-tabs-link:hover { color: var(--color-text-primary) !important; background: none !important; }
+.navigation-tabs-link:hover::after { transform: scaleX(0.5); opacity: .4; }
+.navigation-tabs-link.active { color: var(--color-brand-navy) !important; font-weight: 500 !important; background-color: transparent !important; }
+.navigation-tabs-link.active:hover { background-color: transparent !important; }
+.navigation-tabs-link.active::after { transform: scaleX(1); opacity: 1; }
+
+.navigation-tabs-link .floating-info { color: inherit; }
+
+.navigation-tabs-icon {
+  width: 18px; height: 18px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  opacity: .55;
+  transition: opacity var(--transition-base);
+}
+.navigation-tabs-link.active .navigation-tabs-icon,
+.navigation-tabs-link:hover .navigation-tabs-icon { opacity: 1; }
+/* WebKit resolves an attribute-less svg's auto width to 0 inside a flex box */
+.navigation-tabs-icon svg {
+  width: 18px; height: 18px;
+  display: block;
+  flex-shrink: 0;
+}
+
+.navigation-tabs-badge {
+  font-size: 11px; font-weight: 500;
+  background: var(--color-surface-subtle);
+  color: var(--color-brand-navy);
+  padding: 1px 6px;
+  border-radius: 20px;
+  line-height: 1.6;
+  transition: background var(--transition-base), color var(--transition-base);
+  flex-shrink: 0;
+}
+.navigation-tabs-link.active .navigation-tabs-badge {
+  background: var(--color-brand-navy);
+  color: var(--color-surface-white);
+}
+
+/* ── OVERFLOW FADE + SCROLL ARROWS ────── */
+.navigation-tabs-fade-right,
+.navigation-tabs-fade-left {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 58px;
+  display: flex;
+  align-items: center;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  z-index: 10;
+  color: var(--color-brand-navy);
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .25s ease, visibility .25s ease;
+}
+/* Fades to the nav surface so a tab never bleeds through the chevron */
+.navigation-tabs-fade-left {
+  left: 0;
+  justify-content: flex-start;
+  padding-left: 8px;
+  background: linear-gradient(to left, transparent, rgba(200, 205, 210, 0.45));
+}
+.navigation-tabs-fade-right {
+  right: 0;
+  justify-content: flex-end;
+  padding-right: 8px;
+  background: linear-gradient(to right, transparent, rgba(200, 205, 210, 0.45));
+}
+.navigation-tabs-fade-right.visible,
+.navigation-tabs-fade-left.visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.navigation-tabs-chevron {
+  display: flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--color-surface-white);
+  box-shadow: 0 1px 3px rgba(11, 38, 62, .16), 0 0 0 1px var(--color-border);
+  transition: background var(--transition-base), box-shadow var(--transition-base), transform .12s ease;
+}
+.navigation-tabs-chevron svg { width: 16px; height: 16px; display: block; }
+.navigation-tabs-fade-left:hover .navigation-tabs-chevron,
+.navigation-tabs-fade-right:hover .navigation-tabs-chevron {
+  background: var(--color-surface-subtle);
+  box-shadow: 0 2px 6px rgba(11, 38, 62, .22), 0 0 0 1px var(--color-border);
+}
+.navigation-tabs-fade-left:active .navigation-tabs-chevron,
+.navigation-tabs-fade-right:active .navigation-tabs-chevron { transform: scale(.92); }
+.navigation-tabs-fade-left:focus-visible,
+.navigation-tabs-fade-right:focus-visible { outline: none; }
+.navigation-tabs-fade-left:focus-visible .navigation-tabs-chevron,
+.navigation-tabs-fade-right:focus-visible .navigation-tabs-chevron { box-shadow: var(--focus-ring-navy); }
+
+@media (max-width: 576px) {
+  .navigation-tabs-fade-right,
+  .navigation-tabs-fade-left { width: 42px; }
+  .navigation-tabs-chevron { width: 24px; height: 24px; }
+}
+
+.navigation-tabs-inner .navigation-tabs-link {
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  body.rp-sidebar-collapsed .navigation-tabs {
+    width: calc(100% - var(--layout-cu_sidebar-collapsed-width));
+  }
+}

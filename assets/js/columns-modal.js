@@ -65,12 +65,22 @@
             self.refreshSummary();
         });
 
-        document.addEventListener("keydown", function (e) {
+        this.onKeydown = function (e) {
             if (e.key === "Escape") self.close();
-        });
+        };
+        document.addEventListener("keydown", this.onKeydown);
 
         this.apply();
         this.refreshSummary();
+    };
+
+    /* A table whose column set changes — jobs.html, where each tab
+       carries different columns — throws the modal away and builds a
+       new one, so the overlay and its Escape handler have to go too. */
+    ColumnsModal.prototype.destroy = function () {
+        document.removeEventListener("keydown", this.onKeydown);
+        if (this.overlay && this.overlay.parentNode) this.overlay.parentNode.removeChild(this.overlay);
+        document.body.classList.remove("rp-no-scroll");
     };
 
     ColumnsModal.prototype.markup = function () {

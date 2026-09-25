@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Jobs · Resource Portal</title>
+  <title>My Jobs · Resource Portal</title>
+  <meta name="description" content="Redesign preview of the AGATO resource portal — My Jobs.">
   <link rel="icon" href="assets/img/logo.png">
 
   <link rel="stylesheet" href="assets/css/variables.css">
@@ -11,30 +12,82 @@
   <link rel="stylesheet" href="assets/css/sidebar.css">
   <link rel="stylesheet" href="assets/css/topbar.css">
   <link rel="stylesheet" href="assets/css/availability.css">
+  <link rel="stylesheet" href="assets/css/navigation-tabs.css">
+  <link rel="stylesheet" href="assets/css/toolbar.css">
+  <link rel="stylesheet" href="assets/css/table.css">
+  <link rel="stylesheet" href="assets/css/status.css">
+  <link rel="stylesheet" href="assets/css/pagination.css">
+  <link rel="stylesheet" href="assets/css/columns-modal.css">
   <link rel="stylesheet" href="assets/css/logout-modal.css">
+  <link rel="stylesheet" href="assets/css/jobs.css">
 </head>
 <body>
 
   <!-- Sidebar + topbar + modals are injected here by assets/js/layout.js -->
-  <div id="rp-layout" data-page="jobs" data-title="Jobs"></div>
+  <div id="rp-layout" data-page="jobs" data-title="My Jobs"></div>
 
   <main class="rp-page">
-    <div class="rp-stub">
-      <span class="rp-stub-icon">
-        <span data-rp-icon="jobs"></span>
-      </span>
-      <h1 class="rp-stub-title">Jobs</h1>
-      <p class="rp-stub-note">Not designed yet. It will reuse the same table, toolbar, columns modal and pagination the Invitations page already proves out.</p>
-      <a class="rp-stub-link" href="invitations.html">
-        <span data-rp-icon="arrow-right"></span>
-        Go to Job Invitations
-      </a>
-    </div>
+
+    <section id="rp-jobs-table">
+
+      <!-- Tabs — the customer Orders nav, filled by jobs.js -->
+      <nav class="navigation-tabs">
+        <button class="navigation-tabs-fade-left" type="button" aria-label="Scroll tabs left" tabindex="-1" aria-hidden="true">
+          <span class="navigation-tabs-chevron" data-rp-icon="chevron-left"></span>
+        </button>
+        <div class="navigation-tabs-inner" id="rpJobTabs" role="tablist" aria-label="Filter jobs by stage"></div>
+        <button class="navigation-tabs-fade-right" type="button" aria-label="Scroll tabs right" tabindex="-1" aria-hidden="true">
+          <span class="navigation-tabs-chevron" data-rp-icon="chevron-right"></span>
+        </button>
+      </nav>
+
+      <!-- Toolbar -->
+      <div class="dashboard_toolbar-row">
+        <div class="dashboard_toolbar-search-wrap">
+          <span data-rp-icon="search"></span>
+          <input
+            class="dashboard_toolbar-search-input"
+            id="search-input"
+            type="text"
+            placeholder="Search by Job Id, Project Name, Service or Language"
+            aria-label="Search jobs"
+            autocomplete="off">
+          <kbd class="rp-kbd">/</kbd>
+          <button class="rp-clear-search" id="rpClearSearch" type="button" aria-label="Clear search">
+            <span data-rp-icon="close"></span>
+          </button>
+        </div>
+
+        <div class="dashboard_toolbar-divider"></div>
+
+        <button class="dashboard_toolbar-btn" id="rpColumnsBtn" type="button" title="Choose columns">
+          <span data-rp-icon="columns"></span>
+          <span class="text-label">Columns</span>
+        </button>
+      </div>
+
+      <!-- Table -->
+      <div class="wrapper">
+        <div class="table-wrap" id="scrollContainer">
+          <table id="new-customized-table" class="table" data-table="rp-my-jobs">
+            <colgroup></colgroup>
+            <thead><tr></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="cu-pagination-bar" id="rpPagination"></div>
+      </div>
+
+    </section>
   </main>
 
   <script src="assets/js/icons.js"></script>
   <script src="assets/js/data.js"></script>
   <script src="assets/js/availability.js"></script>
   <script src="assets/js/layout.js"></script>
+  <script src="assets/js/columns-modal.js"></script>
+  <script src="assets/js/navigation-tabs.js"></script>
+  <script src="assets/js/jobs.js"></script>
 </body>
 </html>

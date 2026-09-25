@@ -755,6 +755,795 @@
         interpretation: { label: "Interpreting", icon: "interpreting" }
     };
 
+    /* ============================================================
+       MY JOBS — work already accepted, so no offer and no decision.
+       tab:    active | waiting | completed  (the three nav tabs)
+       Times are offsets in hours, resolved against page load below.
+       ============================================================ */
+    var JOBS = [
+        /* ── Active: job_ready = RE, job status AS / PR ───────── */
+        {
+            jobId: 47990, tab: "active",
+            project: "Cardiac monitor — service manual (vol 2)",
+            service: "Translation", source: "English", target: "Arabic",
+            specialty: "Medical", count: { value: 5400, unit: "Words" },
+            amount: 297.0, progress: 62,
+            deadlineIn: 40, acceptedAgo: 30, pm: PM.sara
+        },
+        {
+            jobId: 47982, tab: "active",
+            project: "Tender response — rail signalling package",
+            service: "Translation", source: "English", target: "Chinese",
+            specialty: "Technical", count: { value: 3200, unit: "Words" },
+            amount: 176.0, progress: 35,
+            deadlineIn: 18, acceptedAgo: 20, pm: PM.mei
+        },
+        {
+            jobId: 47975, tab: "active",
+            project: "Patient discharge summaries — batch 7",
+            service: "Certified", source: "English", target: "Samoan",
+            specialty: "Medical", count: { value: 1850, unit: "Words" },
+            amount: 120.25, progress: 88,
+            deadlineIn: 6, acceptedAgo: 52, pm: PM.daniel
+        },
+        {
+            jobId: 47968, tab: "active",
+            project: "Immigration statements — Hamilton intake",
+            service: "Certified", source: "English", target: "Dari",
+            specialty: "Legal", count: { value: 2100, unit: "Words" },
+            amount: 147.0, progress: 12,
+            deadlineIn: 64, acceptedAgo: 9, pm: PM.tane
+        },
+        {
+            jobId: 47960, tab: "active",
+            project: "ACC assessment appointment — Manukau",
+            service: "Interpreting", source: "English", target: "Samoan",
+            specialty: "Medical", count: { value: 3, unit: "Hours" },
+            amount: 210.0, progress: 45,
+            deadlineIn: 26, acceptedAgo: 14, pm: PM.daniel
+        },
+        {
+            jobId: 47953, tab: "active",
+            project: "Product safety labels — release 9",
+            service: "DTP", source: "English", target: "Filipino",
+            specialty: "Technical", count: { value: 900, unit: "Words" },
+            amount: 58.5, progress: 74,
+            deadlineIn: 90, acceptedAgo: 36, pm: PM.mei
+        },
+        /* One overdue row, so the red deadline has something to prove */
+        {
+            jobId: 47947, tab: "active",
+            project: "School enrolment pack — term 4",
+            service: "Translation", source: "English", target: "Te Reo Māori",
+            specialty: "Government", count: { value: 2600, unit: "Words" },
+            amount: 143.0, progress: 20,
+            deadlineIn: -4, acceptedAgo: 70, pm: PM.tane
+        },
+        {
+            jobId: 47639, tab: "active",
+            project: "Employee handbook — 101 update",
+            service: "Attestation", source: "English", target: "Tongan",
+            specialty: "Education", count: { value: 3, unit: "Documents" },
+            amount: 128.01, progress: 15,
+            deadlineIn: 78, acceptedAgo: 109, pm: PM.sara
+        },
+        {
+            jobId: 47607, tab: "active",
+            project: "Employment contract — hire 102",
+            service: "Translation", source: "English", target: "Vietnamese",
+            specialty: "Technical", count: { value: 4500, unit: "Words" },
+            amount: 351.0, progress: 30,
+            deadlineIn: 52, acceptedAgo: 73, pm: PM.sara
+        },
+        {
+            jobId: 47597, tab: "active",
+            project: "Airport signage set — terminal 103",
+            service: "Translation", source: "Thai", target: "English",
+            specialty: "Government", count: { value: 3200, unit: "Words" },
+            amount: 166.4, progress: 15,
+            deadlineIn: 36, acceptedAgo: 62, pm: PM.mei
+        },
+        {
+            jobId: 47660, tab: "active",
+            project: "Clinical trial summary — site 104",
+            service: "Translation", source: "Urdu", target: "English",
+            specialty: "Legal", count: { value: 4800, unit: "Words" },
+            amount: 192.0, progress: 72,
+            deadlineIn: 180, acceptedAgo: 207, pm: PM.daniel
+        },
+        {
+            jobId: 47616, tab: "active",
+            project: "Patient consent form — trial 105",
+            service: "Translation", source: "English", target: "Chinese",
+            specialty: "Technical", count: { value: 2800, unit: "Words" },
+            amount: 305.2, progress: 80,
+            deadlineIn: 180, acceptedAgo: 207, pm: PM.daniel
+        },
+        {
+            jobId: 47686, tab: "active",
+            project: "Training video script — module 106",
+            service: "Interpreting", source: "English", target: "Vietnamese",
+            specialty: "Government", count: { value: 6, unit: "Hours" },
+            amount: 420.0, progress: 30,
+            deadlineIn: 16, acceptedAgo: 49, pm: PM.tane
+        },
+        {
+            jobId: 47580, tab: "active",
+            project: "Customer support macros — set 107",
+            service: "Attestation", source: "Thai", target: "English",
+            specialty: "Education", count: { value: 3, unit: "Documents" },
+            amount: 233.04, progress: 52,
+            deadlineIn: 28, acceptedAgo: 36, pm: PM.daniel
+        },
+        {
+            jobId: 47567, tab: "active",
+            project: "Real estate listing — unit 108",
+            service: "Proofreading", source: "Thai", target: "English",
+            specialty: "Academic", count: { value: 3200, unit: "Words" },
+            amount: 262.4, progress: 22,
+            deadlineIn: 22, acceptedAgo: 61, pm: PM.mei
+        },
+        {
+            jobId: 47512, tab: "active",
+            project: "Birth certificate — file 109",
+            service: "Proofreading", source: "English", target: "Dari",
+            specialty: "Academic", count: { value: 4500, unit: "Words" },
+            amount: 216.0, progress: 15,
+            deadlineIn: 16, acceptedAgo: 30, pm: PM.tane
+        },
+        {
+            jobId: 47502, tab: "active",
+            project: "Employment contract — hire 110",
+            service: "Translation", source: "English", target: "Filipino",
+            specialty: "Technical", count: { value: 5300, unit: "Words" },
+            amount: 583.0, progress: 80,
+            deadlineIn: 120, acceptedAgo: 131, pm: PM.mei
+        },
+        {
+            jobId: 47628, tab: "active",
+            project: "Pharmaceutical label — batch 111",
+            service: "Attestation", source: "English", target: "Punjabi",
+            specialty: "Education", count: { value: 3, unit: "Documents" },
+            amount: 179.85, progress: 22,
+            deadlineIn: 64, acceptedAgo: 74, pm: PM.mei
+        },
+        {
+            jobId: 47500, tab: "active",
+            project: "Court filing — case file 112",
+            service: "Attestation", source: "German", target: "English",
+            specialty: "Education", count: { value: 2, unit: "Documents" },
+            amount: 87.78, progress: 72,
+            deadlineIn: 36, acceptedAgo: 71, pm: PM.sara
+        },
+        {
+            jobId: 47517, tab: "active",
+            project: "Conference programme — day 113",
+            service: "Interpreting", source: "English", target: "Nepali",
+            specialty: "Government", count: { value: 1, unit: "Hours" },
+            amount: 70.0, progress: 65,
+            deadlineIn: 150, acceptedAgo: 162, pm: PM.daniel
+        },
+        {
+            jobId: 47693, tab: "active",
+            project: "School newsletter — issue 114",
+            service: "Subtitling", source: "Russian", target: "English",
+            specialty: "Marketing", count: { value: 31, unit: "Minutes" },
+            amount: 365.49, progress: 90,
+            deadlineIn: 120, acceptedAgo: 136, pm: PM.mei
+        },
+        {
+            jobId: 47558, tab: "active",
+            project: "Clinical trial summary — site 115",
+            service: "Attestation", source: "English", target: "Tamil",
+            specialty: "Education", count: { value: 4, unit: "Documents" },
+            amount: 189.44, progress: 72,
+            deadlineIn: 22, acceptedAgo: 26, pm: PM.sara
+        },
+        {
+            jobId: 47671, tab: "active",
+            project: "Real estate listing — unit 116",
+            service: "Attestation", source: "English", target: "Chinese",
+            specialty: "Education", count: { value: 1, unit: "Documents" },
+            amount: 82.28, progress: 58,
+            deadlineIn: 22, acceptedAgo: 60, pm: PM.daniel
+        },
+        {
+            jobId: 47610, tab: "active",
+            project: "University transcript — student 117",
+            service: "Proofreading", source: "Farsi", target: "English",
+            specialty: "Academic", count: { value: 3500, unit: "Words" },
+            amount: 325.5, progress: 45,
+            deadlineIn: 44, acceptedAgo: 74, pm: PM.tane
+        },
+        {
+            jobId: 47548, tab: "active",
+            project: "Marketing brochure — campaign 118",
+            service: "Translation", source: "Burmese", target: "English",
+            specialty: "Legal", count: { value: 900, unit: "Words" },
+            amount: 55.8, progress: 65,
+            deadlineIn: 52, acceptedAgo: 64, pm: PM.tane
+        },
+        {
+            jobId: 47638, tab: "active",
+            project: "Council notice — district 119",
+            service: "Certified", source: "English", target: "Somali",
+            specialty: "Government", count: { value: 1100, unit: "Words" },
+            amount: 71.5, progress: 8,
+            deadlineIn: 10, acceptedAgo: 29, pm: PM.daniel
+        },
+        {
+            jobId: 47573, tab: "active",
+            project: "Medical device manual — revision 120",
+            service: "Subtitling", source: "Spanish", target: "English",
+            specialty: "Marketing", count: { value: 40, unit: "Minutes" },
+            amount: 240.4, progress: 52,
+            deadlineIn: 120, acceptedAgo: 159, pm: PM.tane
+        },
+        {
+            jobId: 47649, tab: "active",
+            project: "Insurance claim form — batch 121",
+            service: "Certified", source: "English", target: "Nepali",
+            specialty: "Legal", count: { value: 1000, unit: "Words" },
+            amount: 76.0, progress: 58,
+            deadlineIn: 64, acceptedAgo: 101, pm: PM.daniel
+        },
+        {
+            jobId: 47645, tab: "active",
+            project: "Council notice — district 122",
+            service: "Subtitling", source: "English", target: "Samoan",
+            specialty: "Technical", count: { value: 19, unit: "Minutes" },
+            amount: 140.79, progress: 30,
+            deadlineIn: 78, acceptedAgo: 84, pm: PM.sara
+        },
+        {
+            jobId: 47665, tab: "active",
+            project: "Employee handbook — 123 update",
+            service: "Proofreading", source: "Farsi", target: "English",
+            specialty: "Academic", count: { value: 3600, unit: "Words" },
+            amount: 165.6, progress: 38,
+            deadlineIn: 52, acceptedAgo: 76, pm: PM.sara
+        },
+
+        /* ── Waiting: job_ready = NR — assigned, files not released ── */
+        {
+            jobId: 48002, tab: "waiting",
+            project: "Clinical trial protocol — site 4",
+            service: "Translation", source: "English", target: "Arabic",
+            specialty: "Medical", count: { value: 6800, unit: "Words" },
+            amount: 374.0, progress: 0,
+            deadlineIn: 140, acceptedAgo: 2, pm: PM.sara
+        },
+        {
+            jobId: 47996, tab: "waiting",
+            project: "Annual report 2025 — financial notes",
+            service: "Translation", source: "English", target: "Chinese",
+            specialty: "Financial", count: { value: 4300, unit: "Words" },
+            amount: 236.5, progress: 0,
+            deadlineIn: 120, acceptedAgo: 5, pm: PM.mei
+        },
+        {
+            jobId: 47991, tab: "waiting",
+            project: "Court bundle — affidavits and exhibits",
+            service: "Certified", source: "English", target: "Tamil",
+            specialty: "Legal", count: { value: 3900, unit: "Words" },
+            amount: 273.0, progress: 0,
+            deadlineIn: 96, acceptedAgo: 8, pm: PM.tane
+        },
+        {
+            jobId: 47987, tab: "waiting",
+            project: "Employee handbook — health & safety section",
+            service: "Translation", source: "English", target: "Nepali",
+            specialty: "Technical", count: { value: 2400, unit: "Words" },
+            amount: 132.0, progress: 0,
+            deadlineIn: 72, acceptedAgo: 12, pm: PM.daniel
+        },
+        {
+            jobId: 47984, tab: "waiting",
+            project: "Museum audio guide script",
+            service: "Translation", source: "English", target: "Te Reo Māori",
+            specialty: "Academic", count: { value: 1700, unit: "Words" },
+            amount: 93.5, progress: 0,
+            deadlineIn: 168, acceptedAgo: 18, pm: PM.tane
+        },
+        {
+            jobId: 47317, tab: "waiting",
+            project: "Marketing brochure — campaign 201",
+            service: "DTP", source: "Indonesian", target: "English",
+            specialty: "IT / Software", count: { value: 800, unit: "Words" },
+            amount: 58.4, progress: 0,
+            deadlineIn: 84, acceptedAgo: 12, pm: PM.mei
+        },
+        {
+            jobId: 47441, tab: "waiting",
+            project: "Training video script — module 202",
+            service: "DTP", source: "Russian", target: "English",
+            specialty: "IT / Software", count: { value: 43, unit: "Physical Pages" },
+            amount: 631.24, progress: 0,
+            deadlineIn: 96, acceptedAgo: 4, pm: PM.daniel
+        },
+        {
+            jobId: 47367, tab: "waiting",
+            project: "Tender document — package 203",
+            service: "Translation", source: "English", target: "Tongan",
+            specialty: "Marketing", count: { value: 2600, unit: "Words" },
+            amount: 137.8, progress: 0,
+            deadlineIn: 170, acceptedAgo: 16, pm: PM.mei
+        },
+        {
+            jobId: 47341, tab: "waiting",
+            project: "Safety data sheet — chemical 204",
+            service: "Translation", source: "English", target: "Samoan",
+            specialty: "Legal", count: { value: 2700, unit: "Words" },
+            amount: 91.8, progress: 0,
+            deadlineIn: 260, acceptedAgo: 15, pm: PM.tane
+        },
+        {
+            jobId: 47332, tab: "waiting",
+            project: "Tender document — package 205",
+            service: "Translation", source: "English", target: "Tongan",
+            specialty: "Medical", count: { value: 1600, unit: "Words" },
+            amount: 118.4, progress: 0,
+            deadlineIn: 48, acceptedAgo: 10, pm: PM.mei
+        },
+        {
+            jobId: 47404, tab: "waiting",
+            project: "University transcript — student 206",
+            service: "Translation", source: "English", target: "Tamil",
+            specialty: "Legal", count: { value: 6000, unit: "Words" },
+            amount: 300.0, progress: 0,
+            deadlineIn: 190, acceptedAgo: 5, pm: PM.daniel
+        },
+        {
+            jobId: 47471, tab: "waiting",
+            project: "Marketing brochure — campaign 207",
+            service: "Translation", source: "English", target: "Hindi",
+            specialty: "Government", count: { value: 600, unit: "Words" },
+            amount: 26.4, progress: 0,
+            deadlineIn: 260, acceptedAgo: 8, pm: PM.mei
+        },
+        {
+            jobId: 47358, tab: "waiting",
+            project: "School newsletter — issue 208",
+            service: "Translation", source: "English", target: "Filipino",
+            specialty: "Marketing", count: { value: 4300, unit: "Words" },
+            amount: 206.4, progress: 0,
+            deadlineIn: 84, acceptedAgo: 1, pm: PM.daniel
+        },
+        {
+            jobId: 47384, tab: "waiting",
+            project: "Marketing brochure — campaign 209",
+            service: "Interpreting", source: "English", target: "Japanese",
+            specialty: "Legal", count: { value: 3, unit: "Hours" },
+            amount: 210.0, progress: 0,
+            deadlineIn: 48, acceptedAgo: 4, pm: PM.mei
+        },
+        {
+            jobId: 47430, tab: "waiting",
+            project: "Training video script — module 210",
+            service: "Proofreading", source: "English", target: "Japanese",
+            specialty: "Academic", count: { value: 2400, unit: "Words" },
+            amount: 187.2, progress: 0,
+            deadlineIn: 60, acceptedAgo: 13, pm: PM.daniel
+        },
+        {
+            jobId: 47488, tab: "waiting",
+            project: "Council notice — district 211",
+            service: "Translation", source: "Thai", target: "English",
+            specialty: "Legal", count: { value: 400, unit: "Words" },
+            amount: 28.8, progress: 0,
+            deadlineIn: 220, acceptedAgo: 7, pm: PM.mei
+        },
+        {
+            jobId: 47379, tab: "waiting",
+            project: "School newsletter — issue 212",
+            service: "Translation", source: "Burmese", target: "English",
+            specialty: "Technical", count: { value: 5500, unit: "Words" },
+            amount: 302.5, progress: 0,
+            deadlineIn: 220, acceptedAgo: 14, pm: PM.mei
+        },
+        {
+            jobId: 47457, tab: "waiting",
+            project: "Safety data sheet — chemical 213",
+            service: "Interpreting", source: "Russian", target: "English",
+            specialty: "Medical", count: { value: 2, unit: "Hours" },
+            amount: 140.0, progress: 0,
+            deadlineIn: 190, acceptedAgo: 10, pm: PM.tane
+        },
+        {
+            jobId: 47413, tab: "waiting",
+            project: "Airport signage set — terminal 214",
+            service: "Translation", source: "English", target: "Nepali",
+            specialty: "Medical", count: { value: 2100, unit: "Words" },
+            amount: 134.4, progress: 0,
+            deadlineIn: 220, acceptedAgo: 7, pm: PM.tane
+        },
+        {
+            jobId: 47492, tab: "waiting",
+            project: "Airport signage set — terminal 215",
+            service: "Translation", source: "Burmese", target: "English",
+            specialty: "Government", count: { value: 2700, unit: "Words" },
+            amount: 191.7, progress: 0,
+            deadlineIn: 84, acceptedAgo: 10, pm: PM.daniel
+        },
+        {
+            jobId: 47406, tab: "waiting",
+            project: "Clinical trial summary — site 216",
+            service: "Certified", source: "English", target: "Te Reo Māori",
+            specialty: "Legal", count: { value: 1000, unit: "Words" },
+            amount: 50.0, progress: 0,
+            deadlineIn: 220, acceptedAgo: 19, pm: PM.daniel
+        },
+        {
+            jobId: 47327, tab: "waiting",
+            project: "Airport signage set — terminal 217",
+            service: "DTP", source: "Spanish", target: "English",
+            specialty: "Technical", count: { value: 19, unit: "Physical Pages" },
+            amount: 315.4, progress: 0,
+            deadlineIn: 130, acceptedAgo: 8, pm: PM.daniel
+        },
+        {
+            jobId: 47470, tab: "waiting",
+            project: "Employment contract — hire 218",
+            service: "Subtitling", source: "English", target: "Somali",
+            specialty: "Technical", count: { value: 50, unit: "Minutes" },
+            amount: 437.0, progress: 0,
+            deadlineIn: 170, acceptedAgo: 18, pm: PM.mei
+        },
+        {
+            jobId: 47415, tab: "waiting",
+            project: "Employment contract — hire 219",
+            service: "DTP", source: "Indonesian", target: "English",
+            specialty: "IT / Software", count: { value: 57, unit: "Physical Pages" },
+            amount: 946.77, progress: 0,
+            deadlineIn: 96, acceptedAgo: 8, pm: PM.mei
+        },
+        {
+            jobId: 47438, tab: "waiting",
+            project: "Annual report — section 220",
+            service: "Subtitling", source: "Spanish", target: "English",
+            specialty: "Technical", count: { value: 32, unit: "Minutes" },
+            amount: 237.12, progress: 0,
+            deadlineIn: 60, acceptedAgo: 5, pm: PM.daniel
+        },
+        {
+            jobId: 47315, tab: "waiting",
+            project: "Tender document — package 221",
+            service: "DTP", source: "Thai", target: "English",
+            specialty: "Technical", count: { value: 3400, unit: "Words" },
+            amount: 159.8, progress: 0,
+            deadlineIn: 84, acceptedAgo: 14, pm: PM.tane
+        },
+        {
+            jobId: 47407, tab: "waiting",
+            project: "Museum exhibit label set — hall 222",
+            service: "Proofreading", source: "Thai", target: "English",
+            specialty: "Academic", count: { value: 4600, unit: "Words" },
+            amount: 312.8, progress: 0,
+            deadlineIn: 170, acceptedAgo: 18, pm: PM.daniel
+        },
+        {
+            jobId: 47342, tab: "waiting",
+            project: "Customer support macros — set 223",
+            service: "Certified", source: "English", target: "Japanese",
+            specialty: "Immigration", count: { value: 8, unit: "Documents" },
+            amount: 427.92, progress: 0,
+            deadlineIn: 150, acceptedAgo: 5, pm: PM.sara
+        },
+        {
+            jobId: 47397, tab: "waiting",
+            project: "Rental agreement — property 224",
+            service: "DTP", source: "Farsi", target: "English",
+            specialty: "Technical", count: { value: 800, unit: "Words" },
+            amount: 64.8, progress: 0,
+            deadlineIn: 110, acceptedAgo: 7, pm: PM.tane
+        },
+        {
+            jobId: 47389, tab: "waiting",
+            project: "Employment contract — hire 225",
+            service: "Interpreting", source: "English", target: "Filipino",
+            specialty: "Legal", count: { value: 4, unit: "Hours" },
+            amount: 280.0, progress: 0,
+            deadlineIn: 84, acceptedAgo: 3, pm: PM.sara
+        },
+
+        /* ── Completed: delivered, and somewhere along the bill run ── */
+        {
+            jobId: 47901, tab: "completed", jobStatus: "approved",
+            project: "Vaccine information sheet — update 6",
+            service: "Translation", source: "English", target: "Samoan",
+            specialty: "Medical", count: { value: 1200, unit: "Words" },
+            amount: 66.0, progress: 100,
+            deadlineIn: -72, acceptedAgo: 140, deliveredAgo: 80,
+            billId: "B-2211", jobSlip: true, pm: PM.daniel
+        },
+        {
+            jobId: 47894, tab: "completed", jobStatus: "billed",
+            project: "Insurance policy wording — motor",
+            service: "Certified", source: "English", target: "Chinese",
+            specialty: "Legal", count: { value: 5100, unit: "Words" },
+            amount: 357.0, progress: 100,
+            deadlineIn: -120, acceptedAgo: 210, deliveredAgo: 128,
+            billId: "B-2208", jobSlip: true, pm: PM.mei
+        },
+        {
+            jobId: 47888, tab: "completed", jobStatus: "settled",
+            project: "Airport wayfinding signage — stage 2",
+            service: "DTP", source: "English", target: "Arabic",
+            specialty: "Technical", count: { value: 640, unit: "Words" },
+            amount: 44.8, progress: 100,
+            deadlineIn: -200, acceptedAgo: 290, deliveredAgo: 206,
+            billId: "B-2199", jobSlip: true, pm: PM.sara
+        },
+        /* Delivered, not billed yet — the Bill ID stays blank, as it does live */
+        {
+            jobId: 47875, tab: "completed", jobStatus: "delivered",
+            project: "Family group conference — Christchurch",
+            service: "Interpreting", source: "English", target: "Dari",
+            specialty: "Government", count: { value: 2.5, unit: "Hours" },
+            amount: 175.0, progress: 100,
+            deadlineIn: -34, acceptedAgo: 96, deliveredAgo: 40,
+            billId: null, jobSlip: false, pm: PM.tane
+        },
+        {
+            jobId: 47869, tab: "completed", jobStatus: "approved",
+            project: "Tenancy agreement pack — 6 properties",
+            service: "Certified", source: "English", target: "Tamil",
+            specialty: "Legal", count: { value: 3300, unit: "Words" },
+            amount: 231.0, progress: 100,
+            deadlineIn: -250, acceptedAgo: 340, deliveredAgo: 262,
+            billId: "B-2190", jobSlip: true, pm: PM.tane
+        },
+        {
+            jobId: 47860, tab: "completed", jobStatus: "settled",
+            project: "Food safety plan — dairy processing site",
+            service: "Translation", source: "English", target: "Nepali",
+            specialty: "Technical", count: { value: 4200, unit: "Words" },
+            amount: 231.0, progress: 100,
+            deadlineIn: -310, acceptedAgo: 400, deliveredAgo: 318,
+            billId: "B-2184", jobSlip: true, pm: PM.daniel
+        },
+        {
+            jobId: 47852, tab: "completed", jobStatus: "billed",
+            project: "Driver licence theory handbook — update",
+            service: "Translation", source: "English", target: "Filipino",
+            specialty: "Government", count: { value: 5500, unit: "Words" },
+            amount: 319.0, progress: 100,
+            deadlineIn: -370, acceptedAgo: 470, deliveredAgo: 379,
+            billId: "B-2177", jobSlip: true, pm: PM.sara
+        },
+        {
+            jobId: 47844, tab: "completed", jobStatus: "settled",
+            project: "Consumer app onboarding strings — release 4.2",
+            service: "DTP", source: "English", target: "Chinese",
+            specialty: "IT / Software", count: { value: 1500, unit: "Words" },
+            amount: 96.0, progress: 100,
+            deadlineIn: -430, acceptedAgo: 530, deliveredAgo: 441,
+            billId: "B-2170", jobSlip: true, pm: PM.mei
+        },
+        {
+            jobId: 47111, tab: "completed", jobStatus: "settled",
+            project: "Birth certificate — file 301",
+            service: "Translation", source: "English", target: "Korean",
+            specialty: "Medical", count: { value: 600, unit: "Words" },
+            amount: 48.0, progress: 100,
+            deadlineIn: -320, acceptedAgo: 448, deliveredAgo: 330,
+            billId: "B-2160", jobSlip: true, pm: PM.daniel
+        },
+        {
+            jobId: 47159, tab: "completed", jobStatus: "settled",
+            project: "Court filing — case file 302",
+            service: "Transcreation", source: "Urdu", target: "English",
+            specialty: "Marketing", count: { value: 2100, unit: "Words" },
+            amount: 201.6, progress: 100,
+            deadlineIn: -120, acceptedAgo: 189, deliveredAgo: 144,
+            billId: "B-2152", jobSlip: true, pm: PM.daniel
+        },
+        {
+            jobId: 47259, tab: "completed", jobStatus: "billed",
+            project: "Council notice — district 303",
+            service: "Interpreting", source: "Burmese", target: "English",
+            specialty: "Medical", count: { value: 5, unit: "Hours" },
+            amount: 350.0, progress: 100,
+            deadlineIn: -10, acceptedAgo: 112, deliveredAgo: 39,
+            billId: "B-2148", jobSlip: true, pm: PM.sara
+        },
+        {
+            jobId: 47275, tab: "completed", jobStatus: "settled",
+            project: "University transcript — student 304",
+            service: "Interpreting", source: "French", target: "English",
+            specialty: "Government", count: { value: 6, unit: "Hours" },
+            amount: 420.0, progress: 100,
+            deadlineIn: -150, acceptedAgo: 278, deliveredAgo: 165,
+            billId: "B-2138", jobSlip: true, pm: PM.mei
+        },
+        {
+            jobId: 47014, tab: "completed", jobStatus: "settled",
+            project: "Patient consent form — trial 305",
+            service: "Certified", source: "English", target: "Samoan",
+            specialty: "Immigration", count: { value: 8, unit: "Documents" },
+            amount: 484.48, progress: 100,
+            deadlineIn: -440, acceptedAgo: 495, deliveredAgo: 452,
+            billId: "B-2131", jobSlip: true, pm: PM.daniel
+        },
+        {
+            jobId: 47208, tab: "completed", jobStatus: "settled",
+            project: "Warranty terms — product line 306",
+            service: "Certified", source: "English", target: "Punjabi",
+            specialty: "Government", count: { value: 5, unit: "Documents" },
+            amount: 317.05, progress: 100,
+            deadlineIn: -190, acceptedAgo: 266, deliveredAgo: 216,
+            billId: "B-2121", jobSlip: true, pm: PM.tane
+        },
+        {
+            jobId: 47283, tab: "completed", jobStatus: "billed",
+            project: "Clinical trial summary — site 307",
+            service: "Translation", source: "English", target: "Samoan",
+            specialty: "Medical", count: { value: 2200, unit: "Words" },
+            amount: 136.4, progress: 100,
+            deadlineIn: -120, acceptedAgo: 235, deliveredAgo: 145,
+            billId: "B-2111", jobSlip: true, pm: PM.mei
+        },
+        {
+            jobId: 47094, tab: "completed", jobStatus: "approved",
+            project: "Court filing — case file 308",
+            service: "DTP", source: "English", target: "Japanese",
+            specialty: "IT / Software", count: { value: 20, unit: "Physical Pages" },
+            amount: 308.6, progress: 100,
+            deadlineIn: -50, acceptedAgo: 156, deliveredAgo: 75,
+            billId: "B-2103", jobSlip: true, pm: PM.mei
+        },
+        {
+            jobId: 47027, tab: "completed", jobStatus: "billed",
+            project: "University transcript — student 309",
+            service: "Certified", source: "English", target: "Nepali",
+            specialty: "Legal", count: { value: 2300, unit: "Words" },
+            amount: 101.2, progress: 100,
+            deadlineIn: -320, acceptedAgo: 427, deliveredAgo: 326,
+            billId: "B-2096", jobSlip: true, pm: PM.sara
+        },
+        {
+            jobId: 47244, tab: "completed", jobStatus: "delivered",
+            project: "Product spec sheet — release 310",
+            service: "Translation", source: "Farsi", target: "English",
+            specialty: "Medical", count: { value: 4200, unit: "Words" },
+            amount: 285.6, progress: 100,
+            deadlineIn: -440, acceptedAgo: 515, deliveredAgo: 444,
+            billId: null, jobSlip: false, pm: PM.tane
+        },
+        {
+            jobId: 47060, tab: "completed", jobStatus: "settled",
+            project: "Warranty terms — product line 311",
+            service: "Proofreading", source: "French", target: "English",
+            specialty: "Academic", count: { value: 2700, unit: "Words" },
+            amount: 113.4, progress: 100,
+            deadlineIn: -230, acceptedAgo: 350, deliveredAgo: 251,
+            billId: "B-2086", jobSlip: true, pm: PM.tane
+        },
+        {
+            jobId: 47106, tab: "completed", jobStatus: "approved",
+            project: "Marketing brochure — campaign 312",
+            service: "DTP", source: "English", target: "Nepali",
+            specialty: "IT / Software", count: { value: 23, unit: "Physical Pages" },
+            amount: 206.77, progress: 100,
+            deadlineIn: -70, acceptedAgo: 123, deliveredAgo: 93,
+            billId: "B-2080", jobSlip: true, pm: PM.daniel
+        },
+        {
+            jobId: 47147, tab: "completed", jobStatus: "billed",
+            project: "Customer support macros — set 313",
+            service: "Proofreading", source: "English", target: "Samoan",
+            specialty: "Legal", count: { value: 1500, unit: "Words" },
+            amount: 94.5, progress: 100,
+            deadlineIn: -320, acceptedAgo: 427, deliveredAgo: 349,
+            billId: "B-2075", jobSlip: true, pm: PM.daniel
+        },
+        {
+            jobId: 47072, tab: "completed", jobStatus: "delivered",
+            project: "Warranty terms — product line 314",
+            service: "Certified", source: "French", target: "English",
+            specialty: "Government", count: { value: 2500, unit: "Words" },
+            amount: 97.5, progress: 100,
+            deadlineIn: -10, acceptedAgo: 76, deliveredAgo: 17,
+            billId: null, jobSlip: false, pm: PM.mei
+        },
+        {
+            jobId: 47020, tab: "completed", jobStatus: "settled",
+            project: "Product spec sheet — release 315",
+            service: "Translation", source: "English", target: "Somali",
+            specialty: "Marketing", count: { value: 3700, unit: "Words" },
+            amount: 388.5, progress: 100,
+            deadlineIn: -320, acceptedAgo: 429, deliveredAgo: 332,
+            billId: "B-2071", jobSlip: true, pm: PM.sara
+        },
+        {
+            jobId: 47240, tab: "completed", jobStatus: "settled",
+            project: "Product spec sheet — release 316",
+            service: "Certified", source: "Burmese", target: "English",
+            specialty: "Immigration", count: { value: 3900, unit: "Words" },
+            amount: 327.6, progress: 100,
+            deadlineIn: -70, acceptedAgo: 171, deliveredAgo: 77,
+            billId: "B-2064", jobSlip: true, pm: PM.tane
+        },
+        {
+            jobId: 47253, tab: "completed", jobStatus: "billed",
+            project: "Warranty terms — product line 317",
+            service: "Subtitling", source: "English", target: "Tamil",
+            specialty: "Marketing", count: { value: 36, unit: "Minutes" },
+            amount: 250.56, progress: 100,
+            deadlineIn: -270, acceptedAgo: 401, deliveredAgo: 284,
+            billId: "B-2055", jobSlip: true, pm: PM.sara
+        },
+        {
+            jobId: 47000, tab: "completed", jobStatus: "settled",
+            project: "Birth certificate — file 318",
+            service: "Translation", source: "English", target: "Punjabi",
+            specialty: "Technical", count: { value: 3000, unit: "Words" },
+            amount: 117.0, progress: 100,
+            deadlineIn: -120, acceptedAgo: 167, deliveredAgo: 123,
+            billId: "B-2044", jobSlip: true, pm: PM.mei
+        },
+        {
+            jobId: 47248, tab: "completed", jobStatus: "delivered",
+            project: "Clinical trial summary — site 319",
+            service: "Subtitling", source: "French", target: "English",
+            specialty: "Marketing", count: { value: 18, unit: "Minutes" },
+            amount: 208.26, progress: 100,
+            deadlineIn: -10, acceptedAgo: 129, deliveredAgo: 32,
+            billId: null, jobSlip: false, pm: PM.daniel
+        },
+        {
+            jobId: 47078, tab: "completed", jobStatus: "settled",
+            project: "Pharmaceutical label — batch 320",
+            service: "Translation", source: "English", target: "Nepali",
+            specialty: "Government", count: { value: 4900, unit: "Words" },
+            amount: 308.7, progress: 100,
+            deadlineIn: -320, acceptedAgo: 416, deliveredAgo: 331,
+            billId: "B-2033", jobSlip: true, pm: PM.tane
+        },
+        {
+            jobId: 47069, tab: "completed", jobStatus: "delivered",
+            project: "Customer support macros — set 321",
+            service: "Subtitling", source: "Spanish", target: "English",
+            specialty: "Marketing", count: { value: 44, unit: "Minutes" },
+            amount: 507.32, progress: 100,
+            deadlineIn: -70, acceptedAgo: 169, deliveredAgo: 96,
+            billId: null, jobSlip: false, pm: PM.mei
+        },
+        {
+            jobId: 47076, tab: "completed", jobStatus: "settled",
+            project: "Warranty terms — product line 322",
+            service: "Subtitling", source: "English", target: "Japanese",
+            specialty: "Technical", count: { value: 33, unit: "Minutes" },
+            amount: 312.84, progress: 100,
+            deadlineIn: -190, acceptedAgo: 271, deliveredAgo: 207,
+            billId: "B-2026", jobSlip: true, pm: PM.tane
+        }
+    ];
+
+    RP.JOBS = JOBS.map(function (row) {
+        var out = Object.assign({}, row);
+        out.id = "J-" + row.jobId;
+        out.deadline = new Date(NOW + row.deadlineIn * HOUR);
+        out.acceptedAt = new Date(NOW - row.acceptedAgo * HOUR);
+        out.deliveredAt = row.deliveredAgo == null ? null : new Date(NOW - row.deliveredAgo * HOUR);
+        return out;
+    });
+
+    /* Each step of the money run gets its own hue, so the column reads
+       at a glance. The classes are status.css's own. */
+    RP.JOB_STATUS = {
+        delivered: { label: "Delivered", pill: "status-processing" },
+        approved: { label: "Approved", pill: "status-accepted" },
+        billed: { label: "Billed", pill: "status-accounted" },
+        settled: { label: "Settled", pill: "status-settled" }
+    };
+
+    RP.JOB_TABS = [
+        { key: "active", label: "Active jobs", icon: "circle-play" },
+        { key: "waiting", label: "Waiting jobs", icon: "rotate-clock" },
+        { key: "completed", label: "Completed jobs", icon: "circle-check" }
+    ];
+
     /* The sidebar badge counts what still needs a decision. */
     RP.USER.invitationCount = RP.INVITATIONS.filter(function (row) {
         return row.status === "new_invite" || row.status === "new_bid";
