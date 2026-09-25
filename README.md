@@ -58,8 +58,7 @@ resource portal preview/
     │   ├── variables.css       design tokens — copied from config/static/css/variables.css
     │   ├── base.css            app shell, icons, toasts, segmented filter, placeholders
     │   ├── sidebar.css         rp-sidebar
-    │   ├── topbar.css          rp-topbar, availability pill, profile menu
-    │   ├── availability.css    the availability dropdown (ws-dropdown)
+    │   ├── topbar.css          rp-topbar, availability pill + dropdown, profile menu
     │   ├── toolbar.css         copied from config/static/css/cu_table_toolbar.css
     │   ├── table.css           copied from config/static/tables/table.css
     │   ├── status.css          copied from config/static/css/status.css
@@ -73,7 +72,6 @@ resource portal preview/
     │   ├── icons.js            inline Lucide set — RP.icon('name')
     │   ├── data.js             the dummy records and the signed-in resource
     │   ├── layout.js           renders sidebar + topbar + modals into #rp-layout
-    │   ├── availability.js     the availability pill + dropdown (dummy logic)
     │   ├── columns-modal.js    reusable "Customize Columns" modal
     │   ├── navigation-tabs.js  copied from config/static/js/navigation-tabs.js
     │   ├── invitations.js      table render, search, sort, expand, paginate
@@ -172,30 +170,13 @@ The sidebar and topbar need no edits — they are generated from `NAV` and `RP.U
   Teal, amber and purple sit ~100°+ apart on the hue wheel, so the three tell apart without
   reading them. There is no accepted, declined or expired state: the real list drops the row once
   the invitation is deactivated, and the preview does the same.
-- The availability dropdown is `templates/partials/_work_status_modal.html` grown into a small
-  scheduler. It keeps `#ChangeWorkStatusPost`, `#submit_change_status`, the three statuses
-  (`Translator.WORK_STATUS_OPTIONS`) with their descriptions, and the `ws-option*` / `ws-field*` /
-  `ws-btn*` classes, so `submitWorkStatus()` still binds and `$(form).serialize()` posts every
-  field. Add back the CSRF token and the two hidden inputs. The new fields are named after the
-  models that already exist:
-
-  | Field | Control | Goes to |
-  | --- | --- | --- |
-  | `work_status` | Status tiles | `Translator.work_status` |
-  | `work_status_from` / `work_status_to` | Period (Today · Tomorrow · This week · Next week, or dates) | **no field yet** |
-  | `working_days` (×7, `monday` … `sunday`) | Working days toggles | `ResourceDailyWorkSchedule.is_working_day` per `day` |
-  | `start_time` / `end_time` | Working hours | `ResourceDailyWorkSchedule.start_time` / `end_time` |
-  | `timezone` | Time-zone picker | `Profile.timezone` |
-  | `work_status_description` | Note | `Translator.work_status_description` |
-
-  Under the day toggles, the period is drawn in the same seven columns: working days in the
-  status's colour, days off hatched. The bar above Save says the result in words ("Busy on 2
-  working days · Back to Available on Mon 28 Sept") and turns into a warning, with Save
-  disabled, when no day in the period is a working day.
-
-  In the preview the logic is dummy: Save repaints the pill ("Busy until 27 Sept") and shows a
-  toast, Cancel discards the edits, and nothing is stored — reloading resets it. The time-zone
-  list is a short fixed one; use `Profile.TIMEZONES` in Django.
+- The availability dropdown is `templates/partials/_work_status_modal.html` redesigned: same three
+  statuses (`Translator.WORK_STATUS_OPTIONS`), same descriptions, the optional note, Save / Cancel.
+  It keeps `#ChangeWorkStatusPost`, `name="work_status"`, `name="work_status_description"`,
+  `#submit_change_status` and the `ws-option*` / `ws-field*` / `ws-btn*` classes, so
+  `submitWorkStatus()` binds as before. What changes is the container (`.ws-dropdown`, anchored
+  under the pill, no backdrop or scroll lock) — add back the CSRF token and the two hidden inputs.
+  In the preview it is UI only: Save shows a toast and every close resets the form.
 
 ---
 
@@ -253,4 +234,4 @@ opening or collapsing the sidebar moves that line by 184px, which a viewport que
 | `/` | Jump to the search field |
 | `Esc` | Leave the search field, close any modal, the availability dropdown or the mobile drawer |
 | `Enter` | Submit a bid, when the bid field has focus |
-| `↑` / `↓` / `←` / `→` | Move between statuses in the availability dropdown |
+| `↑` / `↓` | Move between statuses in the availability dropdown |
