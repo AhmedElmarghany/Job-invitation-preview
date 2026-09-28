@@ -270,28 +270,26 @@
             '<div class="rp-profile__identity-name">' +
             user.fullName +
             "</div>" +
-            '<div class="rp-profile__identity-meta">' +
             '<span class="rp-profile__id-chip">' +
             user.resourceId +
             "</span>" +
-            '<span class="rp-profile__since">Partner since ' +
-            user.partnerSince +
+            "</div>" +
+            "</div>" +
+            '<div class="rp-profile__list">' +
+            '<div class="rp-profile__balance" title="Balance = Opening balance + bills - Payments">' +
+            '<span class="rp-profile__balance-label">Balance</span>' +
+            '<span class="rp-profile__balance-amount">' +
+            '<span class="rp-profile__balance-value">' +
+            user.balance +
+            ' <span class="rp-profile__balance-currency">' +
+            user.currency +
+            "</span></span>" +
+            (user.currency !== "USD"
+                ? '<span class="rp-profile__balance-sub">≈ ' + user.balanceUsd + " USD</span>"
+                : "") +
             "</span>" +
             "</div>" +
-            "</div>" +
-            "</div>" +
-            '<div class="rp-profile__balance">' +
-            '<span class="rp-profile__balance-label">' +
-            icon("balance") +
-            "Balance</span>" +
-            '<span class="rp-profile__balance-value">' +
-            user.currency +
-            " " +
-            user.balance +
-            '<small class="rp-profile__balance-sub">≈ USD ' +
-            user.balanceUsd +
-            "</small></span>" +
-            "</div>" +
+            '<div class="rp-profile__divider"></div>' +
             '<div class="rp-profile__help" id="rpHelpGroup">' +
             '<button class="rp-profile__item" type="button" id="rpHelpToggle" aria-expanded="false">' +
             icon("help") +
@@ -308,6 +306,10 @@
             '<button class="rp-profile__item rp-profile__item--danger" type="button" data-logout-trigger aria-haspopup="dialog">' +
             icon("logout") +
             "Sign out</button>" +
+            "</div>" +
+            '<p class="rp-profile__since">Partner since <strong>' +
+            user.partnerSince +
+            "</strong></p>" +
             "</div>" +
             "</div>"
         );
