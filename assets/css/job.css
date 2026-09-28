@@ -1,0 +1,2336 @@
+/* ============================================================
+   PAGE: Single job
+   One accepted job, from the resource's side: what to work on,
+   what to deliver, who to ask. Anatomy and values follow the
+   Invitations panel — white cards, navy section titles, one navy
+   control per decision, gold kept for accents.
+   ============================================================ */
+
+.rp-jobpage {
+    --job-max: 1280px;
+    --job-pad: 24px;
+    --job-aside: 340px;
+}
+
+@media (max-width: 767px) {
+    .rp-jobpage {
+        --job-pad: 14px;
+    }
+}
+
+/* ── Head ────────────────────────────────────────────────── */
+.rp-jobhead {
+    background: var(--color-surface-white);
+}
+
+.rp-jobhead__inner {
+    max-width: var(--job-max);
+    margin: 0 auto;
+    padding: 14px var(--job-pad) 18px;
+}
+
+.rp-crumbs {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+    font-size: 12.5px;
+    color: var(--color-text-secondary);
+}
+
+.rp-crumbs a {
+    color: inherit;
+    text-decoration: none;
+    border-radius: var(--radius-xs);
+}
+
+.rp-crumbs a:hover {
+    color: var(--color-text-primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.rp-crumbs svg {
+    width: 12px;
+    height: 12px;
+    opacity: 0.6;
+}
+
+.rp-crumbs [aria-current] {
+    color: var(--color-text-primary);
+    font-weight: 500;
+}
+
+.rp-jobhead__row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 12px;
+}
+
+.rp-jobhead__mark {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    background: var(--color-surface-subtle);
+    color: var(--color-brand-navy);
+}
+
+.rp-jobhead__mark svg {
+    width: 22px;
+    height: 22px;
+}
+
+.rp-jobhead__titles {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.rp-jobhead__title {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: var(--color-text-primary);
+    overflow-wrap: anywhere;
+}
+
+.rp-jobhead__meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px 8px;
+    margin: 5px 0 0;
+    font-size: 13.5px;
+    color: var(--color-text-secondary);
+}
+
+.rp-jobhead__status.status-pill {
+    flex: 0 0 auto;
+    align-self: flex-start;
+    margin-top: 3px;
+    padding: 3px 11px 2px 9px;
+    font-size: 13.5px;
+}
+
+.rp-idchip {
+    padding: 1px 8px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-subtle);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-dot {
+    display: inline-block;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.5;
+    flex: 0 0 auto;
+}
+
+.rp-pair {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.rp-pair svg {
+    width: 12px;
+    height: 12px;
+    color: var(--color-text-secondary);
+}
+
+@media (max-width: 767px) {
+    .rp-jobhead__row {
+        flex-wrap: wrap;
+        align-items: flex-start;
+    }
+
+    .rp-jobhead__mark {
+        width: 40px;
+        height: 40px;
+    }
+
+    /* A long title would otherwise wrap below the mark instead of beside it */
+    .rp-jobhead__titles {
+        flex: 1 1 calc(100% - 54px);
+    }
+
+    .rp-jobhead__title {
+        font-size: 19px;
+    }
+
+    /* Under the meta line, lined up with the title rather than the mark */
+    .rp-jobhead__status.status-pill {
+        order: 3;
+        margin: 0 0 0 54px;
+    }
+}
+
+/* ── Section tabs ────────────────────────────────────────── */
+.rp-jobtabs {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+}
+
+/* Tab labels line up with the cards: the link's own 14px padding is taken off the gutter */
+.rp-jobtabs .navigation-tabs-inner {
+    max-width: var(--job-max);
+    margin: 0 auto;
+    padding: 0 calc(var(--job-pad) - 14px);
+}
+
+.rp-jobtabs.is-hidden {
+    display: none;
+}
+
+/* ── Layout ──────────────────────────────────────────────── */
+.rp-jobwrap {
+    container: rpJob / inline-size;
+    flex: 1;
+}
+
+.rp-job {
+    max-width: var(--job-max);
+    margin: 0 auto;
+    padding: 20px var(--job-pad) 56px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--job-aside);
+    grid-template-areas: "main aside";
+    gap: 20px;
+    align-items: start;
+}
+
+.rp-job__main {
+    grid-area: main;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.rp-job__aside {
+    grid-area: aside;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: sticky;
+    top: calc(var(--tabs-h) + 20px);
+}
+
+/* A sticky column taller than the screen would hide its own bottom */
+@media (max-height: 760px) {
+    .rp-job__aside {
+        position: static;
+    }
+}
+
+/* Stacked: the summary comes straight after the head, the contact card last */
+@container rpJob (max-width: 980px) {
+    .rp-job {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas: "summary" "main" "contact";
+        gap: 16px;
+        padding-top: 16px;
+    }
+
+    .rp-job__aside {
+        display: contents;
+    }
+
+    .rp-summary {
+        grid-area: summary;
+    }
+
+    .rp-contact {
+        grid-area: contact;
+    }
+}
+
+/* ── Card ────────────────────────────────────────────────── */
+.rp-card {
+    container: rpCard / inline-size;
+    min-width: 0;
+    background: var(--color-surface-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    scroll-margin-top: calc(var(--tabs-h) + 16px);
+}
+
+.rp-card__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-height: 26px;
+    padding: 14px 18px 0;
+}
+
+.rp-card__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.07em;
+    color: var(--color-brand-navy);
+}
+
+.rp-card__title svg {
+    width: 18px;
+    height: 18px;
+    color: var(--color-brand-navy);
+}
+
+.rp-card__count {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 7px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-subtle);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0;
+    color: var(--color-brand-navy);
+}
+
+.rp-card__aside {
+    font-size: 12.5px;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+}
+
+.rp-card__aside strong {
+    font-weight: 500;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-card__body {
+    padding: 12px 18px 18px;
+}
+
+.rp-card__divider {
+    height: 1px;
+    margin: 16px 0;
+    background: var(--color-border);
+}
+
+@media (max-width: 767px) {
+    .rp-card__head {
+        padding: 12px 14px 0;
+    }
+
+    .rp-card__body {
+        padding: 10px 14px 14px;
+    }
+}
+
+/* The section's one bulk action, as .rp-sec__action on the Invitations panel */
+.rp-textbtn {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 26px;
+    padding: 0 9px;
+    border: 0;
+    border-radius: var(--radius-xs);
+    background: var(--color-surface-white);
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--color-brand-navy);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.rp-textbtn svg {
+    width: 13px;
+    height: 13px;
+}
+
+.rp-textbtn:hover:not(:disabled) {
+    background: var(--color-surface-subtle);
+}
+
+.rp-textbtn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+/* ── Buttons ─────────────────────────────────────────────── */
+.rp-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    height: 40px;
+    padding: 0 18px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background var(--transition-fast), border-color var(--transition-fast),
+                color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.rp-button svg {
+    width: 15px;
+    height: 15px;
+    flex: 0 0 auto;
+}
+
+.rp-button--primary {
+    background: var(--color-brand-navy);
+    color: var(--color-surface-white);
+}
+
+.rp-button--primary:hover:not(:disabled) {
+    background: var(--color-brand-navy-hover);
+}
+
+.rp-button--primary:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-navy);
+}
+
+.rp-button--outline {
+    background: var(--color-surface-white);
+    border-color: var(--color-border);
+    color: var(--color-text-primary);
+}
+
+.rp-button--outline:hover:not(:disabled) {
+    background: var(--color-surface-subtle);
+    border-color: var(--color-border-hover);
+}
+
+.rp-button--outline:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-gold);
+}
+
+.rp-button--block {
+    width: 100%;
+}
+
+.rp-button--sm {
+    height: 32px;
+    padding: 0 12px;
+    font-size: 12.5px;
+}
+
+.rp-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.rp-iconbtn {
+    flex: 0 0 auto;
+    display: inline-grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-white);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.rp-iconbtn svg {
+    width: 15px;
+    height: 15px;
+}
+
+.rp-iconbtn:hover:not(:disabled) {
+    background: var(--color-brand-navy);
+    color: var(--color-surface-white);
+}
+
+.rp-iconbtn--square {
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+}
+
+.rp-iconbtn--square svg {
+    width: 18px;
+    height: 18px;
+}
+
+.rp-chipbtn {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 30px;
+    padding: 0 11px;
+    border: 0;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-white);
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--color-brand-navy);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.rp-chipbtn svg {
+    width: 14px;
+    height: 14px;
+}
+
+.rp-chipbtn:hover {
+    background: var(--color-brand-navy);
+    color: var(--color-surface-white);
+}
+
+/* ── Callouts ────────────────────────────────────────────── */
+.rp-callout {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-inset);
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--color-text-secondary);
+}
+
+.rp-callout svg {
+    width: 15px;
+    height: 15px;
+    flex: 0 0 auto;
+    margin-top: 1px;
+}
+
+.rp-callout strong {
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.rp-callout--info svg {
+    color: var(--color-link);
+}
+
+.rp-callout--ok svg {
+    color: var(--color-status-success);
+}
+
+.rp-callout--warn {
+    background: var(--color-status-warning-bg);
+    color: var(--color-status-warning);
+}
+
+.rp-callout--warn strong {
+    color: var(--color-status-warning);
+}
+
+.rp-callout--danger {
+    background: var(--color-status-danger-bg);
+    color: var(--color-status-danger);
+}
+
+.rp-callout--danger strong {
+    color: var(--color-status-danger);
+}
+
+/* ── Progress stepper ────────────────────────────────────── */
+.rp-steps {
+    list-style: none;
+    margin: 0;
+    padding: 6px 0 2px;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.rp-step {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 0 4px;
+    text-align: center;
+}
+
+/* The line leading into a step; navy once the job has reached it */
+.rp-step::before {
+    content: "";
+    position: absolute;
+    top: 11px;
+    left: calc(-50% + 18px);
+    right: calc(50% + 18px);
+    height: 2px;
+    border-radius: 2px;
+    background: var(--color-border);
+}
+
+.rp-step:first-child::before {
+    display: none;
+}
+
+.rp-step.is-done::before,
+.rp-step.is-current::before {
+    background: var(--color-brand-navy);
+}
+
+.rp-step__dot {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--color-border);
+    border-radius: 50%;
+    background: var(--color-surface-white);
+    color: var(--color-surface-white);
+}
+
+.rp-step__dot svg {
+    width: 12px;
+    height: 12px;
+}
+
+.rp-step.is-done .rp-step__dot {
+    background: var(--color-brand-navy);
+    border-color: var(--color-brand-navy);
+}
+
+.rp-step.is-current .rp-step__dot {
+    --step-accent: var(--color-brand-navy);
+    border-color: var(--step-accent);
+    box-shadow: 0 0 0 4px rgba(11, 38, 62, 0.1);
+}
+
+.rp-step.is-current .rp-step__dot::after {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--step-accent);
+}
+
+.rp-step.is-danger .rp-step__dot {
+    --step-accent: var(--color-status-danger);
+    box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.12);
+}
+
+.rp-step.is-waiting .rp-step__dot {
+    --step-accent: var(--color-status-warning);
+    box-shadow: 0 0 0 4px rgba(180, 83, 9, 0.12);
+}
+
+.rp-step__text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.rp-step__label {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.3;
+    color: var(--color-text-secondary);
+}
+
+.rp-step.is-done .rp-step__label,
+.rp-step.is-current .rp-step__label {
+    color: var(--color-text-primary);
+}
+
+.rp-step__sub {
+    font-size: 12px;
+    line-height: 1.35;
+    color: var(--color-text-secondary);
+}
+
+.rp-step.is-danger .rp-step__sub {
+    font-weight: 500;
+    color: var(--color-status-danger);
+}
+
+.rp-step.is-waiting .rp-step__sub {
+    font-weight: 500;
+    color: var(--color-status-warning);
+}
+
+/* Six steps stop fitting side by side on a narrow card; they stack */
+@container rpCard (max-width: 560px) {
+    .rp-steps {
+        grid-template-columns: minmax(0, 1fr);
+        padding-top: 2px;
+    }
+
+    .rp-step {
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 0 0 14px;
+        text-align: left;
+    }
+
+    .rp-step::before {
+        display: none;
+    }
+
+    /* Vertical mode draws the line leading out of a step instead */
+    .rp-step:not(:last-child)::after {
+        content: "";
+        position: absolute;
+        left: 11px;
+        top: 28px;
+        bottom: 2px;
+        width: 2px;
+        border-radius: 2px;
+        background: var(--color-border);
+    }
+
+    .rp-step.is-done:not(:last-child)::after {
+        background: var(--color-brand-navy);
+    }
+
+    .rp-step__dot {
+        flex: 0 0 auto;
+    }
+
+    .rp-step__text {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        padding-top: 2px;
+    }
+}
+
+/* ── Facts ───────────────────────────────────────────────── */
+.rp-kv {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 14px 24px;
+    margin: 0;
+}
+
+.rp-kv > div {
+    min-width: 0;
+}
+
+.rp-kv dt {
+    margin: 0 0 2px;
+    font-size: 13px;
+    line-height: 1.3;
+    color: var(--color-text-secondary);
+}
+
+.rp-kv dd {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--color-text-primary);
+    overflow-wrap: anywhere;
+}
+
+.rp-kv__hint {
+    display: block;
+    margin-top: 1px;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--color-text-secondary);
+}
+
+.rp-kv__wide {
+    grid-column: 1 / -1;
+}
+
+/* ── Files ───────────────────────────────────────────────── */
+.rp-group + .rp-group {
+    margin-top: 16px;
+}
+
+.rp-group__label {
+    margin: 0 0 7px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+}
+
+.rp-filelist {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.rp-fileitem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 8px 7px 8px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-inset);
+    transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.rp-fileitem:hover {
+    background: var(--color-surface-subtle);
+    border-color: var(--color-border-hover);
+}
+
+.rp-fileitem__icon {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-white);
+    color: var(--color-brand-navy);
+}
+
+.rp-fileitem__icon svg {
+    width: 17px;
+    height: 17px;
+}
+
+.rp-fileitem__text {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.rp-fileitem__name {
+    font-size: 14px;
+    color: var(--color-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rp-fileitem__hint {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rp-fileitem__tag {
+    flex: 0 0 auto;
+    padding: 1px 8px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-white);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--color-brand-navy);
+    white-space: nowrap;
+}
+
+.rp-fileitem__size {
+    flex: 0 0 auto;
+    min-width: 52px;
+    text-align: right;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+}
+
+.rp-fileitem__actions {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* A template is the one file the delivery has to follow, so it carries the gold */
+.rp-fileitem--template .rp-fileitem__icon {
+    background: var(--color-surface-gold-pale);
+    color: var(--color-brand-gold);
+}
+
+.rp-fileitem--template .rp-fileitem__tag {
+    background: var(--color-surface-gold-pale);
+    color: #6e5c2a;
+}
+
+.rp-fileitem--template .rp-fileitem__hint {
+    color: #6e5c2a;
+}
+
+.rp-fileitem--locked {
+    background: var(--color-surface-white);
+    border-style: dashed;
+}
+
+.rp-fileitem--locked:hover {
+    background: var(--color-surface-white);
+    border-color: var(--color-border);
+}
+
+.rp-fileitem--locked .rp-fileitem__icon {
+    background: var(--color-surface-inset);
+    color: var(--color-text-secondary);
+}
+
+.rp-fileitem--locked .rp-fileitem__name {
+    color: var(--color-text-secondary);
+}
+
+.rp-lockchip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 10px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-inset);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+}
+
+.rp-lockchip svg {
+    width: 12px;
+    height: 12px;
+}
+
+/* An AI translation still being generated shows its progress in place of the actions */
+.rp-genbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 150px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+}
+
+.rp-bar {
+    flex: 1 1 auto;
+    height: 6px;
+    border-radius: var(--radius-full);
+    background: #e6e2d8;
+    overflow: hidden;
+}
+
+.rp-bar > span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--color-brand-gold);
+}
+
+@container rpCard (max-width: 520px) {
+    .rp-fileitem__tag,
+    .rp-fileitem__size {
+        display: none;
+    }
+
+    .rp-genbar {
+        width: 96px;
+    }
+}
+
+/* ── Instructions ────────────────────────────────────────── */
+.rp-instr {
+    display: flex;
+    gap: 12px;
+}
+
+.rp-instr + .rp-instr {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--color-border);
+}
+
+.rp-avatar {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-subtle);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--color-brand-navy);
+    text-transform: uppercase;
+}
+
+.rp-avatar svg {
+    width: 16px;
+    height: 16px;
+}
+
+.rp-avatar--muted {
+    background: var(--color-surface-subtle);
+}
+
+.rp-instr__who {
+    margin: 0;
+    font-size: 12.5px;
+    color: var(--color-text-secondary);
+}
+
+.rp-instr__who strong {
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.rp-instr__text {
+    margin: 3px 0 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--color-text-primary);
+}
+
+.rp-muted {
+    margin: 0;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+}
+
+/* ── Delivery ────────────────────────────────────────────── */
+.rp-sub + .rp-sub {
+    margin-top: 18px;
+}
+
+.rp-sub__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.rp-sub__title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.rp-sub__note {
+    margin: 2px 0 0;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--color-text-secondary);
+}
+
+.rp-checklist {
+    list-style: none;
+    margin: 10px 0 0;
+    padding: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.rp-checkrow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 10px 9px 12px;
+    transition: background var(--transition-fast);
+}
+
+.rp-checkrow + .rp-checkrow {
+    border-top: 1px solid var(--color-border);
+}
+
+.rp-checkrow:nth-child(even) {
+    background: var(--color-surface-inset);
+}
+
+.rp-checkrow__mark {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--color-surface-subtle);
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-checkrow__mark svg {
+    width: 12px;
+    height: 12px;
+}
+
+.rp-checkrow.is-done .rp-checkrow__mark {
+    background: var(--color-brand-navy);
+    color: var(--color-surface-white);
+}
+
+.rp-checkrow.is-skipped .rp-checkrow__mark {
+    background: var(--color-surface-white);
+    box-shadow: inset 0 0 0 1px var(--color-border);
+}
+
+.rp-checkrow__text {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--color-text-primary);
+}
+
+.rp-checkrow.is-skipped .rp-checkrow__text {
+    color: var(--color-text-secondary);
+}
+
+.rp-checkrow__by {
+    display: block;
+    font-size: 12px;
+    color: var(--color-text-secondary);
+}
+
+/* The segmented control from base.css, one pair per checklist item */
+.rp-checkrow .rp-segmented {
+    flex: 0 0 auto;
+    background: var(--color-surface-white);
+}
+
+.rp-checkrow:nth-child(even) .rp-segmented {
+    background: var(--color-surface-white);
+}
+
+.rp-checkrow .rp-segment {
+    font-size: 12.5px;
+}
+
+.rp-checkrow .rp-segment svg {
+    width: 13px;
+    height: 13px;
+}
+
+.rp-checkrow .rp-segment.is-active[data-answer="C"] {
+    background: var(--color-brand-navy);
+    color: var(--color-surface-white);
+}
+
+.rp-result {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--color-brand-navy);
+    white-space: nowrap;
+}
+
+.rp-result svg {
+    width: 14px;
+    height: 14px;
+}
+
+.rp-result--skip {
+    color: var(--color-text-secondary);
+}
+
+.rp-verify {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    user-select: none;
+}
+
+.rp-verify input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--color-brand-navy);
+    cursor: pointer;
+}
+
+.rp-verify:has(input:checked) {
+    color: var(--color-brand-navy);
+}
+
+@container rpCard (max-width: 560px) {
+    .rp-checkrow {
+        flex-wrap: wrap;
+    }
+
+    .rp-checkrow .rp-segmented,
+    .rp-checkrow .rp-verify {
+        margin-left: 34px;
+    }
+}
+
+/* ── Upload ──────────────────────────────────────────────── */
+.rp-drop {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 14px;
+    padding: 16px 18px;
+    border: 1.5px dashed var(--gold-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-gold-pale);
+    cursor: pointer;
+    transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.rp-drop:hover,
+.rp-drop.is-dragover {
+    border-color: var(--color-brand-gold);
+}
+
+.rp-drop:focus-within {
+    box-shadow: var(--focus-ring-gold);
+}
+
+.rp-drop input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.rp-drop__icon {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--color-surface-white);
+    color: var(--color-brand-gold);
+}
+
+.rp-drop__icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.rp-drop__title {
+    display: block;
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.rp-drop__title u {
+    color: var(--color-brand-navy);
+    text-underline-offset: 2px;
+}
+
+.rp-drop__note {
+    display: block;
+    margin: 2px 0 0;
+    font-size: 12.5px;
+    color: var(--color-text-secondary);
+}
+
+.rp-drop.is-locked {
+    border-color: var(--color-border);
+    background: var(--color-surface-inset);
+    cursor: not-allowed;
+}
+
+.rp-drop.is-locked input {
+    cursor: not-allowed;
+}
+
+.rp-drop.is-locked .rp-drop__icon {
+    color: var(--color-text-secondary);
+}
+
+.rp-drop.is-locked .rp-drop__title u {
+    color: inherit;
+    text-decoration: none;
+}
+
+.rp-deliverbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.rp-deliverbar .rp-fileitem {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+@container rpCard (max-width: 520px) {
+    .rp-deliverbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+/* Delivery before the job is started or released */
+.rp-locked {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-inset);
+}
+
+.rp-locked__icon {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--color-surface-white);
+    color: var(--color-text-secondary);
+}
+
+.rp-locked__icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.rp-locked__title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.rp-locked__note {
+    margin: 2px 0 0;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--color-text-secondary);
+}
+
+/* ── Glossaries ──────────────────────────────────────────── */
+.rp-glosslist {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.rp-gloss {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 10px 11px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+}
+
+.rp-gloss__icon {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-subtle);
+    color: var(--color-brand-navy);
+}
+
+.rp-gloss__icon svg {
+    width: 17px;
+    height: 17px;
+}
+
+.rp-gloss__text {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.rp-gloss__name {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.rp-gloss__meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 7px;
+    margin: 2px 0 0;
+    font-size: 12.5px;
+    color: var(--color-text-secondary);
+}
+
+.rp-gloss__note {
+    margin: 4px 0 0;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--color-text-secondary);
+}
+
+.rp-langchip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 1px 8px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-subtle);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-brand-navy);
+    white-space: nowrap;
+}
+
+.rp-langchip svg {
+    width: 11px;
+    height: 11px;
+}
+
+.rp-gloss .rp-chipbtn {
+    background: var(--color-surface-inset);
+}
+
+.rp-gloss .rp-chipbtn:hover {
+    background: var(--color-brand-navy);
+}
+
+.rp-gloss .rp-iconbtn {
+    background: var(--color-surface-inset);
+}
+
+.rp-gloss .rp-iconbtn:hover {
+    background: var(--color-brand-navy);
+}
+
+@container rpCard (max-width: 520px) {
+    .rp-gloss {
+        flex-wrap: wrap;
+    }
+
+    .rp-gloss .rp-fileitem__actions {
+        margin-left: 48px;
+    }
+}
+
+/* ── Chat ────────────────────────────────────────────────── */
+.rp-chat__thread {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 460px;
+    margin-top: 12px;
+    padding: 16px 18px;
+    overflow-y: auto;
+    background: var(--color-surface-inset);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.rp-chat__day {
+    align-self: center;
+    padding: 2px 10px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    background: var(--color-surface-white);
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+}
+
+.rp-msg {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    max-width: min(78%, 560px);
+}
+
+.rp-msg .rp-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 10.5px;
+}
+
+.rp-msg--me {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.rp-msg__body {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.rp-msg--me .rp-msg__body {
+    align-items: flex-end;
+}
+
+.rp-msg__bubble {
+    padding: 9px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 14px 14px 14px 4px;
+    background: var(--color-surface-white);
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--color-text-primary);
+    overflow-wrap: anywhere;
+}
+
+.rp-msg--me .rp-msg__bubble {
+    border-color: var(--color-brand-navy);
+    border-radius: 14px 14px 4px 14px;
+    background: var(--color-brand-navy);
+    color: var(--color-surface-white);
+}
+
+.rp-msg__meta {
+    margin-top: 4px;
+    padding: 0 4px;
+    font-size: 11.5px;
+    color: var(--color-text-secondary);
+}
+
+.rp-msg__file {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 6px 6px 6px 8px;
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-inset);
+    font-size: 13px;
+}
+
+.rp-msg__file > svg {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 auto;
+    color: var(--color-brand-navy);
+}
+
+.rp-msg__file span {
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rp-msg__file small {
+    flex: 0 0 auto;
+    font-size: 12px;
+    color: var(--color-text-secondary);
+}
+
+.rp-msg__file .rp-iconbtn {
+    width: 26px;
+    height: 26px;
+}
+
+.rp-msg--me .rp-msg__file {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.rp-msg--me .rp-msg__file > svg,
+.rp-msg--me .rp-msg__file small {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.rp-voice {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 220px;
+}
+
+.rp-voice__play {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--color-brand-navy);
+    color: var(--color-surface-white);
+    cursor: pointer;
+}
+
+.rp-voice__play svg {
+    width: 13px;
+    height: 13px;
+    margin-left: 2px;
+}
+
+/* A drawn waveform: bars of varying height, repeated across the track */
+.rp-voice__wave {
+    flex: 1 1 auto;
+    height: 24px;
+    background:
+        linear-gradient(to top, #c9c4b5 0 100%) 0 50% / 3px 40% no-repeat,
+        linear-gradient(to top, #c9c4b5 0 100%) 6px 50% / 3px 70% no-repeat,
+        linear-gradient(to top, #c9c4b5 0 100%) 12px 50% / 3px 55% no-repeat,
+        linear-gradient(to top, #c9c4b5 0 100%) 18px 50% / 3px 90% no-repeat,
+        linear-gradient(to top, #c9c4b5 0 100%) 24px 50% / 3px 45% no-repeat,
+        linear-gradient(to top, #c9c4b5 0 100%) 30px 50% / 3px 75% no-repeat,
+        linear-gradient(to top, #c9c4b5 0 100%) 36px 50% / 3px 35% no-repeat,
+        linear-gradient(to top, #c9c4b5 0 100%) 42px 50% / 3px 65% no-repeat;
+    background-repeat: repeat-x;
+    background-size: 48px 100%;
+    -webkit-mask: linear-gradient(90deg, #000 0 100%);
+}
+
+.rp-voice__time {
+    flex: 0 0 auto;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-secondary);
+}
+
+.rp-chat__composer {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    padding: 12px 14px 14px;
+}
+
+.rp-chat__input {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 40px;
+    max-height: 140px;
+    padding: 10px 12px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-inset);
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--color-text-primary);
+    resize: none;
+    outline: none;
+    transition: background var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.rp-chat__input::placeholder {
+    color: var(--color-text-placeholder);
+}
+
+.rp-chat__input:focus {
+    background: var(--color-surface-white);
+    border-color: var(--gold-border);
+    box-shadow: var(--focus-ring-gold);
+}
+
+.rp-chat__send {
+    width: 40px;
+    padding: 0;
+}
+
+.rp-chat__send svg {
+    width: 17px;
+    height: 17px;
+}
+
+@container rpCard (max-width: 520px) {
+    .rp-chat__thread {
+        padding: 12px;
+    }
+
+    .rp-msg {
+        max-width: 92%;
+    }
+}
+
+/* ── Summary (aside) ─────────────────────────────────────── */
+.rp-summary {
+    padding: 16px 18px 18px;
+}
+
+.rp-summary__label {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+}
+
+.rp-summary__amount {
+    margin: 3px 0 0;
+    font-family: var(--font-heading);
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Unit grey, value in colour — the split the table's price cells already make */
+.rp-summary__currency {
+    color: var(--color-text-secondary);
+}
+
+.rp-summary__usd {
+    margin-left: 6px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0;
+    color: var(--color-text-secondary);
+}
+
+.rp-summary__meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 5px 0 0;
+    font-size: 12.5px;
+    color: var(--color-text-secondary);
+}
+
+.rp-srows {
+    margin: 14px 0 0;
+    border-top: 1px solid var(--color-border);
+}
+
+.rp-srow {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.rp-srow dt {
+    flex: 0 0 auto;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+}
+
+.rp-srow dd {
+    min-width: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+    text-align: right;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.rp-srow__hint {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--color-text-secondary);
+}
+
+.rp-srow--bar dd {
+    flex: 1 1 auto;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    max-width: 190px;
+}
+
+.rp-srow--bar strong {
+    font-size: 12px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-link {
+    color: var(--color-link);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.rp-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+/* Countdown chip, the same pill as the Invitations offer card */
+.rp-time {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 9px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-subtle);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+}
+
+.rp-time svg {
+    width: 12px;
+    height: 12px;
+    flex: 0 0 auto;
+}
+
+.rp-time strong {
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-primary);
+}
+
+.rp-time--urgent {
+    background: var(--color-status-danger-bg);
+    color: var(--color-status-danger);
+}
+
+.rp-time--urgent strong {
+    color: var(--color-status-danger);
+}
+
+.rp-time--ok {
+    background: #ecfdf3;
+    color: var(--color-status-success);
+}
+
+.rp-time--ok strong {
+    color: var(--color-status-success);
+}
+
+.rp-summary__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.rp-summary .rp-callout {
+    margin-top: 14px;
+}
+
+.rp-summary__actions + .rp-callout {
+    margin-top: 12px;
+}
+
+/* ── Contact (aside) ─────────────────────────────────────── */
+.rp-contact {
+    padding: 16px 18px 18px;
+}
+
+.rp-contact__who {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.rp-contact .rp-avatar {
+    width: 44px;
+    height: 44px;
+    font-size: 14px;
+}
+
+.rp-contact__name {
+    margin: 0;
+    font-size: 14.5px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.rp-contact__role {
+    margin: 1px 0 0;
+    font-size: 12.5px;
+    color: var(--color-text-secondary);
+}
+
+.rp-contact__links {
+    list-style: none;
+    margin: 14px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.rp-contact__link {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+    font-size: 13.5px;
+    color: var(--color-link);
+    text-decoration: none;
+}
+
+.rp-contact__link svg {
+    width: 15px;
+    height: 15px;
+    flex: 0 0 auto;
+    color: var(--color-text-secondary);
+}
+
+.rp-contact__link span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rp-contact__link:hover span {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.rp-contact__link small {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--color-text-secondary);
+}
+
+.rp-contact .rp-button {
+    margin-top: 16px;
+}
+
+/* ── Not found ───────────────────────────────────────────── */
+.rp-notfound {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 72px 24px;
+    text-align: center;
+}
+
+.rp-notfound__icon {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    margin-bottom: 4px;
+    border-radius: 50%;
+    background: var(--color-surface-subtle);
+    color: var(--color-brand-gold);
+}
+
+.rp-notfound__icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.rp-notfound__title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.rp-notfound__note {
+    margin: 0 0 8px;
+    max-width: 380px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+}
+
+/* ============================================================
+   MODAL — file viewer and the start-job notice
+   ============================================================ */
+.rp-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(11, 38, 62, 0.45);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    /* Hidden only once the fade ends; shown at once, so focus can land the moment it opens */
+    transition: opacity var(--transition-base), visibility 0s linear 0.28s;
+}
+
+.rp-modal.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition: opacity var(--transition-base), visibility 0s;
+}
+
+.rp-modal__panel {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 440px;
+    max-height: calc(100vh - 48px);
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    background: var(--color-surface-white);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(12px) scale(0.98);
+    transition: transform var(--transition-base);
+}
+
+.rp-modal.is-open .rp-modal__panel {
+    transform: none;
+}
+
+.rp-modal--viewer .rp-modal__panel {
+    max-width: 1120px;
+    height: calc(100vh - 48px);
+}
+
+.rp-modal__head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px 12px 18px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.rp-modal__titles {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.rp-modal__title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rp-modal__sub {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 1px 0 0;
+    font-size: 12.5px;
+    color: var(--color-text-secondary);
+}
+
+.rp-modal__tools {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.rp-modal__tools .rp-iconbtn--square {
+    width: 36px;
+    height: 36px;
+}
+
+.rp-modal__tools .rp-iconbtn--square:hover {
+    background: var(--color-surface-subtle);
+    color: var(--color-text-primary);
+}
+
+.rp-modal__body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+}
+
+.rp-modal__foot {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 14px 18px;
+    border-top: 1px solid var(--color-border);
+}
+
+@media (max-width: 767px) {
+    .rp-modal {
+        padding: 0;
+        align-items: flex-end;
+    }
+
+    .rp-modal__panel {
+        max-height: 92vh;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+
+    .rp-modal--viewer .rp-modal__panel {
+        height: 100%;
+        max-height: none;
+        border-radius: 0;
+    }
+
+    .rp-modal__tools .rp-button {
+        display: none;
+    }
+}
+
+/* ── Notice (start with a template) ─────────────────────── */
+.rp-notice {
+    padding: 22px 22px 18px;
+}
+
+.rp-notice__icon {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--color-surface-gold-pale);
+    color: var(--color-brand-gold);
+}
+
+.rp-notice__icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.rp-notice__title {
+    margin: 14px 0 0;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.rp-notice__text {
+    margin: 6px 0 0;
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+}
+
+.rp-notice .rp-filelist {
+    margin-top: 14px;
+}
+
+.rp-notice .rp-fileitem__tag {
+    display: none;
+}
+
+/* ── Viewer ──────────────────────────────────────────────── */
+.rp-viewer {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+    min-height: 100%;
+    padding: 24px;
+    background: #ebe9e2;
+}
+
+.rp-viewer--compare {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.rp-viewer--compare.is-solo {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.rp-viewer--compare.is-solo .rp-viewer__pane:first-child {
+    display: none;
+}
+
+.rp-viewer__pane {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.rp-viewer__label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+}
+
+.rp-viewer__label svg {
+    width: 14px;
+    height: 14px;
+}
+
+.rp-doc {
+    width: 100%;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 56px 56px;
+    border-radius: 4px;
+    background: var(--color-surface-white);
+    box-shadow: var(--shadow-sm);
+}
+
+.rp-doc__title {
+    margin: 0 0 6px;
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 1.3;
+    color: var(--color-text-primary);
+}
+
+.rp-doc__kicker {
+    margin: 0 0 26px;
+    font-size: 12px;
+    color: var(--color-text-secondary);
+}
+
+/* Placeholder lines stand in for the file's text */
+.rp-skel {
+    height: 8px;
+    margin-bottom: 12px;
+    border-radius: var(--radius-full);
+    background: #ecebe6;
+}
+
+.rp-skel--head {
+    height: 11px;
+    margin: 26px 0 16px;
+    background: #dedbd1;
+}
+
+[dir="rtl"] .rp-skel {
+    margin-left: auto;
+}
+
+.rp-sheet {
+    display: grid;
+    grid-template-columns: 40px repeat(4, minmax(0, 1fr));
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--color-surface-white);
+}
+
+.rp-sheet span {
+    height: 30px;
+    border-right: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+    background: linear-gradient(#ecebe6, #ecebe6) 10px 50% / calc(100% - 28px) 7px no-repeat;
+}
+
+.rp-sheet span:nth-child(-n + 5) {
+    background-color: var(--color-surface-inset);
+}
+
+.rp-sheet span:nth-child(5n + 1) {
+    background: var(--color-surface-inset);
+}
+
+.rp-video {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    max-width: 860px;
+    margin: 0 auto;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(160deg, #1d3550, #0b263e);
+    overflow: hidden;
+}
+
+.rp-video__play {
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.14);
+    color: var(--color-surface-white);
+}
+
+.rp-video__play svg {
+    width: 26px;
+    height: 26px;
+    margin-left: 4px;
+}
+
+.rp-video__caption {
+    position: absolute;
+    left: 50%;
+    bottom: 26px;
+    transform: translateX(-50%);
+    padding: 4px 12px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.55);
+    font-size: 15px;
+    color: var(--color-surface-white);
+    white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+    .rp-viewer {
+        padding: 12px;
+    }
+
+    .rp-viewer--compare {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .rp-doc {
+        padding: 28px 22px 32px;
+    }
+}

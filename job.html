@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Job · Resource Portal</title>
+  <meta name="description" content="Redesign preview of the AGATO resource portal — a single job.">
+  <link rel="icon" href="assets/img/logo.png">
+
+  <link rel="stylesheet" href="assets/css/variables.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/sidebar.css">
+  <link rel="stylesheet" href="assets/css/topbar.css">
+  <link rel="stylesheet" href="assets/css/navigation-tabs.css">
+  <link rel="stylesheet" href="assets/css/status.css">
+  <link rel="stylesheet" href="assets/css/logout-modal.css">
+  <link rel="stylesheet" href="assets/css/job.css">
+</head>
+<body>
+
+  <!-- Sidebar + topbar + modals are injected here by assets/js/layout.js -->
+  <div id="rp-layout" data-page="jobs" data-title="Job Details"></div>
+
+  <main class="rp-page rp-jobpage">
+
+    <!-- Title, breadcrumb and status — filled by job.js -->
+    <header class="rp-jobhead" id="rpJobHead"></header>
+
+    <!-- Section tabs: the Orders nav again, used as a jump list -->
+    <nav class="navigation-tabs rp-jobtabs" id="rpJobNav" aria-label="Job sections">
+      <button class="navigation-tabs-fade-left" type="button" aria-label="Scroll tabs left" tabindex="-1" aria-hidden="true">
+        <span class="navigation-tabs-chevron" data-rp-icon="chevron-left"></span>
+      </button>
+      <div class="navigation-tabs-inner" id="rpJobTabs"></div>
+      <button class="navigation-tabs-fade-right" type="button" aria-label="Scroll tabs right" tabindex="-1" aria-hidden="true">
+        <span class="navigation-tabs-chevron" data-rp-icon="chevron-right"></span>
+      </button>
+    </nav>
+
+    <!-- Cards on the left, payout and project manager on the right -->
+    <div class="rp-jobwrap">
+      <div class="rp-job" id="rpJob"></div>
+    </div>
+
+  </main>
+
+  <!-- File viewer and the start-job notice share one modal -->
+  <div class="rp-modal" id="rpModal" role="dialog" aria-modal="true" aria-labelledby="rpModalTitle" aria-hidden="true">
+    <div class="rp-modal__panel" id="rpModalPanel"></div>
+  </div>
+
+  <script src="assets/js/icons.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script src="assets/js/navigation-tabs.js"></script>
+  <script src="assets/js/job.js"></script>
+</body>
+</html>

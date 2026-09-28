@@ -35,6 +35,7 @@ Nothing inside the folder refers to the folder name, so renaming is safe.
 | --- | --- |
 | `invitations.html` | **Built.** Job Invitations — the full page. |
 | `jobs.html` | **Built.** My Jobs — Active / Waiting / Completed in one page. |
+| `job.html` | **Built.** A single job — opens from a Job ID on My Jobs (`job.html?id=J-47990`). |
 | `dashboard.html` | Placeholder |
 | `earnings.html` | Placeholder |
 | `professional-profile.html` | Placeholder |
@@ -52,6 +53,7 @@ resource portal preview/
 ├── index.html                  redirect → invitations.html
 ├── invitations.html            built page
 ├── jobs.html                   built page
+├── job.html                    built page — one job, ?id=J-…
 ├── dashboard.html …            placeholders, one per sidebar entry
 └── assets/
     ├── css/
@@ -67,7 +69,8 @@ resource portal preview/
     │   ├── logout-modal.css    copied from config/static/css/logoutModal.css
     │   ├── navigation-tabs.css copied from config/static/css/navigation-tabs.css
     │   ├── invitations.css     page-specific: rows, expanded panel, offer card
-    │   └── jobs.css            page-specific: table chrome, waiting/slip cells
+    │   ├── jobs.css            page-specific: table chrome, waiting/slip cells
+    │   └── job.css             page-specific: job head, cards, checklist, upload, chat, viewer
     ├── js/
     │   ├── icons.js            inline Lucide set — RP.icon('name')
     │   ├── data.js             the dummy records and the signed-in resource
@@ -75,7 +78,8 @@ resource portal preview/
     │   ├── columns-modal.js    reusable "Customize Columns" modal
     │   ├── navigation-tabs.js  copied from config/static/js/navigation-tabs.js
     │   ├── invitations.js      table render, search, sort, expand, paginate
-    │   └── jobs.js             tabs, per-tab columns, search, sort, paginate
+    │   ├── jobs.js             tabs, per-tab columns, search, sort, paginate
+    │   └── job.js              one job: sections, jump tabs, start / deliver, chat, file viewer
     ├── fonts/                  IBM Plex Sans + Serif (woff2)
     └── img/                    logo.png, placeholder-headshot.png
 ```
@@ -94,6 +98,10 @@ one, and re-measures when the buttons are written in by the page's script.
 rules that `invitations.css` also carries. That is deliberate: the Invitations design is signed
 off and its file is not to be reopened. When both pages are ported to Django these rules belong
 in one stylesheet, not two.
+
+`job.css` does the same for the Invitations panel: facts, section titles, file rows, the serif
+amount, the countdown chip and the navy CTA are rebuilt at the same sizes and colours under the
+job page's own class names, rather than loading `invitations.css` on a second page.
 
 `variables.css` is a copy too — it is the one file to re-sync if the tokens move.
 
@@ -131,8 +139,66 @@ Three cells are borrowed rather than designed:
 - **Job Slip** and **Actions** use `table.css`'s own `.btn-view` / `.actions-wrap` / `.tooltip-wrap`.
 
 Rows do not expand. The job is already accepted, so there is no offer to read and no decision to
-make — the Job ID and the eye button both go to the job page. In the preview they raise a toast
-saying so.
+make — the Job ID and the eye button both open `job.html?id=…`. The open tab is kept in the URL
+(`jobs.html?tab=waiting`), so Back and the job page's breadcrumb land on the same tab.
+
+---
+
+## Single job
+
+`job.html?id=J-47990` is the resource's page for one accepted job, redesigned from
+`templates/tms/job.html` and `tms/sections/section_2.html`. It keeps every decision the original
+makes and gives each one a place:
+
+- **Head** — breadcrumb back to the tab it came from, a service mark, the project name, then
+  ID · service · languages · specialty, and the status pill.
+- **Jump tabs** — the Orders nav again, sticky, with a scroll-spy. It lists only the sections the
+  job has, as `job_details_nav.html` does.
+- **Cards on the left**, in working order — read, prepare, deliver, ask.
+- **A sticky aside on the right** — the payout, the deadline and the one next step, then the
+  project manager. Below ~980px of content width it stacks, with the summary straight after the
+  head. On a screen shorter than 760px it stops being sticky rather than hide its own bottom.
+
+| Section | Holds | In the original |
+| --- | --- | --- |
+| Overview | Six steps — Assigned, In progress, Delivered, Approved, Billed, Settled — then the facts | The facts table; the steps are new |
+| Instructions | Comments from the project manager and from the customer | The two comment rows |
+| Files | *To work on*: source, original, template, brief. *For reference*: reference, pre-translated, AI translation | Template / Original / Source / Pre-Translated / AI Translation / Reference rows |
+| Glossaries | Name with its ID (`#150`), client or public, term count, the pair in full ("English → Arabic"), View terms and CSV | Glossaries card, per-language services only |
+| Delivery | The previous job's checklist to verify, this job's checklist, the upload; afterwards the delivered files and the submitted checklist | Delivery and Completed files cards |
+| Chat | The job's thread with the project manager | `chat/order_and_job_chat.html` |
+| Aside | Payout with ≈ USD and the rate, deadline with a countdown, progress, the next step; email, phone and mobile | Amount and Deadline rows, Start job, Project manager card |
+
+The status decides the page, the way `section_2.html` does:
+
+| Status | Open this | The aside offers |
+| --- | --- | --- |
+| Assigned, files not released (`job_ready = NR`) | `J-48002` | Start job, disabled, with a note naming the job it waits on |
+| Assigned (`AS`) | `J-47968` | **Start job** — a job with a template asks the resource to use it first |
+| In progress (`PR`) | `J-47990` | **Deliver job**, which jumps to Delivery, and Open in Matecat when CAT is on |
+| Overdue (`OV`) | `J-47947` | The same, under a deadline-passed alert |
+| Delivered (`DL`) | `J-47875` | View delivered file, waiting for approval |
+| Approved / Billed / Settled | `J-47901` / `J-47894` / `J-47888` | Bill ID with its pill, and the job slip |
+
+Two more worth opening: `J-47953` is DTP after a Translation job — the client's original, the
+previous resource's delivery as the source, and their checklist to verify. `J-47982` has an AI
+translation: Compare opens the source and the AI output side by side.
+
+The upload keeps the original rule — locked until every checklist item is answered, Done or
+N/A. The Verified ticks on the previous job's list do not gate it, as before. Colours follow the
+table: from Delivered on, the pills are `RP.JOB_STATUS`'s; before that the page uses
+`.status-new`, `.status-pending`, `.status-inProgress` and `.status-overdue`.
+
+**In the preview**, Start job and Deliver move the job through the real statuses in memory.
+Starting opens the work file, as the real page does after `startJob()`. Delivering needs the
+checklist and any picked file — nothing is uploaded. Chat messages append to the thread.
+Downloads, the bill, the job slip, glossary terms, the email and phone links and Matecat only
+raise a toast. Reloading resets the job.
+
+The table rows carry no `Job.status`, so `data.js` derives one: an active row at 15 % or less
+stands in for accepted-but-not-started, and a passed deadline for Overdue. `RP.jobDetail(job)`
+builds the rest — files, checklists, instructions, glossaries, chat — from the row, so every job
+in the table opens on a full page.
 
 ---
 
@@ -233,5 +299,5 @@ opening or collapsing the sidebar moves that line by 184px, which a viewport que
 | --- | --- |
 | `/` | Jump to the search field |
 | `Esc` | Leave the search field, close any modal, the availability dropdown or the mobile drawer |
-| `Enter` | Submit a bid, when the bid field has focus |
+| `Enter` | Submit a bid, when the bid field has focus; send a chat message on the job page (`Shift+Enter` for a new line) |
 | `↑` / `↓` | Move between statuses in the availability dropdown |

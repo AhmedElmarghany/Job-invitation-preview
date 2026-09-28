@@ -200,9 +200,13 @@
         );
     }
 
+    function jobUrl(row) {
+        return "job.html?id=" + encodeURIComponent(row.id);
+    }
+
     var CELL = {
         "col-id": function (row) {
-            return '<a class="rp-job-id" href="#" data-action="open">' + row.id + "</a>";
+            return '<a class="rp-job-id" href="' + jobUrl(row) + '">' + row.id + "</a>";
         },
         "col-project": function (row) {
             return '<span title="' + escapeHtml(row.project) + '">' + escapeHtml(row.project) + "</span>";
@@ -650,6 +654,9 @@
         buildColumnsModal();
         render();
         els.scroll.scrollLeft = 0;
+
+        /* Kept in the URL so Back from a job page lands on the same tab */
+        global.history.replaceState(null, "", "?tab=" + tab);
     }
 
     /* ── Wiring ──────────────────────────────────────────── */
@@ -725,7 +732,7 @@
 
             if (action === "bill") RP.toast("Bill " + row.billId + " would open here.", "info");
             else if (action === "slip") RP.toast("Job slip for " + row.id + " would download here.", "info");
-            else RP.toast(row.id + " would open on its job page.", "info");
+            else global.location.href = jobUrl(row);
         });
 
         /* Pagination */
@@ -800,6 +807,9 @@
             row.pmName = row.pm ? row.pm.name : "N/A";
             return row;
         });
+
+        var tabParam = new URLSearchParams(global.location.search).get("tab");
+        if (COLUMNS[tabParam]) state.tab = tabParam;
 
         state.sort = Object.assign({}, DEFAULT_SORT[state.tab]);
 

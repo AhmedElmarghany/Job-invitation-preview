@@ -24,10 +24,10 @@
     };
 
     var PM = {
-        sara: { name: "Sara Whitfield", email: "sara.whitfield@agato.example" },
-        daniel: { name: "Daniel Okafor", email: "daniel.okafor@agato.example" },
-        mei: { name: "Mei Lin Chen", email: "meilin.chen@agato.example" },
-        tane: { name: "Tane Ngata", email: "tane.ngata@agato.example" }
+        sara: { name: "Sara Whitfield", email: "sara.whitfield@agato.example", phone: "+64 9 555 0142", mobile: "+64 21 555 0178" },
+        daniel: { name: "Daniel Okafor", email: "daniel.okafor@agato.example", phone: "+64 9 555 0167", mobile: "+64 22 555 0134" },
+        mei: { name: "Mei Lin Chen", email: "meilin.chen@agato.example", phone: "+64 9 555 0181", mobile: null },
+        tane: { name: "Tane Ngata", email: "tane.ngata@agato.example", phone: "+64 4 555 0123", mobile: "+64 27 555 0191" }
     };
 
     /* type:    invitation | bid | interpretation
@@ -1509,12 +1509,23 @@
         }
     ];
 
+    var COMPLETED_STATUS = { delivered: "DL", approved: "AP", billed: "BL", settled: "ST" };
+
     RP.JOBS = JOBS.map(function (row) {
         var out = Object.assign({}, row);
         out.id = "J-" + row.jobId;
         out.deadline = new Date(NOW + row.deadlineIn * HOUR);
         out.acceptedAt = new Date(NOW - row.acceptedAgo * HOUR);
         out.deliveredAt = row.deliveredAgo == null ? null : new Date(NOW - row.deliveredAgo * HOUR);
+
+        /* The rows carry no Job.status; a barely-moved active job stands in for "not started yet". */
+        out.status =
+            row.tab === "completed" ? COMPLETED_STATUS[row.jobStatus]
+            : row.tab === "waiting" ? "AS"
+            : row.deadlineIn < 0 ? "OV"
+            : row.progress <= 15 ? "AS"
+            : "PR";
+        out.jobReady = row.tab !== "waiting";
         return out;
     });
 
@@ -1532,6 +1543,297 @@
         { key: "waiting", label: "Waiting jobs", icon: "rotate-clock" },
         { key: "completed", label: "Completed jobs", icon: "circle-check" }
     ];
+
+    /* ── Job page: built from each row, so every job in RP.JOBS opens on a full page ── */
+    var CHECKLISTS = {
+        Translation: [
+            "Spell-check run in the target language",
+            "Numbers, dates and units match the source",
+            "Glossary terms applied throughout",
+            "Formatting mirrors the source layout",
+            "No untranslated or skipped segments"
+        ],
+        Certified: [
+            "Certification statement added on the last page",
+            "Names spelled exactly as in the passport",
+            "Stamps, seals and signatures described in brackets",
+            "Page count matches the source document"
+        ],
+        Proofreading: [
+            "Read against the source, segment by segment",
+            "Terminology consistent with the glossary",
+            "Every change left as a tracked change",
+            "Queries for the translator added as comments"
+        ],
+        Transcreation: [
+            "Two headline options for every section",
+            "Tone checked against the brand guide",
+            "Back-translation of each headline included"
+        ],
+        DTP: [
+            "Supplied fonts used, none substituted",
+            "Text reflow checked on every page",
+            "Images and captions in the right place",
+            "Print-ready PDF exported with the source file"
+        ],
+        Subtitling: [
+            "No more than 42 characters per line",
+            "Reading speed under 17 characters per second",
+            "Timecodes synced to the audio",
+            "Speaker changes marked"
+        ],
+        Interpreting: [
+            "Session attended from start to finish",
+            "Attendance sheet signed by the client",
+            "Anything unusual noted for the project manager"
+        ],
+        Attestation: [
+            "Original document seen and checked",
+            "Attestation stamp on every page",
+            "Scanned copy is clear and complete"
+        ]
+    };
+
+    /* The job each service waits on in its workflow; Interpreting stands alone. */
+    var PREVIOUS = {
+        Proofreading: "Translation",
+        DTP: "Translation",
+        Attestation: "Certified translation",
+        Subtitling: "Transcription",
+        Translation: "Typing",
+        Certified: "Typing",
+        Transcreation: "Typing"
+    };
+
+    var CHAINED = { Proofreading: true, DTP: true, Attestation: true };
+    var PRICED_PER_LANGUAGE = { Translation: true, Certified: true, Proofreading: true, Transcreation: true };
+
+    var FORMAT = {
+        Translation: "DOCX", Certified: "PDF", Proofreading: "DOCX", Transcreation: "DOCX",
+        DTP: "INDD", Subtitling: "MP4", Interpreting: null, Attestation: "PDF"
+    };
+
+    var UNIT = { Words: "word", Hours: "hour", Documents: "document", Minutes: "minute", "Physical Pages": "page" };
+
+    var LANG_CODE = {
+        Arabic: "ar", Chinese: "zh", Samoan: "sm", Tongan: "to", "Te Reo Māori": "mi", Hindi: "hi",
+        Vietnamese: "vi", Korean: "ko", Japanese: "ja", Nepali: "ne", Punjabi: "pa", Tamil: "ta",
+        Filipino: "fil", Dari: "prs", Somali: "so", English: "en", Spanish: "es", German: "de",
+        Russian: "ru", Farsi: "fa", Indonesian: "id", French: "fr", Burmese: "my", Thai: "th", Urdu: "ur"
+    };
+
+    var PEERS = ["Leila Haddad", "Tomasi Fifita", "Priya Raman", "Jonas Weber", "Hana Sato"];
+
+    var CLIENTS = {
+        Medical: "Cardiac Devices NZ", Legal: "Harbour Lane Legal", Technical: "Tasman Rail Systems",
+        Government: "Te Kāwanatanga Services", Financial: "Kauri Capital", Marketing: "Southern Light Retail",
+        Education: "Waitematā Schools Trust", Immigration: "Pathways Migration", Academic: "Aotearoa Museum",
+        "IT / Software": "Fern Mobile"
+    };
+
+    var PM_NOTES = {
+        Medical: "Keep drug names, dosages and device model numbers exactly as in the source. The client's regulatory team checks every term against the attached termbase.",
+        Legal: "Mirror the source numbering and clause structure. Party names stay in English, with the translation in brackets on first use only.",
+        Technical: "Warnings and cautions follow the ISO 3864 wording in the reference file. Leave part numbers and on-screen labels untranslated.",
+        Government: "Plain-language register, reading age 12. Use the official names for agencies wherever one exists.",
+        Financial: "Figures stay in the source currency and format. Reuse last year's approved translation for every recurring heading.",
+        Marketing: "Adapt rather than translate word for word, so it reads as if it was written locally. Keep headlines under 60 characters.",
+        Education: "The audience is parents, not teachers. Short sentences, and no jargon without a plain explanation next to it.",
+        Immigration: "INZ expects the 2024 certification wording. Spell names exactly as in the passport, even where the usual transliteration differs.",
+        Academic: "Keep citations and reference lists in their original language. Flag any term you are unsure of rather than guessing.",
+        "IT / Software": "Respect the character limits in the file notes. Placeholders such as {name} and %s must stay exactly as they are."
+    };
+
+    var CUSTOMER_NOTES = [
+        "Please keep the terminology from last year's version — our staff are used to it.",
+        "This goes to print on Friday, so the final proof needs to be clean.",
+        null,
+        "Our in-country reviewers may send small preference changes after delivery.",
+        "Numbers in the tables must line up with the original; an auditor checks them.",
+        null
+    ];
+
+    var REFERENCE = {
+        Medical: ["medical-termbase.xlsx", "Termbase"], Technical: ["technical-termbase.xlsx", "Termbase"],
+        Legal: ["legal-termbase.xlsx", "Termbase"], Marketing: ["brand-style-guide.pdf", "Style guide"],
+        "IT / Software": ["ui-style-guide.pdf", "Style guide"], Immigration: ["inz-certification-wording-2024.pdf", "Wording"],
+        Academic: ["reference-list.pdf", "Reference"]
+    };
+
+    function pick(list, seed) {
+        return list[seed % list.length];
+    }
+
+    function slug(text) {
+        return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    }
+
+    function size(seed, minKb, maxKb) {
+        var kb = minKb + (seed * 37) % (maxKb - minKb);
+        return kb >= 1000 ? (kb / 1000).toFixed(1) + " MB" : kb + " KB";
+    }
+
+    /* A completed job's milestones sit between delivery and now, so none lands in the future. */
+    function between(from, to, share) {
+        return new Date(from.getTime() + (to.getTime() - from.getTime()) * share);
+    }
+
+    function filesFor(job, d) {
+        var id = job.jobId;
+        var base = slug(job.project);
+        var ext = (d.format || "PDF").toLowerCase();
+        var code = LANG_CODE[job.target] || "xx";
+        var work = [];
+        var reference = [];
+
+        if (job.service === "Interpreting") {
+            work.push({ kind: "brief", name: "appointment-brief.pdf", size: size(id, 60, 180), tag: "Brief", hint: "Venue, timing and who you will interpret for" });
+        } else if (d.previous && d.previous.delivered) {
+            work.push({ kind: "original", name: base + "." + ext, size: size(id, 180, 900), tag: "Original", hint: "The file the client shared" });
+            work.push({ kind: "source", name: base + "-" + code + "-" + slug(d.previous.service) + ".docx", size: size(id + 3, 160, 820), tag: "Source", hint: "Delivered by " + d.previous.resource + " — the file you work on" });
+        } else if (d.previous) {
+            if (CHAINED[job.service]) {
+                work.push({ kind: "original", name: base + "." + ext, size: size(id, 180, 900), tag: "Original", hint: "Read it now and prepare while you wait" });
+            }
+            work.push({ kind: "source", name: base + (CHAINED[job.service] ? "-" + code + ".docx" : "." + ext), locked: true, tag: "Source", hint: "Released when the " + d.previous.service + " job is delivered" });
+        } else {
+            work.push({ kind: "source", name: base + "." + ext, size: size(id, 180, 900), tag: "Source", hint: "Shared by the client — the file you work on" });
+        }
+
+        if (job.service === "Certified") {
+            work.push({ kind: "template", name: "certification-statement-template.docx", size: "38 KB", tag: "Template", hint: "Use this template for your delivery" });
+        } else if (job.service === "Attestation") {
+            work.push({ kind: "template", name: "attestation-cover-sheet.docx", size: "42 KB", tag: "Template", hint: "Use this template for your delivery" });
+        } else if (job.service === "Translation" && id % 4 === 0) {
+            work.push({ kind: "template", name: "client-report-template.dotx", size: "64 KB", tag: "Template", hint: "Use this template for your delivery" });
+        }
+
+        var ref = REFERENCE[job.specialty];
+        if (ref) reference.push({ kind: "reference", name: ref[0], size: size(id + 7, 70, 420), tag: ref[1] });
+        if (job.service === "Subtitling") reference.push({ kind: "reference", name: "english-transcript.srt", size: size(id, 20, 90), tag: "Transcript" });
+        if (job.specialty === "Financial" || job.specialty === "Government") {
+            reference.push({ kind: "reference", name: "previous-edition-" + code + ".docx", size: size(id + 5, 300, 1400), tag: "Past translation" });
+        }
+
+        if (job.jobReady && job.service === "Translation") {
+            if (id % 5 === 1) {
+                reference.push({ kind: "pretranslated", name: base + "-pretranslated.docx", size: size(id + 2, 150, 700), tag: "Pre-translated", hint: "Machine pre-translation — review it before you rely on it" });
+            }
+            if (id % 3 === 0 || id % 5 === 2) {
+                reference.push({
+                    kind: "ai", name: base + "-ai-" + code + ".docx", size: size(id + 4, 150, 700), tag: "AI translation",
+                    hint: "Compare it side by side with the source",
+                    ai: id % 7 === 0 ? { status: "processing", progress: 64 } : { status: "completed" }
+                });
+            }
+        }
+
+        return { work: work, reference: reference };
+    }
+
+    function checklistFor(service, answered, seed) {
+        return (CHECKLISTS[service] || CHECKLISTS.Translation).map(function (item, i) {
+            return { item: item, answer: answered ? (i === 2 && seed % 2 ? "I" : "C") : null };
+        });
+    }
+
+    function glossariesFor(job) {
+        if (!PRICED_PER_LANGUAGE[job.service] || !job.source || !job.target) return [];
+
+        var list = [{
+            id: 100 + (job.jobId % 60), name: job.specialty + " terminology", client: CLIENTS[job.specialty] || "Client",
+            privacy: "Client", terms: 60 + (job.jobId % 140), note: "Approved by the client's reviewers — use these terms exactly."
+        }];
+
+        if (job.jobId % 2 === 0) {
+            list.push({ id: 7, name: "AGATO house style", client: null, privacy: "Public", terms: 48, note: "Dates, numbers and punctuation rules for every language we work in." });
+        }
+        return list;
+    }
+
+    function chatFor(job, d) {
+        var me = RP.USER.firstName;
+        var pmFirst = job.pm.name.split(" ")[0];
+        var t0 = job.acceptedAt.getTime();
+        var msgs = [
+            { from: "pm", at: t0 + 0.4 * HOUR, text: "Hi " + me + ", thanks for picking this one up. " + (PM_NOTES[job.specialty] || "").split(". ")[0] + "." },
+            { from: "me", at: t0 + 1.1 * HOUR, text: "Thanks " + pmFirst + " — all clear. I will message you here if anything in the source is unclear." }
+        ];
+
+        if (!job.jobReady && d.previous) {
+            msgs.push({ from: "pm", at: t0 + 2.5 * HOUR, text: "The files are released as soon as the " + d.previous.service + " job is delivered. I expect that tomorrow morning." });
+        } else if (job.status !== "AS") {
+            msgs.push({ from: "pm", at: t0 + 4 * HOUR, text: "The client added a few terms this morning — updated list attached.", file: { name: slug(job.specialty) + "-terms-v2.xlsx", size: "88 KB" } });
+            if (job.jobId % 4 === 1) msgs.push({ from: "pm", at: t0 + 6 * HOUR, voice: "0:42" });
+        }
+
+        if (job.status === "OV") {
+            msgs.push({ from: "pm", at: NOW - 1.5 * HOUR, text: "Hi " + me + ", the deadline has passed — how far along are you? Tell me if you need a few more hours." });
+        }
+        if (job.deliveredAt) {
+            msgs.push({ from: "me", at: job.deliveredAt.getTime(), text: "Delivered — the checklist is filled in on the job page." });
+        }
+        if (d.approvedAt) {
+            msgs.push({ from: "pm", at: d.approvedAt.getTime(), text: "Checked and approved. Thanks for the careful work, " + me + "!" });
+        }
+
+        return msgs
+            .filter(function (m) {
+                return m.at < NOW;
+            })
+            .sort(function (a, b) {
+                return a.at - b.at;
+            });
+    }
+
+    RP.jobDetail = function (job) {
+        var id = job.jobId;
+        var d = {
+            format: FORMAT[job.service] === undefined ? "DOCX" : FORMAT[job.service],
+            cat: job.service === "Translation" && id % 3 === 0,
+            usd: Math.round(job.amount * 0.6059 * 100) / 100,
+            rate: job.amount / job.count.value,
+            unit: UNIT[job.count.unit] || "unit",
+            previous: null
+        };
+
+        var prevService = PREVIOUS[job.service];
+        if (!job.jobReady && prevService) {
+            d.previous = { id: "J-" + (id - 1), service: prevService, resource: pick(PEERS, id), delivered: false };
+        } else if (CHAINED[job.service] && prevService) {
+            d.previous = { id: "J-" + (id - 1), service: prevService, resource: pick(PEERS, id), delivered: true };
+            d.previousChecklist = checklistFor(prevService === "Certified translation" ? "Certified" : prevService, true, id + 1)
+                .map(function (row) {
+                    row.verified = false;
+                    return row;
+                });
+        }
+
+        var now = new Date(NOW);
+        d.startedAt = job.status !== "AS" ? between(job.acceptedAt, job.deliveredAt || now, 0.12) : null;
+
+        if (job.deliveredAt) {
+            d.approvedAt = /^(AP|BL|ST)$/.test(job.status) ? between(job.deliveredAt, now, 0.25) : null;
+            d.billedAt = /^(BL|ST)$/.test(job.status) ? between(job.deliveredAt, now, 0.55) : null;
+            d.settledAt = job.status === "ST" ? between(job.deliveredAt, now, 0.85) : null;
+
+            var base = slug(job.project);
+            var ext = job.service === "Subtitling" ? "srt" : (d.format || "pdf").toLowerCase();
+            var name = job.service === "Interpreting"
+                ? "signed-attendance-sheet.pdf"
+                : base + "-" + (LANG_CODE[job.target] || "final") + "-final." + ext;
+            d.delivered = [{ name: name, size: size(id + 9, 200, 950) }];
+            if (job.service === "DTP") d.delivered.push({ name: base + "-print.pdf", size: size(id + 11, 900, 4800) });
+        }
+
+        d.files = filesFor(job, d);
+        d.checklist = checklistFor(job.service, !!job.deliveredAt, id);
+        d.pmNote = PM_NOTES[job.specialty] || null;
+        d.customerNote = pick(CUSTOMER_NOTES, id);
+        d.glossaries = glossariesFor(job);
+        d.chat = chatFor(job, d);
+        return d;
+    };
 
     /* The sidebar badge counts what still needs a decision. */
     RP.USER.invitationCount = RP.INVITATIONS.filter(function (row) {
