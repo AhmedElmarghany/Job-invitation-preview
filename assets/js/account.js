@@ -326,7 +326,7 @@
 
     function personalView() {
         var tz = P.timezone
-            ? esc(P.timezone) + '<span class="pd-value-hint">' + tzOffset(P.timezone) + " · local time " + localTime(P.timezone) + "</span>"
+            ? esc(P.timezone)
             : null;
 
         return (
