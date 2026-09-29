@@ -4,35 +4,57 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>User Account · Resource Portal</title>
+  <meta name="description" content="Redesign preview of the AGATO resource portal — the resource's own profile.">
   <link rel="icon" href="assets/img/logo.png">
 
   <link rel="stylesheet" href="assets/css/variables.css">
   <link rel="stylesheet" href="assets/css/base.css">
   <link rel="stylesheet" href="assets/css/sidebar.css">
   <link rel="stylesheet" href="assets/css/topbar.css">
+  <link rel="stylesheet" href="assets/css/navigation-tabs.css">
+  <link rel="stylesheet" href="assets/css/status.css">
   <link rel="stylesheet" href="assets/css/logout-modal.css">
+  <link rel="stylesheet" href="assets/css/account.css">
+  <link rel="stylesheet" href="assets/css/password-modal.css">
 </head>
 <body>
 
   <!-- Sidebar + topbar + modals are injected here by assets/js/layout.js -->
   <div id="rp-layout" data-page="account" data-title="User Account"></div>
 
-  <main class="rp-page">
-    <div class="rp-stub">
-      <span class="rp-stub-icon">
-        <span data-rp-icon="account"></span>
-      </span>
-      <h1 class="rp-stub-title">User Account</h1>
-      <p class="rp-stub-note">Not designed yet. Personal details, password, timezone and notification preferences belong on this page.</p>
-      <a class="rp-stub-link" href="invitations.html">
-        <span data-rp-icon="arrow-right"></span>
-        Go to Job Invitations
-      </a>
+  <main class="rp-page rp-acctpage">
+
+    <!-- Photo, name, resource ID and the Professional Profile link — filled by account.js -->
+    <header class="rp-accthead" id="rpAcctHead"></header>
+
+    <!-- Section tabs, used as a jump list like the job page -->
+    <nav class="navigation-tabs rp-accttabs" id="rpAcctNav" aria-label="Profile sections">
+      <button class="navigation-tabs-fade-left" type="button" aria-label="Scroll tabs left" tabindex="-1" aria-hidden="true">
+        <span class="navigation-tabs-chevron" data-rp-icon="chevron-left"></span>
+      </button>
+      <div class="navigation-tabs-inner" id="rpAcctTabs"></div>
+      <button class="navigation-tabs-fade-right" type="button" aria-label="Scroll tabs right" tabindex="-1" aria-hidden="true">
+        <span class="navigation-tabs-chevron" data-rp-icon="chevron-right"></span>
+      </button>
+    </nav>
+
+    <!-- Sections on the left, profile strength and the account facts on the right -->
+    <div class="rp-acctwrap">
+      <div class="rp-acct" id="rpAcct"></div>
     </div>
+
   </main>
+
+  <!-- Every dialog on the page shares this one: photo, education, work, document, password -->
+  <div class="rp-modal" id="rpModal" role="dialog" aria-modal="true" aria-labelledby="rpModalTitle" aria-hidden="true">
+    <div class="rp-modal__panel" id="rpModalPanel"></div>
+  </div>
 
   <script src="assets/js/icons.js"></script>
   <script src="assets/js/data.js"></script>
   <script src="assets/js/layout.js"></script>
+  <script src="assets/js/navigation-tabs.js"></script>
+  <script src="assets/js/password-policy.js"></script>
+  <script src="assets/js/account.js"></script>
 </body>
 </html>

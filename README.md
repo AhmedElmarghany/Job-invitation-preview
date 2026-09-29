@@ -39,7 +39,7 @@ Nothing inside the folder refers to the folder name, so renaming is safe.
 | `dashboard.html` | Placeholder |
 | `earnings.html` | Placeholder |
 | `professional-profile.html` | Placeholder |
-| `account.html` | Placeholder |
+| `account.html` | **Built.** User Account — the resource's own profile, opened from their name and photo in the sidebar. |
 
 The sidebar, topbar, availability control, profile menu and logout modal are **final** and shared
 by all six pages, so a new page only needs its own content.
@@ -54,6 +54,7 @@ resource portal preview/
 ├── invitations.html            built page
 ├── jobs.html                   built page
 ├── job.html                    built page — one job, ?id=J-…
+├── account.html                built page — the resource's own profile (User Account)
 ├── dashboard.html …            placeholders, one per sidebar entry
 └── assets/
     ├── css/
@@ -70,7 +71,9 @@ resource portal preview/
     │   ├── navigation-tabs.css copied from config/static/css/navigation-tabs.css
     │   ├── invitations.css     page-specific: rows, expanded panel, offer card
     │   ├── jobs.css            page-specific: table chrome, waiting/slip cells
-    │   └── job.css             page-specific: job head, cards, checklist, upload, chat, viewer
+    │   ├── job.css             page-specific: job head, cards, checklist, upload, chat, viewer
+    │   ├── account.css         page-specific: profile head, field grid, records, technology, terms
+    │   └── password-modal.css  copied from config/static/css/password-modal.css (shell swapped)
     ├── js/
     │   ├── icons.js            inline Lucide set — RP.icon('name')
     │   ├── data.js             the dummy records and the signed-in resource
@@ -79,7 +82,9 @@ resource portal preview/
     │   ├── navigation-tabs.js  copied from config/static/js/navigation-tabs.js
     │   ├── invitations.js      table render, search, sort, expand, paginate
     │   ├── jobs.js             tabs, per-tab columns, search, sort, paginate
-    │   └── job.js              one job: sections, jump tabs, start / deliver, chat, file viewer
+    │   ├── job.js              one job: sections, jump tabs, start / deliver, chat, file viewer
+    │   ├── account.js          the profile: jump tabs, inline edit, dialogs, profile strength
+    │   └── password-policy.js  copied from config/static/js/password-policy.js
     ├── fonts/                  IBM Plex Sans + Serif (woff2)
     └── img/                    logo.png, placeholder-headshot.png
 ```
@@ -102,6 +107,13 @@ in one stylesheet, not two.
 `job.css` does the same for the Invitations panel: facts, section titles, file rows, the serif
 amount, the countdown chip and the navy CTA are rebuilt at the same sizes and colours under the
 job page's own class names, rather than loading `invitations.css` on a second page.
+
+`account.css` follows suit: the head, jump tabs, cards, buttons and modal are rebuilt from
+`job.css`, and the fields inside a card from `profile-details.css` under its own `.pd-*` names, so
+the Personal details markup ports straight onto the customer profile's stylesheet.
+`password-policy.js` is byte-for-byte. `password-modal.css` is too, except that its Bootstrap
+shell (`.modal-dialog`, `.modal-content` and the agile.css bridge) is replaced by the preview's
+`.rp-modal` panel — every `.pwd-*` rule is untouched.
 
 `variables.css` is a copy too — it is the one file to re-sync if the tokens move.
 
@@ -202,6 +214,53 @@ in the table opens on a full page.
 
 ---
 
+## User account
+
+`account.html` is the resource's own profile, redesigned from `templates/accounts/profile/main.html`
+as a translator (`user_type == 'TR'`) sees it. The sidebar's name and photo open it. The page is
+built like the single job: a head with the photo and a Professional Profile button, sticky jump
+tabs with a scroll-spy, cards on the left and a sticky aside on the right. Inside a card the fields
+are laid out as on the customer profile (`customer/profile/personal_details.html`): labels over
+values in a grid, three to a row, instead of one row per field.
+
+The aside stacks earlier than the job page's, below ~1100px of content width, because a form needs
+the width for three fields a row. Stacked, the Terms banner comes first, then profile strength
+(its score beside the to-do list), the sections, and the account facts in one row.
+
+| Section | Holds | In the original |
+| --- | --- | --- |
+| Personal details | Basics, contact, address. View mode by default, **Edit** swaps in the form; the bar under it holds **Reset password** | `personal_details_edit_form.html` + `email_update.html`; the bar and the dialog are the customer profile's |
+| Education | Degree · major, university, country, graduation year | `_education_list.html`, `add_user_education.html` |
+| Work experience | Position, company, country, years, duties (two lines, then *Show more*); "I have no work experience" when empty | `_work_list.html`, `add_work_experience.html` |
+| Technology | **New.** The software the resource works in, in five groups plus their own tools | — |
+| Certifications | Read-only, as before: status pill, ID, expiry, the rejection reason, a link to Services & Prices | `tr_certificate.html` |
+| Documents | CV, resume, education and other documents: upload, replace, delete | `accounts/partials/tr_documents.html` |
+| Terms | **New.** "Dear Ahmed", the two documents, the tick box and Confirm agreement | `term_and_condition_accept.html` was a pop-up only |
+| Aside | Profile strength (what is left, each item opens the right editor), Resource ID with copy, partner since, availability, terms | — |
+
+**Left out, because `main.html` hides them from a translator:** the Billing tab (billing address,
+credit card and bank info), Reference Documents, *How did you find us?*, Industry and the Back
+button. The email stays read-only with the reason on a *Not editable* badge — only AD, OM and VM
+can change it.
+
+**Changed on the way:**
+
+- Change password is no longer an inline form. **Reset password** in the Personal details bar opens
+  the customer profile's dialog — same copy, same checklist, same `data-password-*` gate.
+- Deleting asks in a small *Delete / Keep* popover instead of the modal that made you type a code.
+- Photo upload opens a dialog with a round preview and zoom, instead of the croppie box.
+- Empty values are dashed *+ Add …* buttons that open the editor on that field.
+- `?highlight_cert=334` still scrolls to a certificate and flags it.
+
+Other states worth opening: `account.html?terms=none` (never agreed) and `?terms=agreed` (the
+receipt). The default is an update waiting for agreement, as `is_expired` shows it.
+
+**In the preview**, saving, uploading, the photo, the password and agreeing change the page in
+memory only — the header, sidebar and topbar pick up a new name or photo, and profile strength
+recounts. Reading the terms, viewing a file and the phone links raise a toast. Reloading resets it.
+
+---
+
 ## Adding the next page
 
 1. Copy a placeholder page (e.g. `earnings.html`) and set `data-page` / `data-title` on `#rp-layout`.
@@ -261,6 +320,7 @@ you copied it. Nothing needs stripping:
 | `fill="#000000"`, `stroke="#514231"` … | rewritten to `currentColor`, so it follows the design system |
 | `fill="none"` or a `url(#gradient)` | left alone — structure, not colour |
 | outline or solid | detected from whether the icon strokes |
+| `class="lucide lucide-search"`, `class="ph ph-…"` | kept, so the icon can be found by name in the page; any other class is dropped |
 
 ```js
 jobs: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#000000" viewBox="0 0 256 256"><path d="M106,112a6,6…"></path></svg>`,
@@ -298,6 +358,7 @@ opening or collapsing the sidebar moves that line by 184px, which a viewport que
 | Key | Does |
 | --- | --- |
 | `/` | Jump to the search field |
-| `Esc` | Leave the search field, close any modal, the availability dropdown or the mobile drawer |
+| `Esc` | Leave the search field, close any modal, the availability dropdown or the mobile drawer; on User Account, close the Delete popover first |
 | `Enter` | Submit a bid, when the bid field has focus; send a chat message on the job page (`Shift+Enter` for a new line) |
 | `↑` / `↓` | Move between statuses in the availability dropdown |
+| `Enter` in Technology's search | Pick the first match, or add what was typed as your own tool |

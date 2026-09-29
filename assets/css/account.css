@@ -1,0 +1,2923 @@
+/* ============================================================
+   PAGE: User account
+   The resource's own record — templates/accounts/profile/main.html.
+   Head, jump tabs, cards and modal follow job.css; the fields inside
+   a card follow profile-details.css (.pd-*), labels over values in a
+   grid instead of a two-column table. Navy commits, gold accents.
+   ============================================================ */
+
+.rp-acctpage {
+    --acct-max: 1280px;
+    --acct-pad: 24px;
+    --acct-aside: 300px;
+}
+
+@media (max-width: 767px) {
+    .rp-acctpage {
+        --acct-pad: 14px;
+    }
+}
+
+/* ── Head ────────────────────────────────────────────────── */
+.rp-accthead {
+    background: var(--color-surface-white);
+}
+
+.rp-accthead__inner {
+    max-width: var(--acct-max);
+    margin: 0 auto;
+    padding: 14px var(--acct-pad) 18px;
+}
+
+.rp-crumbs {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+    font-size: 12.5px;
+    color: var(--color-text-secondary);
+}
+
+.rp-crumbs a {
+    color: inherit;
+    text-decoration: none;
+    border-radius: var(--radius-xs);
+}
+
+.rp-crumbs a:hover {
+    color: var(--color-text-primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.rp-crumbs svg {
+    width: 12px;
+    height: 12px;
+    opacity: 0.6;
+}
+
+.rp-crumbs [aria-current] {
+    color: var(--color-text-primary);
+    font-weight: 500;
+}
+
+.rp-accthead__row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 12px;
+}
+
+.rp-accthead__avatar {
+    position: relative;
+    flex: 0 0 auto;
+    width: 64px;
+    height: 64px;
+}
+
+.rp-accthead__avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    background: var(--color-surface-inset);
+    border: 1px solid var(--color-border);
+}
+
+/* The camera chip from the customer profile hero, sized to this avatar */
+.rp-accthead__camera {
+    position: absolute;
+    right: -3px;
+    bottom: -3px;
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-white);
+    box-shadow: 0 1px 5px rgba(41, 23, 4, 0.24);
+    color: var(--color-brand-navy);
+    cursor: pointer;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.rp-accthead__camera svg {
+    width: 14px;
+    height: 14px;
+}
+
+.rp-accthead__camera:hover {
+    background: var(--color-brand-navy);
+    color: var(--color-surface-white);
+}
+
+.rp-accthead__camera:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-gold), 0 1px 5px rgba(41, 23, 4, 0.24);
+}
+
+.rp-accthead__titles {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.rp-accthead__title {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: var(--color-text-primary);
+    overflow-wrap: anywhere;
+}
+
+.rp-accthead__meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px 8px;
+    margin: 6px 0 0;
+    font-size: 13.5px;
+    color: var(--color-text-secondary);
+}
+
+/* Its own line, as the customer profile hero stacks it under the tag */
+.rp-accthead__mail {
+    display: flex;
+    flex-basis: 100%;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.rp-accthead__mail svg {
+    width: 14px;
+    height: 14px;
+}
+
+.rp-accthead__actions {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rp-tag {
+    display: inline-flex;
+    padding: 1px 9px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-subtle);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--color-brand-navy);
+}
+
+.rp-idchip {
+    padding: 1px 8px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-subtle);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-dot {
+    display: inline-block;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.5;
+    flex: 0 0 auto;
+}
+
+.rp-pair {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.rp-pair svg {
+    width: 12px;
+    height: 12px;
+    color: var(--color-text-secondary);
+}
+
+@media (max-width: 767px) {
+    .rp-accthead__row {
+        flex-wrap: wrap;
+    }
+
+    .rp-accthead__avatar {
+        width: 52px;
+        height: 52px;
+    }
+
+    /* A long name would otherwise wrap below the photo instead of beside it */
+    .rp-accthead__titles {
+        flex: 1 1 calc(100% - 68px);
+    }
+
+    .rp-accthead__title {
+        font-size: 19px;
+    }
+
+
+    .rp-accthead__actions {
+        flex: 1 1 100%;
+    }
+
+    .rp-accthead__actions .rp-button {
+        flex: 1 1 auto;
+    }
+}
+
+/* ── Section tabs ────────────────────────────────────────── */
+.rp-accttabs {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+}
+
+/* Tab labels line up with the cards: the link's own 14px padding is taken off the gutter */
+.rp-accttabs .navigation-tabs-inner {
+    max-width: var(--acct-max);
+    margin: 0 auto;
+    padding: 0 calc(var(--acct-pad) - 14px);
+}
+
+.rp-tabdot {
+    flex: 0 0 auto;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-status-warning);
+    box-shadow: 0 0 0 3px rgba(180, 83, 9, 0.14);
+}
+
+/* ── Layout ──────────────────────────────────────────────── */
+.rp-acctwrap {
+    container: rpAcct / inline-size;
+    flex: 1;
+}
+
+.rp-acct {
+    max-width: var(--acct-max);
+    margin: 0 auto;
+    padding: 20px var(--acct-pad) 56px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--acct-aside);
+    grid-template-areas: "main aside";
+    gap: 20px;
+    align-items: start;
+}
+
+/* The banner gets its own row, so it stays first when the aside stacks too */
+.rp-acct.has-banner {
+    grid-template-areas: "banner aside" "main aside";
+}
+
+.rp-acct > .rp-banner {
+    grid-area: banner;
+}
+
+.rp-acct__main {
+    grid-area: main;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.rp-acct__aside {
+    grid-area: aside;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: sticky;
+    top: calc(var(--tabs-h) + 20px);
+}
+
+/* A sticky column taller than the screen would hide its own bottom */
+@media (max-height: 760px) {
+    .rp-acct__aside {
+        position: static;
+    }
+}
+
+/* Stacked earlier than the job page: a form needs three fields a row, and the aside would cost one */
+@container rpAcct (max-width: 1100px) {
+    .rp-acct {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas: "strength" "main" "account";
+        gap: 16px;
+        padding-top: 16px;
+    }
+
+    .rp-acct.has-banner {
+        grid-template-areas: "banner" "strength" "main" "account";
+    }
+
+    .rp-acct__aside {
+        display: contents;
+    }
+
+    .rp-strength {
+        grid-area: strength;
+    }
+
+    .rp-accountcard {
+        grid-area: account;
+    }
+}
+
+/* ── Card ────────────────────────────────────────────────── */
+.rp-card {
+    container: rpCard / inline-size;
+    position: relative;
+    min-width: 0;
+    background: var(--color-surface-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    scroll-margin-top: calc(var(--tabs-h) + 16px);
+    transition: box-shadow var(--transition-fast);
+}
+
+.rp-card__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-height: 26px;
+    padding: 14px 18px 0;
+}
+
+.rp-card__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.07em;
+    color: var(--color-brand-navy);
+}
+
+.rp-card__title svg {
+    width: 18px;
+    height: 18px;
+    color: var(--color-brand-navy);
+}
+
+.rp-card__aside {
+    font-size: 12.5px;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+}
+
+.rp-card__aside strong {
+    font-weight: 500;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-card__body {
+    padding: 14px 18px 18px;
+}
+
+.rp-card__intro {
+    margin: 0 0 14px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--color-text-secondary);
+}
+
+/* An open editor is worth marking, so the leave warning makes sense */
+.rp-card.is-editing {
+    border-color: var(--gold-border);
+    box-shadow: 0 0 0 3px rgba(149, 128, 73, 0.09);
+}
+
+@media (max-width: 767px) {
+    .rp-card__head {
+        padding: 12px 14px 0;
+    }
+
+    .rp-card__body {
+        padding: 12px 14px 14px;
+    }
+
+}
+
+/* The section's one add action, as .rp-sec__action on the Invitations panel */
+.rp-textbtn {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 28px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: var(--radius-xs);
+    background: var(--color-surface-white);
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--color-brand-navy);
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.rp-textbtn svg {
+    width: 14px;
+    height: 14px;
+}
+
+.rp-textbtn:hover {
+    background: var(--color-surface-subtle);
+    color: var(--color-brand-navy);
+}
+
+.rp-linkbtn {
+    display: inline;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    font-weight: 500;
+    color: var(--color-link);
+    cursor: pointer;
+}
+
+.rp-linkbtn:hover {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+/* ── Buttons ─────────────────────────────────────────────── */
+.rp-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    height: 40px;
+    padding: 0 18px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background var(--transition-fast), border-color var(--transition-fast),
+                color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.rp-button svg {
+    width: 15px;
+    height: 15px;
+    flex: 0 0 auto;
+}
+
+.rp-button--primary {
+    background: var(--color-brand-navy);
+    color: var(--color-surface-white);
+}
+
+.rp-button--primary:hover:not(:disabled) {
+    background: var(--color-brand-navy-hover);
+    color: var(--color-surface-white);
+}
+
+.rp-button--primary:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-navy);
+}
+
+.rp-button--outline {
+    background: var(--color-surface-white);
+    border-color: var(--color-border);
+    color: var(--color-text-primary);
+}
+
+.rp-button--outline:hover:not(:disabled) {
+    background: var(--color-surface-subtle);
+    border-color: var(--color-border-hover);
+    color: var(--color-text-primary);
+}
+
+.rp-button--outline:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-gold);
+}
+
+.rp-button--sm {
+    height: 32px;
+    padding: 0 12px;
+    font-size: 12.5px;
+}
+
+.rp-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.rp-iconbtn {
+    flex: 0 0 auto;
+    display: inline-grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xs);
+    background: var(--color-surface-white);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: background var(--transition-fast), border-color var(--transition-fast),
+                color var(--transition-fast);
+}
+
+.rp-iconbtn svg {
+    width: 15px;
+    height: 15px;
+}
+
+.rp-iconbtn:hover {
+    background: var(--color-surface-subtle);
+    border-color: var(--color-text-primary);
+    color: var(--color-text-primary);
+}
+
+.rp-iconbtn.is-danger:hover,
+.rp-iconbtn.is-danger.is-asking {
+    background: var(--color-status-danger-bg);
+    border-color: var(--color-status-danger);
+    color: var(--color-status-danger);
+}
+
+.rp-iconbtn:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-gold);
+}
+
+.rp-iconbtn.is-danger:focus-visible {
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.28);
+}
+
+.rp-iconbtn--bare {
+    width: 26px;
+    height: 26px;
+    border-color: transparent;
+    border-radius: var(--radius-full);
+}
+
+.rp-iconbtn--bare svg {
+    width: 14px;
+    height: 14px;
+}
+
+.rp-iconbtn--bare:hover {
+    border-color: transparent;
+}
+
+.rp-chipbtn {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 30px;
+    padding: 0 11px;
+    border: 0;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-white);
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--color-brand-navy);
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.rp-chipbtn svg {
+    width: 13px;
+    height: 13px;
+}
+
+.rp-chipbtn:hover {
+    background: var(--color-brand-navy);
+    color: var(--color-surface-white);
+}
+
+/* ── Callouts ────────────────────────────────────────────── */
+.rp-callout {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-inset);
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--color-text-secondary);
+}
+
+.rp-callout svg {
+    width: 15px;
+    height: 15px;
+    flex: 0 0 auto;
+    margin-top: 1px;
+}
+
+.rp-callout strong {
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.rp-callout a {
+    font-weight: 500;
+    color: var(--color-link);
+    text-decoration: none;
+}
+
+.rp-callout a:hover {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.rp-callout--info svg {
+    color: var(--color-link);
+}
+
+.rp-callout--lead {
+    margin-bottom: 14px;
+}
+
+.rp-callout--danger {
+    background: var(--color-status-danger-bg);
+    color: #8a1c1c;
+}
+
+.rp-callout--danger strong,
+.rp-callout--danger svg {
+    color: var(--color-status-danger);
+}
+
+/* The one thing on the page that is owed, above everything it could get lost under */
+.rp-banner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border: 1px solid #f3dfae;
+    border-radius: var(--radius-lg);
+    background: var(--color-status-warning-bg);
+}
+
+.rp-banner__icon {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-white);
+    color: var(--color-status-warning);
+}
+
+.rp-banner__icon svg {
+    width: 19px;
+    height: 19px;
+}
+
+.rp-banner__text {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.rp-banner__title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.rp-banner__note {
+    margin: 2px 0 0;
+    font-size: 12.5px;
+    line-height: 1.45;
+    color: #7a4a10;
+}
+
+@container rpAcct (max-width: 560px) {
+    .rp-banner {
+        flex-wrap: wrap;
+        align-items: flex-start;
+    }
+
+    /* A zero basis keeps the text beside the icon instead of wrapping under it */
+    .rp-banner__text {
+        flex: 1 1 0;
+    }
+
+    .rp-banner .rp-button {
+        flex: 1 1 100%;
+    }
+}
+
+/* ── State chips ─────────────────────────────────────────── */
+.rp-state {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 10px;
+    border-radius: var(--radius-full);
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.rp-state svg {
+    width: 12px;
+    height: 12px;
+}
+
+.rp-state--warn {
+    background: var(--color-status-warning-bg);
+    color: var(--color-status-warning);
+}
+
+.rp-state--ok {
+    background: #ecfdf3;
+    color: var(--color-status-success);
+}
+
+.status-verified {
+    --pill-bg: #ecfdf3;
+    --pill-color: #067647;
+}
+
+/* ============================================================
+   FIELDS — the profile-details.css anatomy
+   ============================================================ */
+.pd-group + .pd-group {
+    margin-top: 22px;
+    padding-top: 20px;
+    border-top: 1px solid var(--color-border);
+}
+
+.pd-group-head {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-bottom: 16px;
+}
+
+.pd-group-icon {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-md);
+    background: var(--color-surface-subtle);
+    color: var(--color-brand-navy);
+}
+
+.pd-group-icon svg {
+    width: 17px;
+    height: 17px;
+}
+
+.pd-group-titles {
+    min-width: 0;
+}
+
+.pd-group-title {
+    margin: 0;
+    font-size: 14.5px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--color-text-secondary);
+}
+
+.pd-group-note {
+    margin: 2px 0 0;
+    font-size: 12.5px;
+    line-height: 1.4;
+    color: var(--color-text-secondary);
+}
+
+/* Columns follow the card, not the viewport: the aside and the sidebar both move its width */
+.pd-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px var(--field-gap);
+    align-items: start;
+}
+
+.pd-col-full {
+    grid-column: 1 / -1;
+}
+
+@container rpCard (min-width: 520px) {
+    .pd-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@container rpCard (min-width: 700px) {
+    .pd-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .pd-grid .pd-col-wide {
+        grid-column: span 2;
+    }
+}
+
+/* ── Display ─────────────────────────────────────────────── */
+.pd-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.pd-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.3;
+    color: var(--color-text-secondary);
+}
+
+.pd-label svg {
+    width: 15px;
+    height: 15px;
+    flex: 0 0 auto;
+}
+
+.pd-label .ph-whatsapp-logo {
+    color: #25d366;
+}
+
+.pd-value {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    min-width: 0;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--color-text-primary);
+    overflow-wrap: anywhere;
+}
+
+.pd-value a {
+    color: var(--color-text-primary);
+    text-decoration: none;
+}
+
+.pd-value a:hover {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.pd-value-icon {
+    width: 14px;
+    height: 14px;
+    color: var(--color-text-secondary);
+}
+
+.pd-value-hint {
+    font-size: 12.5px;
+    font-weight: 400;
+    color: var(--color-text-secondary);
+}
+
+.pd-value.is-prose {
+    display: block;
+    font-weight: 400;
+    font-size: 14.5px;
+    line-height: 1.6;
+    max-width: 78ch;
+}
+
+/* An empty value is an invitation, not a blank */
+.pd-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    align-self: flex-start;
+    max-width: 100%;
+    padding: 6px 12px;
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-sm);
+    background: none;
+    font-family: var(--font-body);
+    font-size: 13px;
+    line-height: 1.3;
+    color: var(--color-text-secondary);
+    text-align: left;
+    cursor: pointer;
+    transition: background var(--transition-fast), border-color var(--transition-fast),
+                color var(--transition-fast);
+}
+
+.pd-add::before {
+    content: "+";
+    flex: 0 0 auto;
+    font-size: 15px;
+    line-height: 1;
+    color: var(--color-brand-gold);
+}
+
+.pd-add:hover {
+    background: var(--color-surface-subtle);
+    border-color: var(--gold-border);
+    color: var(--color-brand-navy);
+}
+
+.pd-add:focus-visible {
+    outline: none;
+    border-color: var(--gold-border);
+    box-shadow: var(--focus-ring-gold);
+}
+
+/* ── Edit ────────────────────────────────────────────────── */
+.pd-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+}
+
+.pd-field > label,
+.pd-field > .pd-field-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0;
+    font-size: 13.5px;
+    font-weight: 500;
+    line-height: 1.25;
+    color: var(--color-text-primary);
+}
+
+.pd-field .asterisk {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-status-danger);
+}
+
+.pd-field-hint {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--color-text-secondary);
+}
+
+.pd-form .form-control {
+    width: 100%;
+    height: var(--field-h);
+    min-height: var(--field-h);
+    padding: 0 16px;
+    background: var(--color-surface-inset);
+    border: 0;
+    border-radius: var(--field-radius);
+    box-shadow: none;
+    font-family: var(--font-body);
+    /* 16px so iOS Safari does not zoom the page in on focus */
+    font-size: 16px;
+    line-height: normal;
+    color: var(--color-text-primary);
+    transition: background var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.pd-form textarea.form-control {
+    height: auto;
+    min-height: 96px;
+    padding: 13px 16px;
+    line-height: 1.5;
+    resize: vertical;
+}
+
+.pd-form .form-control::placeholder {
+    font-size: 14px;
+    color: var(--color-text-placeholder);
+    opacity: 1;
+}
+
+.pd-form .form-control:hover:not(:disabled):not([readonly]) {
+    background: var(--color-surface-subtle);
+}
+
+.pd-form .form-control:focus {
+    outline: none;
+    background: var(--color-surface-white);
+    box-shadow: var(--focus-ring-gold);
+}
+
+.pd-form .form-control:disabled {
+    color: var(--color-text-secondary);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.pd-form .form-control.is-invalid,
+.pd-phone.is-invalid {
+    background: var(--color-status-danger-bg);
+    box-shadow: inset 0 0 0 1.5px var(--color-status-danger);
+}
+
+/* A native select wearing the pill, chevron drawn in as the select2 theme does */
+.pd-form select.form-control {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 42px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 16px;
+    cursor: pointer;
+}
+
+.pd-counter {
+    align-self: flex-end;
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+.pd-counter.is-over {
+    color: var(--color-status-danger);
+}
+
+/* Code and number in one pill, standing in for intl-tel-input */
+.pd-phone {
+    display: flex;
+    align-items: stretch;
+    height: var(--field-h);
+    border-radius: var(--field-radius);
+    background: var(--color-surface-inset);
+    overflow: hidden;
+    transition: background var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.pd-phone:hover {
+    background: var(--color-surface-subtle);
+}
+
+.pd-phone:focus-within {
+    background: var(--color-surface-white);
+    box-shadow: var(--focus-ring-gold);
+}
+
+.pd-form .pd-phone select.form-control {
+    flex: 0 0 auto;
+    width: 104px;
+    height: 100%;
+    min-height: 0;
+    padding: 0 28px 0 14px;
+    border-right: 1px solid var(--color-divider);
+    border-radius: 0;
+    background-color: transparent;
+    background-position: right 10px center;
+    background-size: 14px;
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+}
+
+.pd-form .pd-phone input.form-control {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 100%;
+    min-height: 0;
+    border-radius: 0;
+    background: transparent;
+    font-variant-numeric: tabular-nums;
+}
+
+.pd-form .pd-phone .form-control:hover,
+.pd-form .pd-phone .form-control:focus {
+    background-color: transparent;
+    box-shadow: none;
+}
+
+/* Locked field (email): the reason rides on the badge */
+.pd-lock-badge {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 9px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-subtle);
+    font-size: 11.5px;
+    font-weight: 400;
+    color: var(--color-text-secondary);
+    cursor: help;
+}
+
+.pd-lock-badge svg {
+    width: 12px;
+    height: 12px;
+}
+
+.pd-lock-badge:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-gold);
+}
+
+.pd-locked-shell {
+    position: relative;
+}
+
+.pd-form .pd-locked-shell .form-control[readonly] {
+    padding-right: 44px;
+    background: var(--color-surface-subtle);
+    color: var(--color-text-secondary);
+    cursor: default;
+}
+
+.pd-locked-icon {
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    width: 16px;
+    height: 16px;
+    transform: translateY(-50%);
+    color: var(--color-text-secondary);
+    pointer-events: none;
+}
+
+/* A hover-and-focus tip, standing in for the floating Bootstrap tooltip */
+[data-tip] {
+    position: relative;
+}
+
+[data-tip]::after {
+    content: attr(data-tip);
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 8px);
+    z-index: 30;
+    width: max-content;
+    max-width: 260px;
+    padding: 8px 11px;
+    border-radius: var(--radius-sm);
+    background: var(--color-brand-navy);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.45;
+    letter-spacing: 0;
+    white-space: normal;
+    text-align: left;
+    color: var(--color-surface-white);
+    box-shadow: var(--shadow-md);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(4px);
+    transition: opacity var(--transition-fast), transform var(--transition-fast), visibility 0s linear 0.15s;
+    pointer-events: none;
+}
+
+[data-tip]:hover::after,
+[data-tip]:focus-visible::after {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition: opacity var(--transition-fast), transform var(--transition-fast), visibility 0s;
+}
+
+/* ── Actions bar ─────────────────────────────────────────── */
+.pd-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 22px;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-border);
+}
+
+/* While editing the bar becomes a tray pinned to the card foot */
+.rp-card.is-editing .pd-actions {
+    margin: 22px -18px -18px;
+    padding: 14px 18px;
+    background: var(--color-surface-inset);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+@media (max-width: 767px) {
+    .rp-card.is-editing .pd-actions {
+        margin: 20px -14px -14px;
+        padding: 12px 14px;
+    }
+}
+
+.pd-actions-note {
+    flex: 1 1 200px;
+    min-width: 0;
+    margin: 0;
+    font-size: 12.5px;
+    line-height: 1.45;
+    color: var(--color-text-secondary);
+}
+
+.pd-actions-note:empty {
+    display: none;
+}
+
+.pd-actions-note.is-error {
+    color: var(--color-status-danger);
+}
+
+.pd-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex: 0 0 auto;
+    height: 44px;
+    padding: 0 22px;
+    margin: 0;
+    border: none;
+    border-radius: var(--field-radius);
+    font-family: var(--font-body);
+    font-size: 14.5px;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.pd-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.pd-btn-primary {
+    background: var(--color-brand-navy);
+    color: var(--color-surface-white);
+}
+
+.pd-btn-primary:hover:not(:disabled) {
+    background: var(--color-brand-navy-hover);
+}
+
+.pd-btn-primary:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-navy);
+}
+
+.pd-btn-secondary {
+    background: var(--color-surface-white);
+    box-shadow: inset 0 0 0 1px var(--color-border);
+    color: var(--color-text-primary);
+}
+
+.pd-btn-secondary:hover:not(:disabled) {
+    background: var(--color-surface-subtle);
+}
+
+.pd-btn-secondary:focus-visible {
+    outline: none;
+    box-shadow: inset 0 0 0 1px var(--color-border), var(--focus-ring-gold);
+}
+
+.pd-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.pd-head-actions {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pd-edit-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    height: 34px;
+    padding: 0 13px;
+    background: var(--color-surface-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background var(--transition-fast), border-color var(--transition-fast),
+                color var(--transition-fast);
+}
+
+.pd-edit-btn svg {
+    width: 15px;
+    height: 15px;
+    flex: 0 0 auto;
+}
+
+.pd-edit-btn:hover {
+    background: var(--color-surface-subtle);
+    border-color: var(--color-border-hover);
+    color: var(--color-text-primary);
+}
+
+.pd-edit-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-gold);
+}
+
+/* The card's one red control: the chip in danger colours */
+.pd-edit-btn.is-danger {
+    color: var(--color-status-danger);
+}
+
+.pd-edit-btn.is-danger:hover {
+    background: var(--color-status-danger-bg);
+    border-color: var(--color-status-danger);
+    color: var(--color-status-danger);
+}
+
+.pd-edit-btn.is-danger:focus-visible {
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.28);
+}
+
+/* Header chip on a wide card, this twin in the footer on a narrow one */
+.pd-actions .pd-foot-edit,
+.pd-actions.is-twin {
+    display: none;
+}
+
+@container rpCard (max-width: 560px) {
+    .rp-card .pd-head-actions {
+        display: none;
+    }
+
+    .pd-actions .pd-foot-edit {
+        display: inline-flex;
+    }
+
+    .pd-actions.is-twin {
+        display: flex;
+    }
+
+    .pd-actions {
+        justify-content: space-between;
+    }
+
+    .pd-actions-note {
+        flex: 1 1 100%;
+    }
+
+    .pd-actions .pd-btn,
+    .pd-actions .pd-edit-btn {
+        flex: 1 1 0;
+    }
+}
+
+.pd-spinner {
+    display: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: var(--radius-full);
+    animation: pd-spin 0.6s linear infinite;
+}
+
+.is-busy .pd-spinner {
+    display: block;
+}
+
+.is-busy .pd-btn-label {
+    display: none;
+}
+
+@keyframes pd-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ── Empty state ─────────────────────────────────────────── */
+.pd-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 26px 20px 22px;
+    text-align: center;
+}
+
+.pd-empty-icon {
+    display: grid;
+    place-items: center;
+    width: 50px;
+    height: 50px;
+    margin-bottom: 6px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-subtle);
+    color: var(--color-brand-navy);
+}
+
+.pd-empty-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.pd-empty-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.pd-empty-note {
+    margin: 0 0 10px;
+    max-width: 440px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--color-text-secondary);
+}
+
+/* ============================================================
+   RECORDS — education, work experience, certifications
+   ============================================================ */
+.rp-entries {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.rp-entry {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 0;
+    border-top: 1px solid var(--color-border);
+    scroll-margin-top: calc(var(--tabs-h) + 24px);
+}
+
+.rp-entry:first-child {
+    padding-top: 2px;
+    border-top: 0;
+}
+
+.rp-entry:last-child {
+    padding-bottom: 0;
+}
+
+.rp-entry__icon {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius-md);
+    background: var(--color-surface-subtle);
+    color: var(--color-brand-navy);
+}
+
+.rp-entry__icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.rp-entry__body {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.rp-entry__title {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    margin: 0;
+    font-size: 14.5px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--color-text-primary);
+}
+
+.rp-entry__sub,
+.rp-entry__meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 3px 8px;
+    margin: 2px 0 0;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--color-text-secondary);
+}
+
+.rp-entry__sub {
+    color: var(--color-text-primary);
+}
+
+.rp-entry__meta {
+    font-size: 12.5px;
+}
+
+.rp-entry__text {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    margin: 8px 0 0;
+    max-width: 78ch;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--color-text-secondary);
+}
+
+.rp-entry__text.is-open {
+    display: block;
+    -webkit-line-clamp: none;
+}
+
+.rp-entry__more {
+    margin-top: 2px;
+    font-size: 12.5px;
+}
+
+.rp-entry__side {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+.rp-entry__actions {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.rp-entry .rp-callout {
+    margin-top: 10px;
+}
+
+.rp-period {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 9px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-subtle);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-period.is-current {
+    background: rgba(11, 38, 62, 0.07);
+    color: var(--color-brand-navy);
+}
+
+/* Pointed at from a notification link, the way ?highlight_cert= does it on the old page */
+.rp-entry.is-flagged {
+    animation: rp-flag 2.4s ease-out;
+    border-radius: var(--radius-md);
+}
+
+@keyframes rp-flag {
+    0%, 55% {
+        background: var(--color-surface-gold-pale);
+        box-shadow: 0 0 0 8px var(--color-surface-gold-pale);
+    }
+
+    100% {
+        background: transparent;
+        box-shadow: 0 0 0 8px transparent;
+    }
+}
+
+.rp-soon {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 1px 8px;
+    border-radius: var(--radius-full);
+    background: var(--color-status-warning-bg);
+    font-weight: 500;
+    color: var(--color-status-warning);
+    white-space: nowrap;
+}
+
+.rp-soon svg {
+    width: 12px;
+    height: 12px;
+}
+
+@container rpCard (max-width: 520px) {
+    .rp-entry {
+        flex-wrap: wrap;
+    }
+
+    .rp-entry__body {
+        flex: 1 1 0;
+    }
+
+    /* The period and the pill drop under the text, lined up with it */
+    .rp-entry__side {
+        order: 3;
+        flex: 1 1 calc(100% - 50px);
+        flex-direction: row;
+        justify-content: flex-start;
+        margin-left: 50px;
+    }
+}
+
+/* ── Delete? popover ─────────────────────────────────────── */
+.rp-confirm-wrap {
+    position: relative;
+}
+
+.rp-confirm {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 8px);
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 9px 8px 13px;
+    background: var(--color-surface-white);
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    box-shadow: var(--shadow-pop);
+    font-size: 13px;
+    white-space: nowrap;
+    color: var(--color-text-primary);
+    animation: rp-pop-in 0.16s ease-out;
+}
+
+.rp-confirm__text {
+    font-weight: 500;
+}
+
+/* The caret points back down at the bin it belongs to */
+.rp-confirm::after {
+    content: "";
+    position: absolute;
+    right: 10px;
+    bottom: -6px;
+    width: 10px;
+    height: 10px;
+    background: var(--color-surface-white);
+    border-right: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+    transform: rotate(45deg);
+}
+
+.rp-mini {
+    height: 28px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: 9px;
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.rp-mini.is-yes {
+    background: var(--color-status-danger);
+    color: var(--color-surface-white);
+}
+
+.rp-mini.is-yes:hover {
+    background: #b91c1c;
+}
+
+.rp-mini.is-no {
+    background: var(--color-surface-white);
+    box-shadow: inset 0 0 0 1px var(--color-border);
+    color: var(--color-text-secondary);
+}
+
+.rp-mini.is-no:hover {
+    background: var(--color-surface-subtle);
+    color: var(--color-text-primary);
+}
+
+.rp-mini:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.28);
+}
+
+.rp-entry.is-leaving,
+.rp-fileitem.is-leaving {
+    opacity: 0;
+    transform: translateX(14px);
+    transition: opacity var(--transition-base), transform var(--transition-base);
+}
+
+@keyframes rp-pop-in {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* "I have no work experience", kept from _work_list.html */
+.rp-optout {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 4px;
+    padding: 11px 14px;
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-inset);
+    font-size: 13.5px;
+    color: var(--color-text-primary);
+    cursor: pointer;
+}
+
+.rp-optout input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--color-brand-navy);
+}
+
+/* ============================================================
+   FILES — documents and the terms
+   ============================================================ */
+.rp-filelist {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.rp-fileitem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 8px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-inset);
+    transition: border-color var(--transition-fast), background var(--transition-fast),
+                opacity var(--transition-base), transform var(--transition-base);
+}
+
+.rp-fileitem:hover {
+    background: var(--color-surface-subtle);
+    border-color: var(--color-border-hover);
+}
+
+.rp-fileitem__icon {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-white);
+    color: var(--color-brand-navy);
+}
+
+.rp-fileitem__icon svg {
+    width: 17px;
+    height: 17px;
+}
+
+.rp-fileitem__text {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.rp-fileitem__name {
+    font-size: 14px;
+    color: var(--color-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rp-fileitem__hint {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rp-fileitem__tag {
+    flex: 0 0 auto;
+    padding: 1px 8px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-white);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--color-brand-navy);
+    white-space: nowrap;
+}
+
+.rp-fileitem__size {
+    flex: 0 0 auto;
+    min-width: 52px;
+    text-align: right;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+}
+
+.rp-fileitem__actions {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.rp-fileitem__actions .rp-iconbtn {
+    border-color: transparent;
+    background: transparent;
+}
+
+.rp-fileitem__actions .rp-iconbtn:hover {
+    background: var(--color-surface-white);
+    border-color: var(--color-border);
+}
+
+.rp-fileitem__actions .rp-iconbtn.is-danger:hover,
+.rp-fileitem__actions .rp-iconbtn.is-danger.is-asking {
+    background: var(--color-status-danger-bg);
+    border-color: var(--color-status-danger);
+}
+
+@container rpCard (max-width: 520px) {
+    .rp-fileitem__tag,
+    .rp-fileitem__size {
+        display: none;
+    }
+}
+
+.rp-drop {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    border: 1.5px dashed var(--gold-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-gold-pale);
+    cursor: pointer;
+    transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.rp-drop:hover,
+.rp-drop.is-dragover {
+    border-color: var(--color-brand-gold);
+}
+
+.rp-drop:focus-within {
+    box-shadow: var(--focus-ring-gold);
+}
+
+.rp-drop input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.rp-drop__icon {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--color-surface-white);
+    color: var(--color-brand-gold);
+}
+
+.rp-drop__icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.rp-drop__title {
+    display: block;
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.rp-drop__title u {
+    color: var(--color-brand-navy);
+    text-underline-offset: 2px;
+}
+
+.rp-drop__note {
+    display: block;
+    margin: 2px 0 0;
+    font-size: 12.5px;
+    color: var(--color-text-secondary);
+}
+
+.rp-drop.is-invalid {
+    border-color: var(--color-status-danger);
+    background: var(--color-status-danger-bg);
+}
+
+/* ============================================================
+   TECHNOLOGY
+   ============================================================ */
+.rp-tech {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.rp-tech__label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0 0 8px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+}
+
+.rp-tech__label svg {
+    width: 14px;
+    height: 14px;
+}
+
+.rp-chips {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.rp-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-subtle);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.45;
+    color: var(--color-text-primary);
+}
+
+.rp-techedit__bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.rp-search {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 360px;
+    height: 40px;
+    padding: 0 14px;
+    border-radius: var(--field-radius);
+    background: var(--color-surface-inset);
+    color: var(--color-text-secondary);
+    transition: background var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.rp-search:hover {
+    background: var(--color-surface-subtle);
+}
+
+.rp-search:focus-within {
+    background: var(--color-surface-white);
+    box-shadow: var(--focus-ring-gold);
+}
+
+.rp-search svg {
+    width: 16px;
+    height: 16px;
+}
+
+.rp-search input {
+    flex: 1 1 auto;
+    min-width: 0;
+    border: 0;
+    outline: none;
+    background: transparent;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--color-text-primary);
+}
+
+.rp-search input::placeholder {
+    color: var(--color-text-placeholder);
+}
+
+.rp-techedit__count {
+    margin-left: auto;
+    font-size: 12.5px;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+}
+
+.rp-techedit__count strong {
+    font-weight: 600;
+    color: var(--color-brand-navy);
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 13px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    background: var(--color-surface-white);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--color-text-primary);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background var(--transition-fast), border-color var(--transition-fast),
+                color var(--transition-fast);
+}
+
+.rp-toggle svg {
+    display: none;
+    width: 13px;
+    height: 13px;
+}
+
+.rp-toggle:hover {
+    background: var(--color-surface-subtle);
+    border-color: var(--color-border-hover);
+}
+
+.rp-toggle:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-gold);
+}
+
+.rp-toggle[aria-pressed="true"],
+.rp-toggle.is-custom {
+    padding-left: 10px;
+    border-color: var(--color-brand-navy);
+    background: rgba(11, 38, 62, 0.06);
+    font-weight: 500;
+    color: var(--color-brand-navy);
+}
+
+.rp-toggle[aria-pressed="true"] svg,
+.rp-toggle.is-custom svg {
+    display: block;
+}
+
+/* A tool the resource typed in themselves: always picked, removed with its own ✕ */
+.rp-toggle.is-custom {
+    padding-left: 10px;
+    gap: 4px;
+    padding-right: 4px;
+    cursor: default;
+}
+
+.rp-toggle.is-custom .rp-iconbtn--bare {
+    color: var(--color-brand-navy);
+}
+
+.rp-toggle.is-custom .rp-iconbtn--bare svg {
+    display: block;
+}
+
+.rp-tech__group[hidden],
+.rp-toggle[hidden] {
+    display: none;
+}
+
+.rp-addtool {
+    display: flex;
+    gap: 8px;
+    max-width: 440px;
+    margin-top: 10px;
+}
+
+.pd-form .rp-addtool .form-control {
+    height: 38px;
+    min-height: 38px;
+    font-size: 14px;
+    border-radius: var(--radius-sm);
+}
+
+.rp-addtool .pd-edit-btn {
+    height: 38px;
+}
+
+.rp-tech__nomatch {
+    margin: 0;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-inset);
+    font-size: 13px;
+    color: var(--color-text-secondary);
+}
+
+/* ============================================================
+   TERMS AND CONDITIONS
+   ============================================================ */
+.rp-terms__hello {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.rp-terms__text {
+    margin: 6px 0 16px;
+    max-width: 70ch;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+}
+
+.rp-terms__text strong {
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.rp-agree {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 16px;
+    padding: 14px 16px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-white);
+    cursor: pointer;
+    transition: border-color var(--transition-fast), background var(--transition-fast),
+                box-shadow var(--transition-fast);
+}
+
+.rp-agree:hover {
+    border-color: var(--gold-border);
+}
+
+.rp-agree input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.rp-agree__box {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    margin-top: 1px;
+    border: 1.5px solid #8f8f98;
+    border-radius: 6px;
+    background: var(--color-surface-white);
+    color: var(--color-surface-white);
+    transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.rp-agree__box svg {
+    width: 13px;
+    height: 13px;
+    stroke-width: 3;
+    opacity: 0;
+}
+
+.rp-agree__text {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--color-text-primary);
+}
+
+.rp-agree:has(input:checked) {
+    border-color: var(--color-brand-navy);
+    background: rgba(11, 38, 62, 0.035);
+}
+
+.rp-agree:has(input:checked) .rp-agree__box {
+    border-color: var(--color-brand-navy);
+    background: var(--color-brand-navy);
+}
+
+.rp-agree:has(input:checked) .rp-agree__box svg {
+    opacity: 1;
+}
+
+.rp-agree:has(input:focus-visible) {
+    box-shadow: var(--focus-ring-gold);
+}
+
+.rp-terms__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    margin-top: 16px;
+}
+
+.rp-terms__fine {
+    margin: 0;
+    font-size: 12.5px;
+    color: var(--color-text-secondary);
+}
+
+.rp-terms__done {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 14px 16px;
+    border-radius: var(--radius-md);
+    background: #ecfdf3;
+}
+
+.rp-terms__doneicon {
+    flex: 0 0 auto;
+    color: var(--color-status-success);
+}
+
+.rp-terms__doneicon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.rp-terms__donetitle {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.rp-terms__donenote {
+    margin: 2px 0 0;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--color-text-secondary);
+}
+
+@container rpCard (max-width: 520px) {
+    .rp-terms__foot .rp-button {
+        flex: 1 1 100%;
+    }
+}
+
+/* ============================================================
+   ASIDE — profile strength and the account facts
+   ============================================================ */
+.rp-strength__top {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.rp-strength__pct {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: 30px;
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-strength__pct small {
+    font-size: 18px;
+    color: var(--color-text-secondary);
+}
+
+.rp-strength__label {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+}
+
+.rp-bar {
+    height: 6px;
+    margin-top: 10px;
+    border-radius: var(--radius-full);
+    background: #e6e2d8;
+    overflow: hidden;
+}
+
+.rp-bar > span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--color-brand-gold);
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.rp-strength__note {
+    margin: 10px 0 0;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--color-text-secondary);
+}
+
+.rp-todo {
+    list-style: none;
+    margin: 14px 0 0;
+    padding: 6px 0 0;
+    border-top: 1px solid var(--color-border);
+}
+
+.rp-todo__item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 -8px;
+    width: calc(100% + 16px);
+    padding: 8px;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: none;
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    color: var(--color-text-primary);
+    text-align: left;
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.rp-todo__item:hover {
+    background: var(--color-surface-subtle);
+}
+
+.rp-todo__item:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-gold);
+}
+
+.rp-todo__icon {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-subtle);
+    color: var(--color-brand-navy);
+}
+
+.rp-todo__icon svg {
+    width: 14px;
+    height: 14px;
+}
+
+.rp-todo__text {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.rp-todo__item > svg:last-child {
+    width: 15px;
+    height: 15px;
+    color: var(--color-text-secondary);
+    transition: transform var(--transition-fast);
+}
+
+.rp-todo__item:hover > svg:last-child {
+    transform: translateX(2px);
+}
+
+.rp-todo__item.is-urgent .rp-todo__icon {
+    background: var(--color-status-warning-bg);
+    color: var(--color-status-warning);
+}
+
+.rp-strength__done {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 12px 0 0;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-status-success);
+}
+
+.rp-strength__done svg {
+    width: 16px;
+    height: 16px;
+}
+
+.rp-srows {
+    margin: 0;
+}
+
+.rp-srow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 44px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.rp-srow:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+}
+
+.rp-srow dt {
+    flex: 0 0 auto;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+}
+
+.rp-srow dd {
+    min-width: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    text-align: right;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-srow .rp-iconbtn {
+    width: 26px;
+    height: 26px;
+    border-color: transparent;
+}
+
+.rp-srow .rp-iconbtn:hover {
+    border-color: var(--color-border);
+}
+
+.rp-srow .rp-iconbtn svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* Full width once stacked: the score beside its to-do list, the facts in one row */
+@container rpCard (min-width: 600px) {
+    /* The list spans all three rows; the last row takes the slack so the score stays stacked */
+    .rp-strength .rp-card__body {
+        display: grid;
+        grid-template-columns: minmax(200px, 250px) minmax(0, 1fr);
+        grid-template-rows: auto auto 1fr;
+        column-gap: 32px;
+        align-items: start;
+    }
+
+    .rp-strength .rp-todo {
+        grid-column: 2;
+        grid-row: 1 / span 3;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 2px 20px;
+        margin: 0;
+        padding: 0;
+        border-top: 0;
+    }
+
+    .rp-strength .rp-todo__item {
+        margin: 0;
+        width: 100%;
+    }
+
+    .rp-strength .rp-strength__done {
+        grid-column: 2;
+        grid-row: 1;
+        margin: 0;
+    }
+
+    .rp-accountcard .rp-srows {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0 24px;
+    }
+
+    .rp-accountcard .rp-srow {
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        gap: 3px;
+        min-height: 0;
+        padding: 2px 0 0;
+        border-bottom: 0;
+    }
+
+    .rp-accountcard .rp-srow dd {
+        justify-content: flex-start;
+        text-align: left;
+    }
+}
+
+@container rpCard (min-width: 860px) {
+    .rp-strength .rp-todo {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* The topbar pill's colours, so the two always read as one status */
+.rp-avstate {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--av-color);
+}
+
+.rp-avstate::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--av-dot);
+}
+
+.rp-avstate--AV {
+    --av-color: #0f766e;
+    --av-dot: #10a37f;
+}
+
+.rp-avstate--BS {
+    --av-color: #b45309;
+    --av-dot: #e08a1e;
+}
+
+.rp-avstate--NA {
+    --av-color: #52525b;
+    --av-dot: #a1a1aa;
+}
+
+/* ============================================================
+   MODAL — the dialogs, and the shell the password one shares
+   ============================================================ */
+.rp-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(11, 38, 62, 0.45);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    /* Hidden only once the fade ends; shown at once, so focus can land the moment it opens */
+    transition: opacity var(--transition-base), visibility 0s linear 0.28s;
+}
+
+.rp-modal.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition: opacity var(--transition-base), visibility 0s;
+}
+
+.rp-modal__panel {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 600px;
+    max-height: calc(100vh - 48px);
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    background: var(--color-surface-white);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(12px) scale(0.98);
+    transition: transform var(--transition-base);
+}
+
+.rp-modal.is-open .rp-modal__panel {
+    transform: none;
+}
+
+.rp-modal--photo .rp-modal__panel {
+    max-width: 460px;
+}
+
+/* The form carries head, body and foot, so it has to pass the height on */
+.rp-modal__panel > form {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    flex: 1 1 auto;
+}
+
+.pd-modal-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 22px 24px 16px;
+}
+
+.pd-modal-titles {
+    min-width: 0;
+}
+
+.pd-modal-title {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 500;
+    line-height: 1.25;
+    color: var(--color-text-primary);
+}
+
+.pd-modal-note {
+    margin: 4px 0 0;
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: var(--color-text-secondary);
+}
+
+.pd-modal-close {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-inset);
+    color: var(--color-text-primary);
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.pd-modal-close svg {
+    width: 18px;
+    height: 18px;
+}
+
+.pd-modal-close:hover {
+    background: var(--color-surface-subtle);
+}
+
+.pd-modal-close:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-gold);
+}
+
+.pd-modal-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 2px 24px 6px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.pd-modal-foot {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 18px 24px;
+}
+
+/* The dialog is 600px wide whatever the screen, so it keeps two columns until a phone */
+.pd-modal-body .pd-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.pd-modal-body .pd-col-wide {
+    grid-column: 1 / -1;
+}
+
+.rp-yearpair {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 8px;
+    color: var(--color-text-secondary);
+}
+
+/* The policy scope wraps head, body and foot, so it passes the panel's height on */
+.rp-pwdscope {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.rp-checkline {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--color-text-primary);
+    cursor: pointer;
+}
+
+.rp-checkline input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--color-brand-navy);
+}
+
+@media (max-width: 767px) {
+    .rp-modal {
+        padding: 0;
+        align-items: flex-end;
+    }
+
+    .rp-modal__panel {
+        max-height: 92vh;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+
+    .rp-modal--photo .rp-modal__panel,
+    .pwd-modal .rp-modal__panel {
+        max-width: none;
+    }
+
+    .pd-modal-head,
+    .pd-modal-body,
+    .pd-modal-foot {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .pd-modal-body .pd-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .pd-modal-foot .pd-btn {
+        flex: 1 1 0;
+    }
+}
+
+/* ── Photo ───────────────────────────────────────────────── */
+.rp-photo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 4px 0 6px;
+}
+
+.rp-photo__stage {
+    width: 184px;
+    height: 184px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--color-surface-inset);
+    box-shadow: 0 0 0 6px var(--color-surface-subtle);
+}
+
+.rp-photo__stage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.12s linear;
+}
+
+.rp-photo__zoom {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 280px;
+    color: var(--color-text-secondary);
+}
+
+.rp-photo__zoom svg {
+    width: 14px;
+    height: 14px;
+}
+
+.rp-photo__zoom svg:last-child {
+    width: 19px;
+    height: 19px;
+}
+
+.rp-photo__zoom input {
+    flex: 1 1 auto;
+    accent-color: var(--color-brand-gold);
+}
+
+.rp-photo__zoom input:disabled {
+    opacity: 0.45;
+}
+
+.rp-photo__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+}
+
+.rp-photo__actions input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+
+.rp-photo__actions label {
+    position: relative;
+}
+
+.rp-photo__actions label:focus-within {
+    box-shadow: var(--focus-ring-gold);
+}
+
+.rp-photo .pd-field-hint {
+    text-align: center;
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+    .rp-card,
+    .rp-fileitem,
+    .rp-bar > span,
+    .rp-modal,
+    .rp-modal__panel,
+    .rp-entry.is-leaving,
+    .rp-fileitem.is-leaving {
+        transition: none;
+    }
+
+    .rp-entry.is-flagged,
+    .rp-confirm,
+    .pd-spinner {
+        animation: none;
+    }
+}

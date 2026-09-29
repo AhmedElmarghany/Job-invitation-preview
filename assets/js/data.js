@@ -10,9 +10,9 @@
     var RP = (global.RP = global.RP || {});
 
     RP.USER = {
-        firstName: "Ahmad",
-        fullName: "Ahmad Elmarghany",
-        resourceId: "R-10482",
+        firstName: "Ahmed",
+        fullName: "Ahmed Elmarghany",
+        resourceId: "T-202",
         partnerSince: "March 2021",
         photo: "assets/img/placeholder-headshot.png",
         availability: "AV",
@@ -1833,6 +1833,128 @@
         d.glossaries = glossariesFor(job);
         d.chat = chatFor(job, d);
         return d;
+    };
+
+    /* ── User account: what templates/accounts/profile/main.html shows a resource about themselves ── */
+    var DAY = 24 * 3600 * 1000;
+
+    RP.COUNTRIES = [
+        { code: "AE", name: "United Arab Emirates", dial: "+971" },
+        { code: "AU", name: "Australia", dial: "+61" },
+        { code: "BH", name: "Bahrain", dial: "+973" },
+        { code: "CA", name: "Canada", dial: "+1" },
+        { code: "EG", name: "Egypt", dial: "+20" },
+        { code: "FJ", name: "Fiji", dial: "+679" },
+        { code: "FR", name: "France", dial: "+33" },
+        { code: "DE", name: "Germany", dial: "+49" },
+        { code: "IN", name: "India", dial: "+91" },
+        { code: "JO", name: "Jordan", dial: "+962" },
+        { code: "KW", name: "Kuwait", dial: "+965" },
+        { code: "LB", name: "Lebanon", dial: "+961" },
+        { code: "MA", name: "Morocco", dial: "+212" },
+        { code: "NZ", name: "New Zealand", dial: "+64" },
+        { code: "OM", name: "Oman", dial: "+968" },
+        { code: "PK", name: "Pakistan", dial: "+92" },
+        { code: "PH", name: "Philippines", dial: "+63" },
+        { code: "QA", name: "Qatar", dial: "+974" },
+        { code: "WS", name: "Samoa", dial: "+685" },
+        { code: "SA", name: "Saudi Arabia", dial: "+966" },
+        { code: "ES", name: "Spain", dial: "+34" },
+        { code: "TO", name: "Tonga", dial: "+676" },
+        { code: "TN", name: "Tunisia", dial: "+216" },
+        { code: "GB", name: "United Kingdom", dial: "+44" },
+        { code: "US", name: "United States", dial: "+1" }
+    ];
+
+    RP.TIMEZONES = [
+        { id: "Pacific/Auckland", offset: "+12" },
+        { id: "Pacific/Tongatapu", offset: "+13" },
+        { id: "Pacific/Apia", offset: "+13" },
+        { id: "Pacific/Fiji", offset: "+12" },
+        { id: "Australia/Sydney", offset: "+10" },
+        { id: "Asia/Manila", offset: "+8" },
+        { id: "Asia/Kolkata", offset: "+5:30" },
+        { id: "Asia/Karachi", offset: "+5" },
+        { id: "Asia/Dubai", offset: "+4" },
+        { id: "Asia/Qatar", offset: "+3" },
+        { id: "Asia/Riyadh", offset: "+3" },
+        { id: "Asia/Amman", offset: "+3" },
+        { id: "Africa/Cairo", offset: "+3" },
+        { id: "Europe/Berlin", offset: "+2" },
+        { id: "Europe/London", offset: "+1" },
+        { id: "Africa/Casablanca", offset: "+1" },
+        { id: "America/New_York", offset: "-4" },
+        { id: "America/Los_Angeles", offset: "-7" }
+    ];
+
+    /* The choices add_user_education.html offers, in its order */
+    RP.DEGREES = ["Bachelor", "Specialist", "Master", "Master of Business Administration (MBA)", "Ph.D", "Doctor of Science", "Diploma", "Other"];
+
+    /* crt_document_type in tr_documents.html: value → label */
+    RP.DOC_TYPES = {
+        cv: "CV",
+        resume: "Resume",
+        "educational-document": "Educational document",
+        "other document": "Other document"
+    };
+
+    RP.TECH_GROUPS = [
+        { key: "office", label: "Office and documents", icon: "file", tools: ["Microsoft Word", "Microsoft Excel", "Microsoft PowerPoint", "Microsoft Visio", "Google Docs", "Google Sheets", "Adobe Acrobat Pro"] },
+        { key: "design", label: "Design and DTP", icon: "pen-tool", tools: ["Adobe InDesign", "Adobe Illustrator", "Adobe Photoshop", "Adobe FrameMaker", "QuarkXPress", "Affinity Publisher", "Canva"] },
+        { key: "cat", label: "CAT tools", icon: "languages", tools: ["Matecat", "Trados Studio", "memoQ", "Phrase (Memsource)", "Wordfast", "Smartcat", "OmegaT", "XTM Cloud", "Crowdin"] },
+        { key: "media", label: "Subtitling and media", icon: "captions", tools: ["Subtitle Edit", "Aegisub", "EZTitles", "OOONA", "Adobe Premiere Pro", "Audacity"] },
+        { key: "remote", label: "Remote interpreting", icon: "video", tools: ["Zoom", "Microsoft Teams", "Google Meet", "Webex", "Interprefy", "KUDO"] }
+    ];
+
+    RP.PROFILE = {
+        greeting: "Mr",
+        nativeName: "",
+        email: "ahmedelmarghany01@gmail.com",
+        website: "linkedin.com/in/ahmed-elmarghany",
+        about: "Arabic and English translator with eleven years in legal, medical and marketing content for clients across the Gulf and North Africa. I also subtitle e-learning courses and lay out Arabic documents in InDesign.",
+        phone: { country: "AE", number: "4 555 0147" },
+        mobile: { country: "AE", number: "50 555 0182" },
+        whatsapp: { country: "AE", number: "50 555 0182" },
+        timezone: "Asia/Dubai",
+        country: "AE",
+        city: "Dubai",
+        state: "Dubai",
+        address: "Apartment 1204, Building 7, Al Marsa Street, Dubai Marina",
+        zip: "",
+        photoIsPlaceholder: true,
+
+        educations: [
+            { id: 41, degree: "Master", major: "Translation and Interpreting", university: "Hamad Bin Khalifa University", country: "QA", year: 2016 },
+            { id: 37, degree: "Bachelor", major: "English Language and Literature", university: "Cairo University", country: "EG", year: 2012 }
+        ],
+
+        works: [
+            { id: 58, position: "Senior Arabic Translator", company: "Lingua Bridge Ltd", country: "AE", start: 2019, end: null, duties: "Translate and review legal, medical and marketing content for Gulf clients. I lead a team of four linguists and wrote the Arabic style guide and termbase the team still works from." },
+            { id: 52, position: "Translator and DTP specialist", company: "Nile Language Services", country: "EG", start: 2014, end: 2019, duties: "Translated technical manuals and certified documents, and laid out more than 40 Arabic brochures and catalogues in InDesign." },
+            { id: 47, position: "Freelance subtitler", company: "Self-employed", country: "EG", start: 2012, end: 2014, duties: "Subtitled documentaries and e-learning courses from English into Arabic." }
+        ],
+        noExperience: false,
+
+        /* tr_certificate.html: read-only here, added under Services & Prices */
+        certificates: [
+            { id: 311, name: "ATA Certified Translator", service: "Translation", country: "United States", source: "English", target: "Arabic", certId: "ATA-512384", file: "ata-certificate.pdf", expires: null, status: "verified" },
+            { id: 318, name: "NAATI Certified Translator", service: "Translation", country: "Australia", source: "English", target: "Arabic", certId: "CPN8XQ2A", file: "naati-certification.pdf", expires: new Date(NOW + 47 * DAY), status: "verified" },
+            { id: 326, name: "Diploma in Translation (CIOL)", service: "Translation", country: "United Kingdom", source: "Arabic", target: "English", certId: "CIOL-78214", file: "ciol-diptrans.pdf", expires: null, status: "pending" },
+            { id: 334, name: "Court Interpreter Licence", service: "Interpreting", country: "United Arab Emirates", source: "Arabic", target: "English", certId: "MOJ-2291-4", file: "court-interpreter-licence.jpg", expires: new Date(NOW + 520 * DAY), status: "rejected", reason: "The scan is cut off at the bottom, so the expiry date cannot be read. Upload the whole page." }
+        ],
+
+        documents: [
+            { id: 91, type: "cv", name: "Ahmed-Elmarghany-CV-2026.pdf", size: "412 KB", description: "CV updated with the 2025–2026 projects", uploaded: new Date(2026, 1, 3) },
+            { id: 88, type: "educational-document", name: "MA-Translation-degree.pdf", size: "1.8 MB", description: "Master's degree certificate and transcript", uploaded: new Date(2023, 2, 14) },
+            { id: 84, type: "other document", name: "Reference-letter-Lingua-Bridge.pdf", size: "236 KB", description: "Reference letter from Lingua Bridge", uploaded: new Date(2025, 0, 20) }
+        ],
+
+        /* New: nothing picked yet, the way every resource meets it */
+        technology: [],
+        customTools: [],
+
+        /* updated = agreed to an older version, as usertermsandconditionacceptance's is_expired */
+        terms: { state: "updated", version: "September 2026", updatedOn: new Date(NOW - 27 * DAY), agreedOn: new Date(2025, 2, 12, 10, 24) }
     };
 
     /* The sidebar badge counts what still needs a decision. */
