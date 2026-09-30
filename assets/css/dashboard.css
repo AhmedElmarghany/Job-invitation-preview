@@ -16,17 +16,24 @@
     --ramp-3: #476482;
     --ramp-4: #284864;
     --ramp-5: #0b263e;
-    --ramp-track: #e3e8ee;
-    --bar-quiet: #c9d2dc;
-    --grid-line: #eceae4;
 
     --good-ink: #067647;
     --good-bg: #ecfdf3;
-    --warn-fill: #e08a1e;
+    --ok-fill: var(--color-status-success);
+    --ok-track: #dcf3e1;
+    --warn-fill: #d97706;
     --warn-track: #fbecd2;
     --bad-ink: #b91c1c;
     --bad-bg: #fef2f2;
     --bad-track: #fde2e2;
+
+    /* Tinted rows: the warning set is account.css's .rp-banner, the danger set its twin */
+    --warn-border: #f3dfae;
+    --warn-bg-hover: #fef1d2;
+    --warn-note: #7a4a10;
+    --bad-border: #f5d0d0;
+    --bad-bg-hover: #fde8e8;
+    --bad-note: #8a1c1c;
 }
 
 @media (max-width: 767px) {
@@ -35,7 +42,7 @@
     }
 }
 
-/* Visually hidden, kept for screen readers: the table twin of each chart */
+/* Visually hidden, still read aloud: the unit or word a sighted reader gets from the layout */
 .rp-sr {
     position: absolute;
     width: 1px;
@@ -154,33 +161,9 @@
     }
 }
 
-/* Two tiles a row even on a phone — one each would push revenue a screen down */
-@container rpDash (max-width: 320px) {
-    .rp-stat {
-        grid-column: 1 / -1;
-    }
-}
-
 @container rpDash (max-width: 560px) {
     .rp-dash {
         gap: 12px;
-    }
-
-    .rp-attn {
-        gap: 8px;
-    }
-
-    .rp-attn__item {
-        padding: 8px 10px;
-    }
-
-    .rp-attn__icon {
-        width: 28px;
-        height: 28px;
-    }
-
-    .rp-stat {
-        padding: 13px 14px 12px;
     }
 }
 
@@ -346,31 +329,32 @@
 }
 
 /* ── Needs your attention ────────────────────────────────── */
+/* One row while they fit; only the items that apply are listed, so the count varies */
 .rp-attn {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
     gap: 10px;
 }
 
 .rp-attn__item {
     display: flex;
     align-items: center;
-    gap: 11px;
+    gap: 12px;
     min-width: 0;
-    padding: 10px 12px;
+    padding: 10px 12px 10px 10px;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
     background: var(--color-surface-white);
-    font-size: 13.5px;
-    line-height: 1.35;
     color: var(--color-text-primary);
     text-decoration: none;
-    transition: background var(--transition-fast), border-color var(--transition-fast);
+    transition: background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .rp-attn__item:hover {
     background: var(--color-surface-subtle);
     border-color: var(--color-border-hover);
+    box-shadow: var(--shadow-sm);
     color: var(--color-text-primary);
 }
 
@@ -383,36 +367,72 @@
     flex: 0 0 auto;
     display: grid;
     place-items: center;
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     border-radius: var(--radius-full);
     background: var(--color-surface-subtle);
     color: var(--color-brand-navy);
 }
 
 .rp-attn__icon svg {
-    width: 16px;
-    height: 16px;
+    width: 17px;
+    height: 17px;
 }
 
+/* The count leads on its own line and what it means follows, so no item wraps mid-sentence */
+.rp-attn__text {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 12.5px;
+    line-height: 1.4;
+    color: var(--color-text-secondary);
+}
+
+.rp-attn__text strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--color-text-primary);
+}
+
+/* .rp-attn__item--danger {
+    background: var(--color-status-danger-bg);
+    border-color: var(--bad-border);
+} */
+
+/* .rp-attn__item--danger:hover {
+    background: var(--bad-bg-hover);
+    border-color: var(--bad-border);
+} */
+
 .rp-attn__item--danger .rp-attn__icon {
-    background: var(--bad-bg);
+    background: var(--color-status-danger-bg);
     color: var(--color-status-danger);
 }
+
+/* .rp-attn__item--danger .rp-attn__text {
+    color: var(--bad-note);
+} */
+
+/* .rp-attn__item--warn {
+    background: var(--color-status-warning-bg);
+    border-color: var(--warn-border);
+} */
+
+/* .rp-attn__item--warn:hover {
+    background: var(--warn-bg-hover);
+    border-color: var(--warn-border);
+} */
 
 .rp-attn__item--warn .rp-attn__icon {
     background: var(--color-status-warning-bg);
     color: var(--color-status-warning);
 }
 
-.rp-attn__text {
-    flex: 1 1 auto;
-    min-width: 0;
-}
-
-.rp-attn__text strong {
-    font-weight: 600;
-}
+/* .rp-attn__item--warn .rp-attn__text {
+    color: var(--warn-note);
+} */
 
 .rp-attn__item > svg:last-child {
     flex: 0 0 auto;
@@ -426,48 +446,94 @@
     transform: translateX(2px);
 }
 
-/* ── Stat tiles ──────────────────────────────────────────── */
+@container rpDash (max-width: 1080px) {
+    .rp-attn {
+        grid-auto-flow: row;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    /* An odd one out takes the whole row rather than leave a hole beside it */
+    .rp-attn__item:last-child:nth-child(odd) {
+        grid-column: 1 / -1;
+    }
+}
+
+@container rpDash (max-width: 560px) {
+    .rp-attn {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 8px;
+    }
+
+    .rp-attn__item {
+        padding: 9px 10px;
+    }
+
+    .rp-attn__icon {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+/* ── Stat tiles — company-profile.css's .cp-card ──────────── */
+/* Its two grounds swapped: a white bordered tray around a grey inset well */
 .rp-stat {
-    container: rpStat / inline-size;
     display: flex;
     flex-direction: column;
+    gap: 12px;
     min-width: 0;
-    padding: 15px 18px 14px;
+    padding: 14px;
     background: var(--color-surface-white);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
+    transition: box-shadow var(--transition-fast);
+}
+
+.rp-stat:hover {
+    box-shadow: var(--shadow-sm);
+}
+
+.rp-stat__well {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 16px 16px 18px;
+    background: var(--color-surface-inset);
+    border-radius: var(--radius-md);
+    box-shadow: inset var(--shadow-sm);
 }
 
 .rp-stat__head {
     display: flex;
     align-items: center;
-    gap: 8px;
-    min-height: 30px;
+    gap: 10px;
+    min-width: 0;
 }
 
 .rp-stat__icon {
     flex: 0 0 auto;
     display: grid;
     place-items: center;
-    width: 30px;
-    height: 30px;
+    width: 34px;
+    height: 34px;
     border-radius: 10px;
-    background: var(--color-surface-subtle);
+    background: var(--color-surface-white);
     color: var(--color-brand-navy);
 }
 
 .rp-stat__icon svg {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
 }
 
 .rp-stat__label {
     min-width: 0;
     margin: 0;
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.07em;
-    color: var(--color-brand-navy);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.3;
+    color: var(--color-text-primary);
+    overflow-wrap: anywhere;
 }
 
 /* A label that opens its list carries a quiet arrow, so it reads as a way in */
@@ -488,6 +554,7 @@
 }
 
 .rp-stat__label a:hover {
+    color: var(--color-brand-navy);
     text-decoration: underline;
     text-underline-offset: 3px;
 }
@@ -497,41 +564,53 @@
     transform: translateX(2px);
 }
 
-.rp-stat__head .rp-scope {
-    margin-left: auto;
-}
-
+/* The figure sits at the end, as .cp-card-value does; the serif is this page's figure face */
+/* Tabular figures on every counted number, so the count-up does not jitter the width */
 .rp-stat__value {
-    margin: 14px 0 0;
+    margin: 6px 0 0;
     font-family: var(--font-heading);
-    font-size: 30px;
+    font-size: 28px;
     font-weight: 500;
     line-height: 1.1;
     letter-spacing: -0.01em;
     color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+}
+
+/* Number first, what it counts after — the order the balance settled on */
+.rp-stat__unit {
+    margin-left: 6px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0;
+    color: var(--color-text-secondary);
 }
 
 .rp-stat__words {
-    margin: 4px 0 14px;
-    font-size: 13.5px;
+    margin: 0;
+    font-size: 13px;
     color: var(--color-text-secondary);
 }
 
 .rp-stat__words strong {
     font-weight: 500;
     color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
 }
 
-/* margin-top: auto keeps the four feet level across the row whatever sits above them */
+/* The note lives on the tray under the well, right-aligned like .cp-card-foot */
 .rp-stat__foot {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     flex-wrap: wrap;
     gap: 4px 6px;
-    margin-top: auto;
-    padding-top: 11px;
-    border-top: 1px solid var(--color-border);
+    margin: 0;
+    padding: 0 4px 2px;
     font-size: 12.5px;
+    line-height: 1.35;
     color: var(--color-text-secondary);
 }
 
@@ -564,22 +643,35 @@
     color: var(--bad-ink);
 }
 
-/* A half-width phone tile keeps its label on one line by losing the icon */
-@container rpStat (max-width: 200px) {
-    .rp-stat__icon,
-    .rp-stat__head .rp-scope,
-    .rp-stat__label a svg {
-        display: none;
+@container rpDash (max-width: 560px) {
+    /* One a row, as .cp-cards goes on a phone; the figure moves up beside the label to keep it short */
+    .rp-stat {
+        grid-column: 1 / -1;
+        padding: 8px;
+        gap: 8px;
     }
 
-    .rp-stat__label {
-        font-size: 12.5px;
-        letter-spacing: 0.02em;
+    .rp-stat__well {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas: "head value" "head words";
+        align-items: center;
+        gap: 2px 12px;
+        padding: 12px 14px;
+    }
+
+    .rp-stat__head {
+        grid-area: head;
     }
 
     .rp-stat__value {
-        margin-top: 8px;
-        font-size: 26px;
+        grid-area: value;
+        margin: 0;
+        font-size: 24px;
+    }
+
+    .rp-stat__words {
+        grid-area: words;
     }
 }
 
@@ -607,7 +699,6 @@
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.07em;
-    text-transform: uppercase;
     color: var(--color-text-secondary);
 }
 
@@ -625,6 +716,7 @@
     line-height: 1.15;
     letter-spacing: -0.01em;
     color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
     overflow-wrap: anywhere;
 }
 
@@ -670,16 +762,24 @@
     }
 }
 
+/* The breakdown of Total expected, on the same well as the job tiles */
+.rp-pipe {
+    margin-top: 18px;
+    padding: 14px 14px 10px;
+    background: var(--color-surface-inset);
+    border-radius: var(--radius-md);
+    box-shadow: inset var(--shadow-sm);
+}
+
 .rp-section-label {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
     gap: 10px;
-    margin: 22px 0 10px;
+    margin: 0 0 10px;
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.07em;
-    text-transform: uppercase;
     color: var(--color-text-secondary);
 }
 
@@ -717,20 +817,23 @@
     opacity: 0.78;
 }
 
+/* One row a stage with the amount at the end, as the job page's summary rows read */
 .rp-pipe__legend {
     list-style: none;
-    margin: 12px 0 0;
+    margin: 10px 0 0;
     padding: 0;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 8px 16px;
 }
 
 .rp-pipe__legend li {
     display: grid;
-    grid-template-columns: 10px minmax(0, 1fr);
-    column-gap: 8px;
+    grid-template-columns: 10px minmax(0, 1fr) auto;
+    column-gap: 9px;
     align-items: center;
+    padding: 5px 0;
+}
+
+.rp-pipe__legend li + li {
+    border-top: 1px solid var(--color-border);
 }
 
 .rp-swatch {
@@ -741,7 +844,7 @@
 }
 
 .rp-pipe__name {
-    font-size: 12.5px;
+    font-size: 13px;
     color: var(--color-text-secondary);
     white-space: nowrap;
     overflow: hidden;
@@ -749,128 +852,39 @@
 }
 
 .rp-pipe__amount {
-    grid-column: 2;
     font-size: 13.5px;
     font-weight: 500;
     color: var(--color-text-primary);
-}
-
-/* ── Paid per month ──────────────────────────────────────── */
-.rp-chart {
-    position: relative;
-    display: grid;
-    grid-template-columns: 34px minmax(0, 1fr);
-    grid-template-rows: 150px auto;
-}
-
-.rp-chart__ticks {
-    position: relative;
-    grid-row: 1;
-}
-
-.rp-chart__tick {
-    position: absolute;
-    right: 8px;
-    transform: translateY(50%);
-    font-size: 11px;
-    line-height: 1;
-    color: var(--color-text-secondary);
     font-variant-numeric: tabular-nums;
+    text-align: right;
 }
 
-.rp-chart__plot {
-    position: relative;
-    grid-row: 1;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-around;
-    gap: 2px;
-    border-bottom: 1px solid #c9c6bb;
-}
+/* A full-width card has no neighbour to match in height, so the stages sit on one row in the bar's order */
+@container rpCard (min-width: 760px) {
+    .rp-pipe {
+        padding-bottom: 16px;
+    }
 
-.rp-chart__grid {
-    position: absolute;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: var(--grid-line);
-    pointer-events: none;
-}
+    .rp-pipe__legend {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 8px 16px;
+        margin-top: 12px;
+    }
 
-/* The column is the hit target, taller and wider than the bar it holds */
-.rp-chart__col {
-    position: relative;
-    flex: 1 1 0;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    height: 100%;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    cursor: default;
-}
+    .rp-pipe__legend li {
+        grid-template-columns: 10px minmax(0, 1fr);
+        column-gap: 8px;
+        padding: 0;
+    }
 
-.rp-chart__col:focus-visible {
-    outline: none;
-}
+    .rp-pipe__legend li + li {
+        border-top: 0;
+    }
 
-.rp-chart__bar {
-    position: relative;
-    width: 100%;
-    max-width: 24px;
-    min-height: 2px;
-    border-radius: 4px 4px 0 0;
-    background: var(--bar-quiet);
-    transition: background var(--transition-fast), opacity var(--transition-fast);
-}
-
-.rp-chart__col.is-on .rp-chart__bar {
-    background: var(--ramp-5);
-}
-
-.rp-chart__col:hover .rp-chart__bar,
-.rp-chart__col:focus-visible .rp-chart__bar {
-    opacity: 0.78;
-}
-
-.rp-chart__col:focus-visible .rp-chart__bar {
-    box-shadow: var(--focus-ring-gold);
-}
-
-/* Only the current month is labelled; the axis and the tooltip carry the rest */
-.rp-chart__cap {
-    position: absolute;
-    bottom: calc(100% + 4px);
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--color-text-primary);
-    white-space: nowrap;
-}
-
-.rp-chart__months {
-    grid-column: 2;
-    display: flex;
-    justify-content: space-around;
-    gap: 2px;
-    padding-top: 6px;
-}
-
-.rp-chart__months span {
-    flex: 1 1 0;
-    min-width: 0;
-    font-size: 11px;
-    color: var(--color-text-secondary);
-    text-align: center;
-    white-space: nowrap;
-}
-
-/* Every other month label on a narrow card, so none collide */
-@container rpCard (max-width: 480px) {
-    .rp-chart__months span:nth-child(even) {
-        visibility: hidden;
+    .rp-pipe__amount {
+        grid-column: 2;
+        text-align: left;
     }
 }
 
@@ -879,14 +893,18 @@
     list-style: none;
     margin: 0;
     padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+}
+
+/* A hairline between meters, so each note reads with its own bar and not the next label */
+.rp-meter + .rp-meter {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--color-border);
 }
 
 .rp-meter {
-    --fill: var(--ramp-5);
-    --track: var(--ramp-track);
+    --fill: var(--ok-fill);
+    --track: var(--ok-track);
 }
 
 .rp-meter--warn {
@@ -919,6 +937,7 @@
     font-weight: 500;
     line-height: 1;
     color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
 }
 
 .rp-meter__value small {
@@ -932,6 +951,7 @@
     margin-top: 9px;
     border-radius: var(--radius-full);
     background: var(--track);
+    transition: background var(--transition-base);
 }
 
 .rp-meter__fill {
@@ -939,7 +959,7 @@
     height: 100%;
     border-radius: inherit;
     background: var(--fill);
-    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1), background var(--transition-base);
 }
 
 /* The level's line: a hairline tick taller than the track, with its value beside the note */
@@ -965,11 +985,12 @@
     color: var(--color-text-secondary);
 }
 
+/* Chips below match account.css and job.css, so the same state reads the same on every page */
 .rp-state {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: 1px 8px;
+    gap: 5px;
+    padding: 2px 10px;
     border-radius: var(--radius-full);
     font-size: 12px;
     font-weight: 500;
@@ -1071,12 +1092,13 @@
 }
 
 .rp-idchip {
-    padding: 0 7px;
+    padding: 1px 8px;
     border-radius: var(--radius-full);
     background: var(--color-surface-subtle);
     font-size: 12px;
     font-weight: 500;
     color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
 }
 
 .rp-dot {
@@ -1092,12 +1114,13 @@
 .rp-pair {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
 }
 
 .rp-pair svg {
-    width: 11px;
-    height: 11px;
+    width: 12px;
+    height: 12px;
+    color: var(--color-text-secondary);
 }
 
 /* The countdown chip of the job page */
@@ -1117,6 +1140,7 @@
 .rp-time svg {
     width: 12px;
     height: 12px;
+    flex: 0 0 auto;
 }
 
 .rp-time--soon {
@@ -1161,14 +1185,30 @@
     font-variant-numeric: tabular-nums;
 }
 
+/* On a narrow card the title gets the whole row; the deadline and progress share the line under it */
 @container rpCard (max-width: 560px) {
     .rp-duerow {
-        grid-template-columns: 36px minmax(0, 1fr) auto;
-        row-gap: 6px;
+        grid-template-columns: 36px auto minmax(0, 1fr);
+        row-gap: 8px;
+    }
+
+    .rp-duerow__icon {
+        grid-row: 1 / span 2;
+        align-self: start;
+    }
+
+    .rp-duerow__text {
+        grid-column: 2 / -1;
+    }
+
+    .rp-duerow .rp-time {
+        grid-column: 2;
+        grid-row: 2;
     }
 
     .rp-duerow .rp-progress {
-        grid-column: 2 / -1;
+        grid-column: 3;
+        grid-row: 2;
     }
 }
 
@@ -1183,7 +1223,7 @@
     position: relative;
     display: flex;
     gap: 12px;
-    padding-bottom: 16px;
+    padding-bottom: 14px;
 }
 
 .rp-feed__item:last-child {
@@ -1227,13 +1267,20 @@
     color: var(--color-text-secondary);
 }
 
+/* The time sits at the end of the event's first line, so the feed stays level with Due soon */
 .rp-feed__text {
     flex: 1 1 auto;
     min-width: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    column-gap: 12px;
     padding-top: 1px;
 }
 
 .rp-feed__line {
+    grid-column: 1;
+    grid-row: 1;
     margin: 0;
     font-size: 13.5px;
     line-height: 1.45;
@@ -1251,11 +1298,14 @@
     text-underline-offset: 2px;
 }
 
+/* An amount never splits from its currency */
 .rp-feed__line strong {
     font-weight: 600;
+    white-space: nowrap;
 }
 
 .rp-feed__detail {
+    grid-column: 1 / -1;
     margin: 1px 0 0;
     font-size: 12.5px;
     color: var(--color-text-secondary);
@@ -1265,17 +1315,19 @@
 }
 
 .rp-feed__time {
-    display: block;
-    margin-top: 2px;
+    grid-column: 2;
+    grid-row: 1;
     font-size: 12px;
     color: var(--color-text-secondary);
+    white-space: nowrap;
 }
 
 /* ── Reduced motion ──────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
     .rp-meter__fill,
+    .rp-meter__track,
     .rp-tip,
-    .rp-chart__bar,
+    .rp-stat,
     .rp-attn__item > svg:last-child {
         transition: none;
     }

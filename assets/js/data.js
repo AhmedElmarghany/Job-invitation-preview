@@ -2014,7 +2014,7 @@
         /* Rolling 90 days; the tips are the expectations word for word */
         performance: [
             {
-                key: "quality", label: "Quality", value: 96, target: null, misses: 0,
+                key: "quality", label: "Quality", value: 96, target: null,
                 evidence: "No gross mistakes in 24 reviewed jobs",
                 tip: "Avoid any gross mistake in translation and stick to the required format to maintain a high quality level."
             },
@@ -2029,7 +2029,7 @@
                 tip: "Respond to messages within 1 working hour to not lose a level. At least 80% of all your replies should be within this time frame."
             },
             {
-                key: "conduct", label: "Professional conduct", value: 100, target: null, misses: 0,
+                key: "conduct", label: "Professional conduct", value: 100, target: null,
                 evidence: "No warnings",
                 tip: "Avoid receiving warnings for breaching our terms of service and stay professional with our clients and staff."
             }

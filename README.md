@@ -74,7 +74,7 @@ resource portal preview/
     │   ├── jobs.css            page-specific: table chrome, waiting/slip cells
     │   ├── job.css             page-specific: job head, cards, checklist, upload, chat, viewer
     │   ├── account.css         page-specific: profile head, field grid, records, technology, terms
-    │   ├── dashboard.css       page-specific: stat tiles, revenue pipeline and chart, meters, feed
+    │   ├── dashboard.css       page-specific: job tiles, revenue pipeline, meters, due soon, feed
     │   └── password-modal.css  copied from config/static/css/password-modal.css (shell swapped)
     ├── js/
     │   ├── icons.js            inline Lucide set — RP.icon('name')
@@ -86,7 +86,7 @@ resource portal preview/
     │   ├── jobs.js             tabs, per-tab columns, search, sort, paginate
     │   ├── job.js              one job: sections, jump tabs, start / deliver, chat, file viewer
     │   ├── account.js          the profile: jump tabs, inline edit, dialogs, profile strength
-    │   ├── dashboard.js        the home: period switch, count-up, tips, chart keyboard walk
+    │   ├── dashboard.js        the home: period switch, count-up, tips, meters that repaint from data-value
     │   └── password-policy.js  copied from config/static/js/password-policy.js
     ├── fonts/                  IBM Plex Sans + Serif (woff2)
     └── img/                    logo.png, placeholder-headshot.png
@@ -275,15 +275,15 @@ segmented control from `base.css`) and reads top to bottom as *what needs me →
 | --- | --- | --- |
 | Head | Today's date, a greeting, the period switch | — |
 | Needs your attention | Overdue jobs, jobs due in 24 hours, invitations waiting, terms to agree to — only the ones that apply | `RP.JOBS`, `RP.USER.invitationCount`, `RP.PROFILE.terms` |
-| Jobs | Active, Completed, Lost bids, Declined: the count, its words, the change vs the previous period | Active from `RP.JOBS`; the rest from `RP.DASHBOARD.periods` |
-| Revenue | Total paid (period) and Total expected (now), both with ≈ USD; where the expected money is; paid per month | `RP.JOBS` amounts by stage; `RP.DASHBOARD.monthly` |
-| Performance | Quality, On-time delivery, Response rate, Professional conduct — a meter each, the target as a tick, a state chip | `RP.DASHBOARD.performance` |
+| Jobs | Active, Completed, Lost bids, Declined: the count, its words, the change vs the previous period — on the customer portal's `.cp-card` | Active from `RP.JOBS`; the rest from `RP.DASHBOARD.periods` |
+| Revenue | Total paid (period) and Total expected (now), both with ≈ USD; where the expected money is | `RP.JOBS` amounts by stage; `RP.DASHBOARD.monthly` |
+| Performance | Quality, On-time delivery, Response rate, Professional conduct — a meter each in green, orange or red, the target as a tick, a state chip | `RP.DASHBOARD.performance` |
 | Due soon | The next five deadlines, overdue first, each opening its job | `RP.JOBS` |
 | Recent activity | Invitations, deliveries, approvals, payments, lost bids and declines | `RP.DASHBOARD.activity` |
 
 **Scopes are labelled, not implied.** The period switch (This month / Last 3 months / This year /
-All time) changes Completed, Lost bids, Declined, Total paid and the highlighted bars of the
-chart. Active jobs and Total expected carry a *Now* chip, and Performance says *Last 90 days*,
+All time) changes Completed, Lost bids, Declined and Total paid. Active jobs and Total expected
+carry a *Now* chip, and Performance says *Last 90 days*,
 because those numbers do not belong to a period. The choice is kept in the URL (`?period=year`)
 and in `localStorage`.
 
@@ -291,12 +291,52 @@ and in `localStorage`.
 hover, on keyboard focus, and on tap (a tap pins it). The four performance tips are the
 expectations word for word, and the targets they name (90%, 80%) are the ticks on the meters.
 
-**Charts** follow the data-viz method: the stages of the expected money are one navy ramp,
-light to dark in the order money travels, validated as an ordinal ramp on white; the monthly
-chart is one series, with the chosen period in navy and the rest recessive. Both have a hover
-tip, a legend or a screen-reader table, and a single tab stop — the arrows walk the months.
-Status colours appear only where a value means good or bad (deltas, meters, deadlines), always
-with an icon and a word.
+**Needs your attention** leads each item with its count on its own line (*1 job*, *24 invitations*)
+and what it means under it, quieter, so no item wraps mid-sentence. Overdue and due-soon items are
+tinted like the User Account's terms banner — a white icon disc on a pale red or amber ground; the
+rest stay white. The items share one row while they fit, go two a row below ~1080px of content
+width (an odd last one takes the whole row), and one a row on a phone.
+
+**The four job tiles** are the customer portal's `.cp-card` (`company-profile.css`) with its two
+grounds swapped: a grey inset well with the icon, the label and the figure, on a white bordered
+tray that carries the note under it. The figure keeps this page's serif. On a phone the tiles go
+one a row, with the figure beside the label.
+
+**Where the expected money is** follows the data-viz method: one navy ramp, light to dark in the
+order money travels, validated as an ordinal ramp on white, with a legend carrying every value. It
+sits on the tiles' grey well (`.rp-pipe`), so it reads as the breakdown of the totals above it. The
+legend is one row a stage with the amount at the end, like the job page's summary rows; on a
+full-width card, where there is no Performance card beside it to match in height, the five stages
+line up on one row in the bar's order instead.
+
+**Balanced rows.** Revenue sits beside Performance and Due soon beside Recent activity, and each
+pair is built to end at about the same height, so neither card has an empty bottom. A hairline
+separates the meters, and each event's time sits at the end of its first line. On a phone a Due
+soon row gives the title the whole line and puts the deadline and progress under it.
+
+**Performance meters take their colour from the percentage.** A meter with a target (On-time
+delivery 90%, Response rate 80%) is green from the target up, orange within 10 points under it,
+red below that. Quality and Professional conduct have no stated target, so their line is 90%.
+The chip says the same in words — *On track*, *Below 80%* / *Needs attention*, *At risk* — so the
+state never rests on colour alone.
+
+| Meter | Green | Orange | Red |
+| --- | --- | --- | --- |
+| On-time delivery (target 90) | 90–100 | 80–89 | 0–79 |
+| Response rate (target 80) | 80–100 | 70–79 | 0–69 |
+| Quality, Professional conduct (line 90) | 90–100 | 80–89 | 0–79 |
+
+**Trying the colours.** Everything a meter shows is worked out from its `data-value`, so either:
+
+- **Elements panel:** find `<li class="rp-meter" data-meter="response" data-value="76" …>`,
+  double-click `data-value` and type another number. The bar, its colour, the number and the chip
+  repaint as you press Enter. `data-target` moves (or, emptied, removes) the target tick the same way.
+- **Console:** `RP.dashboard.setMeter("response", 65)` — or with a new target,
+  `RP.dashboard.setMeter("conduct", 95, 98)`. It answers with the state it painted.
+
+Changing the bar's `width` by hand does nothing to the colour — the width is an output of
+`data-value`, not an input. The line and the band live in `dashboard.js` (`GREEN_LINE`,
+`ORANGE_BAND`); the colours are `--ok-*`, `--warn-*` and `--bad-*` at the top of `dashboard.css`.
 
 `data.js` now works out `RP.USER.balance` from the billed jobs, so the profile menu's Balance and
 the dashboard's *Billed* stage are the same number.
@@ -404,4 +444,3 @@ opening or collapsing the sidebar moves that line by 184px, which a viewport que
 | `Enter` | Submit a bid, when the bid field has focus; send a chat message on the job page (`Shift+Enter` for a new line) |
 | `↑` / `↓` | Move between statuses in the availability dropdown |
 | `Enter` in Technology's search | Pick the first match, or add what was typed as your own tool |
-| `←` / `→`, `Home` / `End` | Walk the months of the dashboard's paid-per-month chart |

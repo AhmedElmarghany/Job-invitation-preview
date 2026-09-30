@@ -3,7 +3,7 @@
    The resource's home. What is open now comes from RP.JOBS, so it
    matches My Jobs; the history behind it (past months, lost bids,
    performance) from RP.DASHBOARD. The period switch, the tips and
-   the chart hovers are the page's own; every link opens a real page.
+   the meters are the page's own; every link opens a real page.
    ============================================================ */
 (function (global) {
     "use strict";
@@ -30,10 +30,10 @@
 
     /* good: which direction of change is the better one, for the delta's colour */
     var STATS = [
-        { key: "active", label: "Active jobs", icon: "circle-play", href: "jobs.html?tab=active", tip: "Jobs you are working on now, and the words in them." },
-        { key: "completed", label: "Completed jobs", icon: "circle-check", href: "jobs.html?tab=completed", tip: "Jobs you delivered in this period, and the words in them.", good: "up" },
-        { key: "lost", label: "Lost bids", icon: "bid", tip: "Bids you sent that went to another resource.", good: "down" },
-        { key: "declined", label: "Declined jobs", icon: "circle-x", tip: "Invitations you turned down.", good: "down" }
+        { key: "active", label: "Active jobs", unit: ["job", "jobs"], icon: "circle-play", href: "jobs.html?tab=active", tip: "Jobs you are working on now, and the words in them." },
+        { key: "completed", label: "Completed jobs", unit: ["job", "jobs"], icon: "circle-check", href: "jobs.html?tab=completed", tip: "Jobs you delivered in this period, and the words in them.", good: "up" },
+        { key: "lost", label: "Lost bids", unit: ["bid", "bids"], icon: "bid", tip: "Bids you sent that went to another resource.", good: "down" },
+        { key: "declined", label: "Declined jobs", unit: ["job", "jobs"], icon: "circle-x", tip: "Invitations you turned down.", good: "down" }
     ];
 
     /* In the order money travels, lightest to darkest on the navy ramp */
@@ -75,10 +75,6 @@
 
     function num(value) {
         return Math.round(value).toLocaleString(LOCALE);
-    }
-
-    function compact(value) {
-        return value >= 1000 ? (value / 1000).toLocaleString(LOCALE, { maximumFractionDigits: 1 }) + "k" : String(value);
     }
 
     function plural(n, one, many) {
@@ -354,7 +350,7 @@
             value = S.active.length;
             words = u.words;
             tip += unitsNote(u);
-            foot = "<span>" + S.waiting.length + " more waiting for files</span>";
+            foot = '<span class="rp-scope">Now</span><span>' + S.waiting.length + " more waiting for files</span>";
         } else {
             var f = F[def.key];
             value = f.jobs;
@@ -367,13 +363,12 @@
 
         return (
             '<section class="rp-stat" id="stat-' + def.key + '" aria-labelledby="stat-' + def.key + '-label">' +
-            '<div class="rp-stat__head"><span class="rp-stat__icon" aria-hidden="true">' + icon(def.icon) + "</span>" +
+            '<div class="rp-stat__well"><div class="rp-stat__head"><span class="rp-stat__icon" aria-hidden="true">' + icon(def.icon) + "</span>" +
             '<h2 class="rp-stat__label" id="stat-' + def.key + '-label">' + label + "</h2>" +
-            info(tip, "About " + def.label.toLowerCase()) +
-            (def.key === "active" ? '<span class="rp-scope">Now</span>' : "") + "</div>" +
-            '<p class="rp-stat__value">' + counter(value, def.key) + "</p>" +
-            '<p class="rp-stat__words"><strong>' + counter(words, def.key + "-words") + "</strong> words</p>" +
-            '<div class="rp-stat__foot">' + foot + "</div></section>"
+            info(tip, "About " + def.label.toLowerCase()) + "</div>" +
+            '<p class="rp-stat__value">' + counter(value, def.key) + '<span class="rp-stat__unit">' + plural(value, def.unit[0], def.unit[1]) + "</span></p>" +
+            '<p class="rp-stat__words"><strong>' + counter(words, def.key + "-words") + "</strong> words</p></div>" +
+            '<p class="rp-stat__foot">' + foot + "</p></section>"
         );
     }
 
@@ -392,7 +387,7 @@
     function pipeline(exp) {
         var cur = esc(RP.USER.currency);
         return (
-            '<p class="rp-section-label">Where the expected money is</p>' +
+            '<div class="rp-pipe"><p class="rp-section-label">Where the expected money is</p>' +
             /* The legend under it carries every value, so the bar itself stays out of the reading order */
             '<div class="rp-pipe__bar" aria-hidden="true">' +
             exp.stages
@@ -412,69 +407,7 @@
                     );
                 })
                 .join("") +
-            "</ul>"
-        );
-    }
-
-    function niceMax(value) {
-        var step = [250, 500, 1000, 2000, 2500, 5000, 10000].filter(function (s) {
-            return s * 4 >= value;
-        })[0] || Math.ceil(value / 4 / 10000) * 10000;
-        return step * 4;
-    }
-
-    function chart() {
-        var on = monthsIn(state.period);
-        var max = niceMax(Math.max.apply(null, D.monthly.map(function (m) { return m.paid; })));
-        var last = D.monthly.length - 1;
-        var cur = esc(RP.USER.currency);
-        var ticks = [0, 1, 2, 3, 4].map(function (i) {
-            return (max / 4) * i;
-        });
-        var month = function (m, opts) {
-            return m.month.toLocaleDateString(LOCALE, opts);
-        };
-
-        return (
-            '<p class="rp-section-label">Paid per month<small>Last 12 months</small></p>' +
-            '<div class="rp-chart"><div class="rp-chart__ticks" aria-hidden="true">' +
-            ticks
-                .map(function (t) {
-                    return '<span class="rp-chart__tick" style="bottom:' + (t / max) * 100 + '%">' + (t ? compact(t) : "0") + "</span>";
-                })
-                .join("") +
-            '</div><div class="rp-chart__plot" role="group" aria-label="Paid per month">' +
-            ticks
-                .slice(1)
-                .map(function (t) {
-                    return '<span class="rp-chart__grid" style="bottom:' + (t / max) * 100 + '%" aria-hidden="true"></span>';
-                })
-                .join("") +
-            D.monthly
-                .map(function (m, i) {
-                    var name = month(m, { month: "long", year: "numeric" });
-                    return (
-                        '<button type="button" class="rp-chart__col' + (on.indexOf(i) !== -1 ? " is-on" : "") + '" tabindex="' + (i === last ? 0 : -1) +
-                        '" data-tip-value="' + money(m.paid) + " " + cur + '" data-tip-label="' + esc(name) + ' · paid" aria-label="' + esc(name + ", " + money(m.paid) + " " + RP.USER.currency + " paid") +
-                        '"><span class="rp-chart__bar" style="height:' + ((m.paid / max) * 100).toFixed(2) + '%">' +
-                        (i === last ? '<span class="rp-chart__cap">' + compact(Math.round(m.paid)) + "</span>" : "") + "</span></button>"
-                    );
-                })
-                .join("") +
-            '</div><div class="rp-chart__months" aria-hidden="true">' +
-            D.monthly
-                .map(function (m) {
-                    return "<span>" + month(m, { month: "short" }) + "</span>";
-                })
-                .join("") +
-            "</div></div>" +
-            '<table class="rp-sr"><caption>Paid per month, last 12 months</caption><thead><tr><th scope="col">Month</th><th scope="col">Paid (' + cur + ")</th></tr></thead><tbody>" +
-            D.monthly
-                .map(function (m) {
-                    return "<tr><th scope=\"row\">" + month(m, { month: "long", year: "numeric" }) + "</th><td>" + money(m.paid) + "</td></tr>";
-                })
-                .join("") +
-            "</tbody></table>"
+            "</ul></div>"
         );
     }
 
@@ -494,33 +427,73 @@
                 tip: "Money for work that is not paid yet — jobs waiting for files, in progress, delivered, approved and billed.",
                 foot: "<span>" + exp.jobs + " jobs not paid yet</span>"
             }) +
-            "</div>" + pipeline(exp) + chart() + "</div></section>"
+            "</div>" + pipeline(exp) + "</div></section>"
         );
     }
 
     /* ── Performance ─────────────────────────────────────── */
 
-    /* A metric with a target is judged against it; one without, by whether anything went wrong */
-    function judge(m) {
-        if (m.target != null) return m.value >= m.target ? "ok" : m.value >= m.target - 10 ? "warn" : "bad";
-        return m.misses ? "warn" : "ok";
+    /* Green from the line up, orange within 10 points under it, red below that */
+    var GREEN_LINE = 90;
+    var ORANGE_BAND = 10;
+
+    function judge(value, target) {
+        var line = target == null ? GREEN_LINE : target;
+        return value >= line ? "ok" : value >= line - ORANGE_BAND ? "warn" : "bad";
+    }
+
+    function stateChip(st, target) {
+        if (st === "ok") return icon("check") + "On track";
+        if (st === "warn") return icon("warning") + (target == null ? "Needs attention" : "Below " + target + "%");
+        return icon("circle-alert") + "At risk";
+    }
+
+    /* Everything the meter shows is worked out from data-value, so one attribute repaints it */
+    function paintMeter(li) {
+        var value = Math.max(0, Math.min(100, Math.round(Number(li.dataset.value) || 0)));
+        var target = li.dataset.target === "" || li.dataset.target == null ? null : Number(li.dataset.target);
+        var st = judge(value, target);
+        var track = li.querySelector(".rp-meter__track");
+        var chip = li.querySelector("[data-meter-state]");
+
+        li.classList.remove("rp-meter--ok", "rp-meter--warn", "rp-meter--bad");
+        li.classList.add("rp-meter--" + st);
+        li.querySelector("[data-meter-value]").innerHTML = value + "<small>%</small>";
+        li.querySelector(".rp-meter__fill").style.width = value + "%";
+        chip.className = "rp-state rp-state--" + st;
+        chip.innerHTML = stateChip(st, target);
+        track.setAttribute("aria-valuenow", value);
+        track.setAttribute("aria-valuetext", value + "%, " + chip.textContent.toLowerCase());
+
+        var tick = track.querySelector(".rp-meter__target");
+        if (target == null && tick) tick.remove();
+        if (target != null) {
+            if (!tick) {
+                tick = document.createElement("span");
+                tick.className = "rp-meter__target";
+                tick.setAttribute("aria-hidden", "true");
+                track.appendChild(tick);
+            }
+            tick.style.left = target + "%";
+        }
+        var note = li.querySelector("[data-meter-note]");
+        note.textContent = note.dataset.evidence + (target != null ? " · target " + target + "%" : "");
     }
 
     function perfMarkup() {
         var rows = D.performance.map(function (m) {
-            var st = judge(m);
-            var chip = st === "ok" ? icon("check") + "On track" : icon("warning") + (m.target != null ? "Below " + m.target + "%" : "Needs attention");
+            var target = m.target == null ? "" : m.target;
             return (
-                '<li class="rp-meter' + (st === "ok" ? "" : " rp-meter--" + st) + '">' +
+                '<li class="rp-meter" data-meter="' + m.key + '" data-value="' + m.value + '" data-target="' + target + '">' +
                 '<div class="rp-meter__top"><h3 class="rp-meter__label" id="meter-' + m.key + '">' + m.label + "</h3>" +
                 info(m.tip, "What " + m.label.toLowerCase() + " asks of you") +
-                '<span class="rp-meter__value">' + m.value + "<small>%</small></span></div>" +
-                '<div class="rp-meter__track" role="meter" aria-labelledby="meter-' + m.key + '" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + m.value + '"' +
-                (m.target != null ? ' aria-valuetext="' + m.value + "%, target " + m.target + '%"' : "") + ">" +
-                '<span class="rp-meter__fill" style="width:0" data-width="' + m.value + '"></span>' +
+                '<span class="rp-meter__value" data-meter-value>' + m.value + "<small>%</small></span></div>" +
+                '<div class="rp-meter__track" role="meter" aria-labelledby="meter-' + m.key + '" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + m.value + '">' +
+                '<span class="rp-meter__fill" style="width:0"></span>' +
                 (m.target != null ? '<span class="rp-meter__target" style="left:' + m.target + '%" aria-hidden="true"></span>' : "") + "</div>" +
-                '<p class="rp-meter__note"><span>' + esc(m.evidence) + (m.target != null ? " · target " + m.target + "%" : "") + "</span>" +
-                '<span class="rp-state rp-state--' + st + '">' + chip + "</span></p></li>"
+                '<p class="rp-meter__note"><span data-meter-note data-evidence="' + esc(m.evidence) + '">' + esc(m.evidence) +
+                (m.target != null ? " · target " + m.target + "%" : "") + "</span>" +
+                '<span class="rp-state" data-meter-state></span></p></li>'
             );
         });
 
@@ -641,16 +614,25 @@
         });
     }
 
-    function fillMeters() {
-        var meters = els.dash.querySelectorAll("[data-width]");
-        var fill = function () {
-            meters.forEach(function (el) {
-                el.style.width = el.dataset.width + "%";
-            });
+    function paintMeters() {
+        var meters = els.dash.querySelectorAll("[data-meter]");
+        var paint = function () {
+            meters.forEach(paintMeter);
         };
-        if (still()) return fill();
-        /* A beat at 0 first, so the transition has somewhere to start from */
-        global.setTimeout(fill, 60);
+        if (still()) return paint();
+        /* A beat at 0 first, so the fill has somewhere to grow from */
+        global.setTimeout(paint, 60);
+    }
+
+    /* Edit data-value on a meter in DevTools and it repaints — colour, chip and all */
+    function watchMeters() {
+        var list = els.dash.querySelector(".rp-meters");
+        if (!list || !global.MutationObserver) return;
+        new MutationObserver(function (changes) {
+            changes.forEach(function (change) {
+                paintMeter(change.target);
+            });
+        }).observe(list, { subtree: true, attributes: true, attributeFilter: ["data-value", "data-target"] });
     }
 
     /* ── Tooltip ─────────────────────────────────────────── */
@@ -769,24 +751,11 @@
             dueMarkup() +
             activityMarkup();
         countUp(els.dash);
-        fillMeters();
+        paintMeters();
+        watchMeters();
     }
 
     /* ── Wiring ──────────────────────────────────────────── */
-
-    /* One tab stop for the whole chart; the arrows walk its months */
-    function chartKeys(e) {
-        var col = e.target.closest(".rp-chart__col");
-        if (!col || (e.key !== "ArrowLeft" && e.key !== "ArrowRight" && e.key !== "Home" && e.key !== "End")) return;
-        var cols = Array.prototype.slice.call(col.parentNode.querySelectorAll(".rp-chart__col"));
-        var i = cols.indexOf(col);
-        var next = e.key === "Home" ? 0 : e.key === "End" ? cols.length - 1 : i + (e.key === "ArrowRight" ? 1 : -1);
-        if (next < 0 || next >= cols.length) return;
-        e.preventDefault();
-        col.tabIndex = -1;
-        cols[next].tabIndex = 0;
-        cols[next].focus();
-    }
 
     function wire() {
         document.addEventListener("click", function (e) {
@@ -824,8 +793,7 @@
         });
 
         document.addEventListener("keydown", function (e) {
-            if (e.key === "Escape") return hideTip();
-            chartKeys(e);
+            if (e.key === "Escape") hideTip();
         });
 
         global.addEventListener("scroll", hideTip, { passive: true });
@@ -846,6 +814,17 @@
         state.period = readPeriod();
         render();
         wire();
+
+        RP.dashboard = {
+            setMeter: function (key, value, target) {
+                var li = els.dash.querySelector('[data-meter="' + key + '"]');
+                if (!li) return "No meter called " + key + ". Try: " + D.performance.map(function (m) { return m.key; }).join(", ");
+                if (target !== undefined) li.dataset.target = target === null ? "" : target;
+                li.dataset.value = value;
+                paintMeter(li);
+                return key + " → " + li.querySelector("[data-meter-state]").textContent;
+            }
+        };
     }
 
     if (document.readyState === "loading") {
