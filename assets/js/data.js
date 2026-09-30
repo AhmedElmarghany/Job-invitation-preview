@@ -1957,6 +1957,94 @@
         terms: { state: "updated", version: "September 2026", updatedOn: new Date(NOW - 27 * DAY), agreedOn: new Date(2025, 2, 12, 10, 24) }
     };
 
+    /* ── Dashboard: the history the job rows cannot carry — past months, bids, performance ── */
+    RP.USD_RATE = 0.6059;
+
+    /* The balance is billed work not yet paid, so the profile menu and the dashboard agree */
+    var BILLED = RP.JOBS.filter(function (job) {
+        return job.status === "BL";
+    }).reduce(function (sum, job) {
+        return sum + job.amount;
+    }, 0);
+    var MONEY_FMT = { minimumFractionDigits: 2, maximumFractionDigits: 2 };
+    RP.USER.balance = BILLED.toLocaleString("en-NZ", MONEY_FMT);
+    RP.USER.balanceUsd = (BILLED * RP.USD_RATE).toLocaleString("en-NZ", MONEY_FMT);
+
+    /* Paid per calendar month, oldest first; the current month is whatever the settled rows add up to */
+    var PAID_BY_MONTH = [2840.5, 3120.75, 2610.2, 2215.4, 2980.6, 3405.1, 3050.3, 2870.9, 3290.45, 3610.8, 3155.1];
+    var SETTLED = RP.JOBS.filter(function (job) {
+        return job.status === "ST";
+    }).reduce(function (sum, job) {
+        return sum + job.amount;
+    }, 0);
+    var THIS_MONTH = new Date(NOW);
+
+    RP.DASHBOARD = {
+        since: RP.USER.partnerSince,
+        monthly: PAID_BY_MONTH.concat([Math.round(SETTLED * 100) / 100]).map(function (paid, i) {
+            return { month: new Date(THIS_MONTH.getFullYear(), THIS_MONTH.getMonth() - 11 + i, 1), paid: paid };
+        }),
+        paidLastYearToDate: 25240.3,
+        paidAllTime: 104812.45,
+
+        /* The month's completed jobs come from the rows; the longer periods add the history behind them */
+        periods: {
+            month: {
+                label: "This month", vs: "last month",
+                lost: { jobs: 4, words: 9800 }, declined: { jobs: 6, words: 12400 },
+                prev: { completed: 27, lost: 6, declined: 4 }
+            },
+            quarter: {
+                label: "Last 3 months", vs: "the 3 months before",
+                completed: { jobs: 84, words: 158420 }, lost: { jobs: 13, words: 31400 }, declined: { jobs: 17, words: 36100 },
+                prev: { completed: 77, lost: 12, declined: 19 }
+            },
+            year: {
+                label: "This year", vs: "this time last year",
+                completed: { jobs: 241, words: 452880 }, lost: { jobs: 38, words: 94200 }, declined: { jobs: 49, words: 108300 },
+                prev: { completed: 218, lost: 41, declined: 57 }
+            },
+            all: {
+                label: "All time", vs: null,
+                completed: { jobs: 1164, words: 2184300 }, lost: { jobs: 142, words: 368900 }, declined: { jobs: 186, words: 421000 },
+                prev: null
+            }
+        },
+
+        /* Rolling 90 days; the tips are the expectations word for word */
+        performance: [
+            {
+                key: "quality", label: "Quality", value: 96, target: null, misses: 0,
+                evidence: "No gross mistakes in 24 reviewed jobs",
+                tip: "Avoid any gross mistake in translation and stick to the required format to maintain a high quality level."
+            },
+            {
+                key: "ontime", label: "On-time delivery", value: 93, target: 90,
+                evidence: "41 of 44 jobs delivered on time",
+                tip: "Deliver at least 90% of all your projects on time to not lose a level."
+            },
+            {
+                key: "response", label: "Response rate", value: 76, target: 80,
+                evidence: "38 of 50 replies within 1 working hour",
+                tip: "Respond to messages within 1 working hour to not lose a level. At least 80% of all your replies should be within this time frame."
+            },
+            {
+                key: "conduct", label: "Professional conduct", value: 100, target: null, misses: 0,
+                evidence: "No warnings",
+                tip: "Avoid receiving warnings for breaching our terms of service and stay professional with our clients and staff."
+            }
+        ],
+
+        activity: [
+            { type: "invite", job: "J-48210", detail: "Cardiac monitor — instructions for use (batch 12)", at: new Date(NOW - 3 * HOUR) },
+            { type: "delivered", job: "J-47072", detail: "Warranty terms — product line 314", at: new Date(NOW - 17 * HOUR) },
+            { type: "lost", job: "J-48163", detail: "Mining safety manual — English → Arabic", at: new Date(NOW - 26 * HOUR) },
+            { type: "paid", bill: "B-2064", amount: 327.6, at: new Date(NOW - 30 * HOUR) },
+            { type: "approved", job: "J-47094", detail: "Court filing — case file 308", at: new Date(NOW - 52 * HOUR) },
+            { type: "declined", job: "J-48141", detail: "Pharmacy leaflet — English → Tongan", at: new Date(NOW - 60 * HOUR) }
+        ]
+    };
+
     /* The sidebar badge counts what still needs a decision. */
     RP.USER.invitationCount = RP.INVITATIONS.filter(function (row) {
         return row.status === "new_invite" || row.status === "new_bid";

@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Dashboard · Resource Portal</title>
+  <meta name="description" content="Redesign preview of the AGATO resource portal — the resource's dashboard.">
   <link rel="icon" href="assets/img/logo.png">
 
   <link rel="stylesheet" href="assets/css/variables.css">
@@ -11,28 +12,31 @@
   <link rel="stylesheet" href="assets/css/sidebar.css">
   <link rel="stylesheet" href="assets/css/topbar.css">
   <link rel="stylesheet" href="assets/css/logout-modal.css">
+  <link rel="stylesheet" href="assets/css/dashboard.css">
 </head>
 <body>
 
   <!-- Sidebar + topbar + modals are injected here by assets/js/layout.js -->
   <div id="rp-layout" data-page="dashboard" data-title="Dashboard"></div>
 
-  <main class="rp-page">
-    <div class="rp-stub">
-      <span class="rp-stub-icon">
-        <span data-rp-icon="dashboard"></span>
-      </span>
-      <h1 class="rp-stub-title">Dashboard</h1>
-      <p class="rp-stub-note">Not designed yet. The shell around it — sidebar, topbar, availability control and profile menu — is final, so this page only needs its own content.</p>
-      <a class="rp-stub-link" href="invitations.html">
-        <span data-rp-icon="arrow-right"></span>
-        Go to Job Invitations
-      </a>
+  <main class="rp-page rp-dashpage">
+
+    <!-- Greeting, today's date and the period switch — filled by dashboard.js -->
+    <header class="rp-dashhead" id="rpDashHead"></header>
+
+    <!-- Attention, jobs, revenue, performance, due soon and recent activity -->
+    <div class="rp-dashwrap">
+      <div class="rp-dash" id="rpDash"></div>
     </div>
+
   </main>
+
+  <!-- One tip for every info button and chart mark on the page -->
+  <div class="rp-tip" id="rpTip" role="tooltip" hidden></div>
 
   <script src="assets/js/icons.js"></script>
   <script src="assets/js/data.js"></script>
   <script src="assets/js/layout.js"></script>
+  <script src="assets/js/dashboard.js"></script>
 </body>
 </html>

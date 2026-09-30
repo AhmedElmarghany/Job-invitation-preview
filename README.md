@@ -36,7 +36,7 @@ Nothing inside the folder refers to the folder name, so renaming is safe.
 | `invitations.html` | **Built.** Job Invitations — the full page. |
 | `jobs.html` | **Built.** My Jobs — Active / Waiting / Completed in one page. |
 | `job.html` | **Built.** A single job — opens from a Job ID on My Jobs (`job.html?id=J-47990`). |
-| `dashboard.html` | Placeholder |
+| `dashboard.html` | **Built.** Dashboard — the resource's home; the logo and the first sidebar entry open it. |
 | `earnings.html` | Placeholder |
 | `professional-profile.html` | Placeholder |
 | `account.html` | **Built.** User Account — the resource's own profile, opened from their name and photo in the sidebar. |
@@ -55,7 +55,8 @@ resource portal preview/
 ├── jobs.html                   built page
 ├── job.html                    built page — one job, ?id=J-…
 ├── account.html                built page — the resource's own profile (User Account)
-├── dashboard.html …            placeholders, one per sidebar entry
+├── dashboard.html              built page — the resource's home, ?period=month|quarter|year|all
+├── earnings.html …             placeholders, one per sidebar entry
 └── assets/
     ├── css/
     │   ├── variables.css       design tokens — copied from config/static/css/variables.css
@@ -73,6 +74,7 @@ resource portal preview/
     │   ├── jobs.css            page-specific: table chrome, waiting/slip cells
     │   ├── job.css             page-specific: job head, cards, checklist, upload, chat, viewer
     │   ├── account.css         page-specific: profile head, field grid, records, technology, terms
+    │   ├── dashboard.css       page-specific: stat tiles, revenue pipeline and chart, meters, feed
     │   └── password-modal.css  copied from config/static/css/password-modal.css (shell swapped)
     ├── js/
     │   ├── icons.js            inline Lucide set — RP.icon('name')
@@ -84,6 +86,7 @@ resource portal preview/
     │   ├── jobs.js             tabs, per-tab columns, search, sort, paginate
     │   ├── job.js              one job: sections, jump tabs, start / deliver, chat, file viewer
     │   ├── account.js          the profile: jump tabs, inline edit, dialogs, profile strength
+    │   ├── dashboard.js        the home: period switch, count-up, tips, chart keyboard walk
     │   └── password-policy.js  copied from config/static/js/password-policy.js
     ├── fonts/                  IBM Plex Sans + Serif (woff2)
     └── img/                    logo.png, placeholder-headshot.png
@@ -261,6 +264,45 @@ recounts. Reading the terms, viewing a file and the phone links raise a toast. R
 
 ---
 
+## Dashboard
+
+`dashboard.html` is new — the current system has no page like it. The logo and the first sidebar
+entry open it. It keeps the other pages' anatomy (white head band, cards with navy titles, the
+segmented control from `base.css`) and reads top to bottom as *what needs me → my jobs → my money
+→ how I am doing → what is next*.
+
+| Block | Shows | Comes from |
+| --- | --- | --- |
+| Head | Today's date, a greeting, the period switch | — |
+| Needs your attention | Overdue jobs, jobs due in 24 hours, invitations waiting, terms to agree to — only the ones that apply | `RP.JOBS`, `RP.USER.invitationCount`, `RP.PROFILE.terms` |
+| Jobs | Active, Completed, Lost bids, Declined: the count, its words, the change vs the previous period | Active from `RP.JOBS`; the rest from `RP.DASHBOARD.periods` |
+| Revenue | Total paid (period) and Total expected (now), both with ≈ USD; where the expected money is; paid per month | `RP.JOBS` amounts by stage; `RP.DASHBOARD.monthly` |
+| Performance | Quality, On-time delivery, Response rate, Professional conduct — a meter each, the target as a tick, a state chip | `RP.DASHBOARD.performance` |
+| Due soon | The next five deadlines, overdue first, each opening its job | `RP.JOBS` |
+| Recent activity | Invitations, deliveries, approvals, payments, lost bids and declines | `RP.DASHBOARD.activity` |
+
+**Scopes are labelled, not implied.** The period switch (This month / Last 3 months / This year /
+All time) changes Completed, Lost bids, Declined, Total paid and the highlighted bars of the
+chart. Active jobs and Total expected carry a *Now* chip, and Performance says *Last 90 days*,
+because those numbers do not belong to a period. The choice is kept in the URL (`?period=year`)
+and in `localStorage`.
+
+**Every metric explains itself.** Each tile and each meter has an info button; its tip opens on
+hover, on keyboard focus, and on tap (a tap pins it). The four performance tips are the
+expectations word for word, and the targets they name (90%, 80%) are the ticks on the meters.
+
+**Charts** follow the data-viz method: the stages of the expected money are one navy ramp,
+light to dark in the order money travels, validated as an ordinal ramp on white; the monthly
+chart is one series, with the chosen period in navy and the rest recessive. Both have a hover
+tip, a legend or a screen-reader table, and a single tab stop — the arrows walk the months.
+Status colours appear only where a value means good or bad (deltas, meters, deadlines), always
+with an icon and a word.
+
+`data.js` now works out `RP.USER.balance` from the billed jobs, so the profile menu's Balance and
+the dashboard's *Billed* stage are the same number.
+
+---
+
 ## Adding the next page
 
 1. Copy a placeholder page (e.g. `earnings.html`) and set `data-page` / `data-title` on `#rp-layout`.
@@ -362,3 +404,4 @@ opening or collapsing the sidebar moves that line by 184px, which a viewport que
 | `Enter` | Submit a bid, when the bid field has focus; send a chat message on the job page (`Shift+Enter` for a new line) |
 | `↑` / `↓` | Move between statuses in the availability dropdown |
 | `Enter` in Technology's search | Pick the first match, or add what was typed as your own tool |
+| `←` / `→`, `Home` / `End` | Walk the months of the dashboard's paid-per-month chart |
