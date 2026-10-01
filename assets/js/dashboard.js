@@ -49,7 +49,7 @@
         invite: { icon: "invitations" },
         delivered: { icon: "send" },
         approved: { icon: "check-check" },
-        paid: { icon: "hand-coins", tone: "paid" },
+        paid: { icon: "credit-card-check", tone: "paid" },
         lost: { icon: "bid", tone: "quiet" },
         declined: { icon: "circle-x", tone: "quiet" }
     };
