@@ -3,36 +3,89 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Earnings · Resource Portal</title>
+  <title>My Earnings · Resource Portal</title>
+  <meta name="description" content="Redesign preview of the AGATO resource portal — My Earnings.">
   <link rel="icon" href="assets/img/logo.png">
 
   <link rel="stylesheet" href="assets/css/variables.css">
   <link rel="stylesheet" href="assets/css/base.css">
   <link rel="stylesheet" href="assets/css/sidebar.css">
   <link rel="stylesheet" href="assets/css/topbar.css">
+  <link rel="stylesheet" href="assets/css/toolbar.css">
+  <link rel="stylesheet" href="assets/css/table.css">
+  <link rel="stylesheet" href="assets/css/status.css">
+  <link rel="stylesheet" href="assets/css/pagination.css">
+  <link rel="stylesheet" href="assets/css/columns-modal.css">
   <link rel="stylesheet" href="assets/css/logout-modal.css">
+  <link rel="stylesheet" href="assets/css/earnings.css">
 </head>
 <body>
 
   <!-- Sidebar + topbar + modals are injected here by assets/js/layout.js -->
-  <div id="rp-layout" data-page="earnings" data-title="Earnings"></div>
+  <div id="rp-layout" data-page="earnings" data-title="My Earnings"></div>
 
   <main class="rp-page">
-    <div class="rp-stub">
-      <span class="rp-stub-icon">
-        <span data-rp-icon="earnings"></span>
-      </span>
-      <h1 class="rp-stub-title">Earnings</h1>
-      <p class="rp-stub-note">Not designed yet. Bills, payments and the running balance will live here.</p>
-      <a class="rp-stub-link" href="invitations.html">
-        <span data-rp-icon="arrow-right"></span>
-        Go to Job Invitations
-      </a>
-    </div>
+
+    <section id="rp-earnings-table">
+
+      <!-- Totals of every bill the filters and search let through, on all pages -->
+      <div class="rp-totals" id="rpTotals"></div>
+
+      <!-- Toolbar -->
+      <div class="dashboard_toolbar-row rp-earn-toolbar">
+        <div class="dashboard_toolbar-search-wrap">
+          <span data-rp-icon="search"></span>
+          <input
+            class="dashboard_toolbar-search-input"
+            id="search-input"
+            type="text"
+            placeholder="Search by Bill No. or Job No."
+            aria-label="Search by bill number or job number"
+            autocomplete="off">
+          <kbd class="rp-kbd">/</kbd>
+          <button class="rp-clear-search" id="rpClearSearch" type="button" aria-label="Clear search">
+            <span data-rp-icon="close"></span>
+          </button>
+        </div>
+
+        <div class="dashboard_toolbar-divider rp-earn-toolbar__divider"></div>
+
+        <div class="rp-earn-filters">
+          <div class="rp-period-filter" id="rpPeriod"></div>
+          <div class="rp-segmented rp-status-filter" id="rpStatus" role="group" aria-label="Filter by payment status"></div>
+        </div>
+
+        <div class="dashboard_toolbar-divider rp-earn-toolbar__divider"></div>
+
+        <button class="dashboard_toolbar-btn" id="rpColumnsBtn" type="button" title="Choose columns">
+          <span data-rp-icon="columns"></span>
+          <span class="text-label">Columns</span>
+        </button>
+      </div>
+
+      <!-- Table -->
+      <div class="wrapper">
+        <div class="table-wrap" id="scrollContainer">
+          <table id="new-customized-table" class="table" data-table="rp-my-earnings">
+            <colgroup></colgroup>
+            <thead><tr></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="cu-pagination-bar" id="rpPagination"></div>
+      </div>
+
+    </section>
   </main>
+
+  <!-- One tip for the totals' info buttons and the status pills -->
+  <div class="rp-tip" id="rpTip" role="tooltip" hidden></div>
 
   <script src="assets/js/icons.js"></script>
   <script src="assets/js/data.js"></script>
   <script src="assets/js/layout.js"></script>
+  <script src="assets/js/columns-modal.js"></script>
+  <script src="assets/js/earnings.js"></script>
 </body>
 </html>

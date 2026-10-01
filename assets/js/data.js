@@ -1243,7 +1243,7 @@
             specialty: "Medical", count: { value: 1200, unit: "Words" },
             amount: 66.0, progress: 100,
             deadlineIn: -72, acceptedAgo: 140, deliveredAgo: 80,
-            billId: "B-2211", jobSlip: true, pm: PM.daniel
+            billId: "B-2216", jobSlip: true, pm: PM.daniel
         },
         {
             jobId: 47894, tab: "completed", jobStatus: "billed",
@@ -1252,7 +1252,7 @@
             specialty: "Legal", count: { value: 5100, unit: "Words" },
             amount: 357.0, progress: 100,
             deadlineIn: -120, acceptedAgo: 210, deliveredAgo: 128,
-            billId: "B-2208", jobSlip: true, pm: PM.mei
+            billId: "B-2209", jobSlip: true, pm: PM.mei
         },
         {
             jobId: 47888, tab: "completed", jobStatus: "settled",
@@ -1261,7 +1261,7 @@
             specialty: "Technical", count: { value: 640, unit: "Words" },
             amount: 44.8, progress: 100,
             deadlineIn: -200, acceptedAgo: 290, deliveredAgo: 206,
-            billId: "B-2199", jobSlip: true, pm: PM.sara
+            billId: "B-2201", jobSlip: true, pm: PM.sara
         },
         /* Delivered, not billed yet — the Bill ID stays blank, as it does live */
         {
@@ -1280,7 +1280,7 @@
             specialty: "Legal", count: { value: 3300, unit: "Words" },
             amount: 231.0, progress: 100,
             deadlineIn: -250, acceptedAgo: 340, deliveredAgo: 262,
-            billId: "B-2190", jobSlip: true, pm: PM.tane
+            billId: "B-2216", jobSlip: true, pm: PM.tane
         },
         {
             jobId: 47860, tab: "completed", jobStatus: "settled",
@@ -1289,7 +1289,7 @@
             specialty: "Technical", count: { value: 4200, unit: "Words" },
             amount: 231.0, progress: 100,
             deadlineIn: -310, acceptedAgo: 400, deliveredAgo: 318,
-            billId: "B-2184", jobSlip: true, pm: PM.daniel
+            billId: "B-2201", jobSlip: true, pm: PM.daniel
         },
         {
             jobId: 47852, tab: "completed", jobStatus: "billed",
@@ -1298,7 +1298,7 @@
             specialty: "Government", count: { value: 5500, unit: "Words" },
             amount: 319.0, progress: 100,
             deadlineIn: -370, acceptedAgo: 470, deliveredAgo: 379,
-            billId: "B-2177", jobSlip: true, pm: PM.sara
+            billId: "B-2209", jobSlip: true, pm: PM.sara
         },
         {
             jobId: 47844, tab: "completed", jobStatus: "settled",
@@ -1307,7 +1307,7 @@
             specialty: "IT / Software", count: { value: 1500, unit: "Words" },
             amount: 96.0, progress: 100,
             deadlineIn: -430, acceptedAgo: 530, deliveredAgo: 441,
-            billId: "B-2170", jobSlip: true, pm: PM.mei
+            billId: "B-2201", jobSlip: true, pm: PM.mei
         },
         {
             jobId: 47111, tab: "completed", jobStatus: "settled",
@@ -1316,7 +1316,7 @@
             specialty: "Medical", count: { value: 600, unit: "Words" },
             amount: 48.0, progress: 100,
             deadlineIn: -320, acceptedAgo: 448, deliveredAgo: 330,
-            billId: "B-2160", jobSlip: true, pm: PM.daniel
+            billId: "B-2201", jobSlip: true, pm: PM.daniel
         },
         {
             jobId: 47159, tab: "completed", jobStatus: "settled",
@@ -1325,7 +1325,7 @@
             specialty: "Marketing", count: { value: 2100, unit: "Words" },
             amount: 201.6, progress: 100,
             deadlineIn: -120, acceptedAgo: 189, deliveredAgo: 144,
-            billId: "B-2152", jobSlip: true, pm: PM.daniel
+            billId: "B-2201", jobSlip: true, pm: PM.daniel
         },
         {
             jobId: 47259, tab: "completed", jobStatus: "billed",
@@ -1334,7 +1334,7 @@
             specialty: "Medical", count: { value: 5, unit: "Hours" },
             amount: 350.0, progress: 100,
             deadlineIn: -10, acceptedAgo: 112, deliveredAgo: 39,
-            billId: "B-2148", jobSlip: true, pm: PM.sara
+            billId: "B-2209", jobSlip: true, pm: PM.sara
         },
         {
             jobId: 47275, tab: "completed", jobStatus: "settled",
@@ -1343,7 +1343,7 @@
             specialty: "Government", count: { value: 6, unit: "Hours" },
             amount: 420.0, progress: 100,
             deadlineIn: -150, acceptedAgo: 278, deliveredAgo: 165,
-            billId: "B-2138", jobSlip: true, pm: PM.mei
+            billId: "B-2201", jobSlip: true, pm: PM.mei
         },
         {
             jobId: 47014, tab: "completed", jobStatus: "settled",
@@ -1352,7 +1352,7 @@
             specialty: "Immigration", count: { value: 8, unit: "Documents" },
             amount: 484.48, progress: 100,
             deadlineIn: -440, acceptedAgo: 495, deliveredAgo: 452,
-            billId: "B-2131", jobSlip: true, pm: PM.daniel
+            billId: "B-2201", jobSlip: true, pm: PM.daniel
         },
         {
             jobId: 47208, tab: "completed", jobStatus: "settled",
@@ -1361,7 +1361,7 @@
             specialty: "Government", count: { value: 5, unit: "Documents" },
             amount: 317.05, progress: 100,
             deadlineIn: -190, acceptedAgo: 266, deliveredAgo: 216,
-            billId: "B-2121", jobSlip: true, pm: PM.tane
+            billId: "B-2201", jobSlip: true, pm: PM.tane
         },
         {
             jobId: 47283, tab: "completed", jobStatus: "billed",
@@ -1370,7 +1370,7 @@
             specialty: "Medical", count: { value: 2200, unit: "Words" },
             amount: 136.4, progress: 100,
             deadlineIn: -120, acceptedAgo: 235, deliveredAgo: 145,
-            billId: "B-2111", jobSlip: true, pm: PM.mei
+            billId: "B-2209", jobSlip: true, pm: PM.mei
         },
         {
             jobId: 47094, tab: "completed", jobStatus: "approved",
@@ -1379,7 +1379,7 @@
             specialty: "IT / Software", count: { value: 20, unit: "Physical Pages" },
             amount: 308.6, progress: 100,
             deadlineIn: -50, acceptedAgo: 156, deliveredAgo: 75,
-            billId: "B-2103", jobSlip: true, pm: PM.mei
+            billId: "B-2216", jobSlip: true, pm: PM.mei
         },
         {
             jobId: 47027, tab: "completed", jobStatus: "billed",
@@ -1388,7 +1388,7 @@
             specialty: "Legal", count: { value: 2300, unit: "Words" },
             amount: 101.2, progress: 100,
             deadlineIn: -320, acceptedAgo: 427, deliveredAgo: 326,
-            billId: "B-2096", jobSlip: true, pm: PM.sara
+            billId: "B-2209", jobSlip: true, pm: PM.sara
         },
         {
             jobId: 47244, tab: "completed", jobStatus: "delivered",
@@ -1406,7 +1406,7 @@
             specialty: "Academic", count: { value: 2700, unit: "Words" },
             amount: 113.4, progress: 100,
             deadlineIn: -230, acceptedAgo: 350, deliveredAgo: 251,
-            billId: "B-2086", jobSlip: true, pm: PM.tane
+            billId: "B-2201", jobSlip: true, pm: PM.tane
         },
         {
             jobId: 47106, tab: "completed", jobStatus: "approved",
@@ -1415,7 +1415,7 @@
             specialty: "IT / Software", count: { value: 23, unit: "Physical Pages" },
             amount: 206.77, progress: 100,
             deadlineIn: -70, acceptedAgo: 123, deliveredAgo: 93,
-            billId: "B-2080", jobSlip: true, pm: PM.daniel
+            billId: "B-2216", jobSlip: true, pm: PM.daniel
         },
         {
             jobId: 47147, tab: "completed", jobStatus: "billed",
@@ -1424,7 +1424,7 @@
             specialty: "Legal", count: { value: 1500, unit: "Words" },
             amount: 94.5, progress: 100,
             deadlineIn: -320, acceptedAgo: 427, deliveredAgo: 349,
-            billId: "B-2075", jobSlip: true, pm: PM.daniel
+            billId: "B-2209", jobSlip: true, pm: PM.daniel
         },
         {
             jobId: 47072, tab: "completed", jobStatus: "delivered",
@@ -1442,7 +1442,7 @@
             specialty: "Marketing", count: { value: 3700, unit: "Words" },
             amount: 388.5, progress: 100,
             deadlineIn: -320, acceptedAgo: 429, deliveredAgo: 332,
-            billId: "B-2071", jobSlip: true, pm: PM.sara
+            billId: "B-2201", jobSlip: true, pm: PM.sara
         },
         {
             jobId: 47240, tab: "completed", jobStatus: "settled",
@@ -1451,7 +1451,7 @@
             specialty: "Immigration", count: { value: 3900, unit: "Words" },
             amount: 327.6, progress: 100,
             deadlineIn: -70, acceptedAgo: 171, deliveredAgo: 77,
-            billId: "B-2064", jobSlip: true, pm: PM.tane
+            billId: "B-2201", jobSlip: true, pm: PM.tane
         },
         {
             jobId: 47253, tab: "completed", jobStatus: "billed",
@@ -1460,7 +1460,7 @@
             specialty: "Marketing", count: { value: 36, unit: "Minutes" },
             amount: 250.56, progress: 100,
             deadlineIn: -270, acceptedAgo: 401, deliveredAgo: 284,
-            billId: "B-2055", jobSlip: true, pm: PM.sara
+            billId: "B-2209", jobSlip: true, pm: PM.sara
         },
         {
             jobId: 47000, tab: "completed", jobStatus: "settled",
@@ -1469,7 +1469,7 @@
             specialty: "Technical", count: { value: 3000, unit: "Words" },
             amount: 117.0, progress: 100,
             deadlineIn: -120, acceptedAgo: 167, deliveredAgo: 123,
-            billId: "B-2044", jobSlip: true, pm: PM.mei
+            billId: "B-2201", jobSlip: true, pm: PM.mei
         },
         {
             jobId: 47248, tab: "completed", jobStatus: "delivered",
@@ -1487,7 +1487,7 @@
             specialty: "Government", count: { value: 4900, unit: "Words" },
             amount: 308.7, progress: 100,
             deadlineIn: -320, acceptedAgo: 416, deliveredAgo: 331,
-            billId: "B-2033", jobSlip: true, pm: PM.tane
+            billId: "B-2201", jobSlip: true, pm: PM.tane
         },
         {
             jobId: 47069, tab: "completed", jobStatus: "delivered",
@@ -1505,7 +1505,7 @@
             specialty: "Technical", count: { value: 33, unit: "Minutes" },
             amount: 312.84, progress: 100,
             deadlineIn: -190, acceptedAgo: 271, deliveredAgo: 207,
-            billId: "B-2026", jobSlip: true, pm: PM.tane
+            billId: "B-2201", jobSlip: true, pm: PM.tane
         }
     ];
 
@@ -1978,6 +1978,197 @@
         return sum + job.amount;
     }, 0);
     var THIS_MONTH = new Date(NOW);
+    var PAID_ALL_TIME = 104812.45;
+
+    /* ── Earnings: one bill a month, filed on the 1st as celery_tasks/bills.py's monthly run does ── */
+    /* The newest bill carries the Billed jobs and the one before it the Settled ones, so pending = balance */
+    var PENDING_BILL = "B-2209";
+    var LAST_PAID_BILL = "B-2201";
+    var BILLS_SINCE = new Date(2021, 2, 1);
+    var BILLED_JOBS_ALL_TIME = 1155;
+    var PAID_AT = new Date(NOW - 30 * HOUR);
+
+    var BILL_WORK = [
+        ["Product safety sheet — batch", "Translation"], ["Employment contract — hire", "Translation"],
+        ["Court filing — case file", "Certified"], ["Warranty terms — product line", "Translation"],
+        ["Patient leaflet — update", "Proofreading"], ["Website copy — page set", "Transcreation"],
+        ["Annual report — section", "Translation"], ["Tender documents — lot", "Translation"],
+        ["Training manual — module", "DTP"], ["Marketing brochure — edition", "Transcreation"],
+        ["Birth certificate — applicant", "Certified"], ["Insurance claim — file", "Proofreading"],
+        ["App strings — release", "Translation"], ["Hotel guest guide — edition", "DTP"],
+        ["Clinical trial consent — site", "Translation"], ["Training video — episode", "Subtitling"],
+        ["Family court hearing — session", "Interpreting"], ["Hospital appointment — clinic", "Interpreting"]
+    ];
+
+    /* Bonuses and deductions sit on a few bills, as formatVatAndBonusIncludedAMount adds them in */
+    var BILL_ADJUST = {
+        5: { bonus: 60, bonusNote: "Rush delivery" },
+        16: { bonus: 45, bonusNote: "Quality bonus" },
+        23: { deduction: 25, deductionNote: "Late delivery" }
+    };
+
+    /* Seeded, so every reload and every viewer gets the same bills */
+    function seeded(seed) {
+        return function () {
+            seed = (seed + 0x6d2b79f5) | 0;
+            var t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+            t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+            return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+    }
+
+    function cents(value) {
+        return Math.round(value * 100) / 100;
+    }
+
+    function total(list) {
+        return list.reduce(function (sum, value) {
+            return sum + value;
+        }, 0);
+    }
+
+    /* The last part takes the rounding, so a bill's jobs add up to its amount to the cent */
+    function split(amount, n, rand) {
+        var weights = [];
+        for (var i = 0; i < n; i++) weights.push(0.35 + rand() * rand() * 2.4);
+        var all = total(weights);
+        var parts = weights.slice(0, n - 1).map(function (w) {
+            return cents((amount * w) / all);
+        });
+        parts.push(cents(amount - total(parts)));
+        return parts;
+    }
+
+    function billedJobs(status) {
+        return RP.JOBS.filter(function (job) {
+            return job.status === status;
+        }).map(function (job) {
+            return { id: job.id, project: job.project, service: job.service, amount: job.amount, real: true };
+        }).sort(function (a, b) {
+            return a.id.localeCompare(b.id);
+        });
+    }
+
+    RP.BILLS = (function () {
+        var rand = seeded(2209);
+        var month = new Date(new Date(NOW).getFullYear(), new Date(NOW).getMonth(), 1);
+        var count = (month.getFullYear() - BILLS_SINCE.getFullYear()) * 12 + month.getMonth() - BILLS_SINCE.getMonth();
+        var pendingJobs = billedJobs("BL");
+        var paidJobs = billedJobs("ST");
+        var amount = {};
+        var jobs = {};
+        var num = {};
+        var k;
+
+        /* Paid two months on: bill k lands in the month PAID_BY_MONTH lists k - 2 months back */
+        amount[1] = cents(BILLED);
+        amount[2] = cents(SETTLED);
+        for (k = 3; k <= Math.min(13, count); k++) amount[k] = PAID_BY_MONTH[13 - k];
+
+        /* Older bills ramp up from the first month and add up to the all-time Total paid */
+        var older = cents(PAID_ALL_TIME - total(PAID_BY_MONTH) - SETTLED);
+        var ramp = {};
+        for (k = 14; k <= count; k++) {
+            var t = count === 14 ? 1 : (count - k) / (count - 14);
+            ramp[k] = (0.2 + 1.4 * Math.pow(t, 1.6)) * (0.88 + rand() * 0.24);
+        }
+        var rampSum = total(Object.keys(ramp).map(function (key) {
+            return ramp[key];
+        }));
+        var placed = 0;
+        for (k = count; k > 14; k--) {
+            amount[k] = cents((older * ramp[k]) / rampSum);
+            placed += amount[k];
+        }
+        if (count >= 14) amount[14] = cents(older - placed);
+
+        /* Jobs grew from ~60 to ~110 NZD each, so recent bills carry fewer jobs for their money */
+        var restJobs = BILLED_JOBS_ALL_TIME - pendingJobs.length - paidJobs.length;
+        var weight = {};
+        for (k = 3; k <= count; k++) weight[k] = amount[k] / (60 + (50 * (count - k)) / Math.max(1, count - 3));
+        var restWeight = total(Object.keys(weight).map(function (key) {
+            return weight[key];
+        }));
+        var counts = {};
+        var remainders = [];
+        for (k = 3; k <= count; k++) {
+            var exact = (weight[k] / restWeight) * restJobs;
+            counts[k] = Math.max(1, Math.floor(exact));
+            remainders.push({ k: k, rem: exact - Math.floor(exact) });
+        }
+        var missing = restJobs - total(Object.keys(counts).map(function (key) {
+            return counts[key];
+        }));
+        remainders.sort(function (a, b) {
+            return b.rem - a.rem;
+        }).slice(0, Math.max(0, missing)).forEach(function (r) {
+            counts[r.k] += 1;
+        });
+
+        num[1] = 2209;
+        num[2] = 2201;
+        for (k = 3; k <= count; k++) num[k] = num[k - 1] - (7 + Math.floor(rand() * 8));
+
+        jobs[1] = pendingJobs;
+        jobs[2] = paidJobs;
+        for (k = 3; k <= count; k++) {
+            /* Job numbers drift down ~238 a month, clear of the 47000s the job rows use */
+            var top = 46990 - (k - 3) * 238;
+            var taken = {};
+            var ids = [];
+            while (ids.length < counts[k]) {
+                var id = top - Math.floor(rand() * 230);
+                if (taken[id]) continue;
+                taken[id] = true;
+                ids.push(id);
+            }
+            ids.sort(function (a, b) {
+                return a - b;
+            });
+            var adjust = BILL_ADJUST[k] || {};
+            var parts = split(amount[k] - (adjust.bonus || 0) + (adjust.deduction || 0), ids.length, rand);
+            jobs[k] = ids.map(function (jobId, i) {
+                var work = BILL_WORK[Math.floor(rand() * BILL_WORK.length)];
+                return {
+                    id: "J-" + jobId,
+                    project: work[0] + " " + (10 + Math.floor(rand() * 290)),
+                    service: work[1],
+                    amount: parts[i],
+                    real: false
+                };
+            });
+        }
+
+        var bills = [];
+        for (k = 1; k <= count; k++) {
+            var y = month.getFullYear();
+            var m = month.getMonth() - k;
+            var adj = BILL_ADJUST[k] || {};
+            bills.push({
+                id: "B-" + num[k],
+                num: num[k],
+                from: new Date(y, m, 1),
+                to: new Date(y, m + 1, 0),
+                issued: new Date(y, m + 1, 1),
+                due: new Date(y, m + 2, 20),
+                paidOn: k === 1 ? null : k === 2 ? PAID_AT : new Date(y, m + 2, 6 + Math.floor(rand() * 12), 10 + Math.floor(rand() * 6), Math.floor(rand() * 60)),
+                status: k === 1 ? "pending" : "paid",
+                amount: amount[k],
+                bonus: adj.bonus || 0,
+                bonusNote: adj.bonusNote || "",
+                deduction: adj.deduction || 0,
+                deductionNote: adj.deductionNote || "",
+                method: k === 1 ? null : k <= 30 ? "Wise" : "PayPal",
+                jobs: jobs[k]
+            });
+        }
+        return bills;
+    })();
+
+    RP.BILL_STATUS = {
+        pending: { label: "Pending", pill: "status-pending" },
+        paid: { label: "Paid", pill: "status-paid" }
+    };
 
     RP.DASHBOARD = {
         since: RP.USER.partnerSince,
@@ -1985,7 +2176,7 @@
             return { month: new Date(THIS_MONTH.getFullYear(), THIS_MONTH.getMonth() - 11 + i, 1), paid: paid };
         }),
         paidLastYearToDate: 25240.3,
-        paidAllTime: 104812.45,
+        paidAllTime: PAID_ALL_TIME,
 
         /* The month's completed jobs come from the rows; the longer periods add the history behind them */
         periods: {
@@ -2039,7 +2230,7 @@
             { type: "invite", job: "J-48210", detail: "Cardiac monitor — instructions for use (batch 12)", at: new Date(NOW - 3 * HOUR) },
             { type: "delivered", job: "J-47072", detail: "Warranty terms — product line 314", at: new Date(NOW - 17 * HOUR) },
             { type: "lost", job: "J-48163", detail: "Mining safety manual — English → Arabic", at: new Date(NOW - 26 * HOUR) },
-            { type: "paid", bill: "B-2064", amount: 327.6, at: new Date(NOW - 30 * HOUR) },
+            { type: "paid", bill: LAST_PAID_BILL, amount: cents(SETTLED), at: PAID_AT },
             { type: "approved", job: "J-47094", detail: "Court filing — case file 308", at: new Date(NOW - 52 * HOUR) },
             { type: "declined", job: "J-48141", detail: "Pharmacy leaflet — English → Tongan", at: new Date(NOW - 60 * HOUR) }
         ]

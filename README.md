@@ -37,7 +37,7 @@ Nothing inside the folder refers to the folder name, so renaming is safe.
 | `jobs.html` | **Built.** My Jobs — Active / Waiting / Completed in one page. |
 | `job.html` | **Built.** A single job — opens from a Job ID on My Jobs (`job.html?id=J-47990`). |
 | `dashboard.html` | **Built.** Dashboard — the resource's home; the logo and the first sidebar entry open it. |
-| `earnings.html` | Placeholder |
+| `earnings.html` | **Built.** My Earnings — every bill, paid and pending, with its totals. |
 | `professional-profile.html` | Placeholder |
 | `account.html` | **Built.** User Account — the resource's own profile, opened from their name and photo in the sidebar. |
 
@@ -56,7 +56,8 @@ resource portal preview/
 ├── job.html                    built page — one job, ?id=J-…
 ├── account.html                built page — the resource's own profile (User Account)
 ├── dashboard.html              built page — the resource's home, ?period=month|quarter|year|all
-├── earnings.html …             placeholders, one per sidebar entry
+├── earnings.html               built page — the bills, ?period=…&status=…&q=… or ?bill=B-…
+├── professional-profile.html   placeholder
 └── assets/
     ├── css/
     │   ├── variables.css       design tokens — copied from config/static/css/variables.css
@@ -75,6 +76,7 @@ resource portal preview/
     │   ├── job.css             page-specific: job head, cards, checklist, upload, chat, viewer
     │   ├── account.css         page-specific: profile head, field grid, records, technology, terms
     │   ├── dashboard.css       page-specific: job tiles, revenue pipeline, meters, due soon, feed
+    │   ├── earnings.css        page-specific: totals, period picker, status filter, bill panel
     │   └── password-modal.css  copied from config/static/css/password-modal.css (shell swapped)
     ├── js/
     │   ├── icons.js            inline Lucide set — RP.icon('name')
@@ -87,6 +89,7 @@ resource portal preview/
     │   ├── job.js              one job: sections, jump tabs, start / deliver, chat, file viewer
     │   ├── account.js          the profile: jump tabs, inline edit, dialogs, profile strength
     │   ├── dashboard.js        the home: period switch, count-up, tips, meters that repaint from data-value
+    │   ├── earnings.js         the bills: period and status filters, search, totals, the open bill
     │   └── password-policy.js  copied from config/static/js/password-policy.js
     ├── fonts/                  IBM Plex Sans + Serif (woff2)
     └── img/                    logo.png, placeholder-headshot.png
@@ -117,6 +120,10 @@ the Personal details markup ports straight onto the customer profile's styleshee
 `password-policy.js` is byte-for-byte. `password-modal.css` is too, except that its Bootstrap
 shell (`.modal-dialog`, `.modal-content` and the agile.css bridge) is replaced by the preview's
 `.rp-modal` panel — every `.pwd-*` rule is untouched.
+
+`earnings.css` does the same once more: the totals are `dashboard.css`'s `.rp-stat` tiles and the
+table chrome, sort icon, empty state and open row are `jobs.css` and `invitations.css`, all under
+their original class names.
 
 `variables.css` is a copy too — it is the one file to re-sync if the tokens move.
 
@@ -343,9 +350,71 @@ the dashboard's *Billed* stage are the same number.
 
 ---
 
+## My Earnings
+
+`earnings.html` replaces the two panels the resource dashboard shows today — **My Earnings**
+(`#trBills`, the pending bills) and **My Payments** (`#trPayments`, the paid ones) — with one table
+of bills, paid and pending together. The sidebar's Earnings entry opens it. Full-timers never
+reach it, as before: the original answers *Not allowed*, and the preview's resource is a freelancer.
+
+| Column | Shows | In the original |
+| --- | --- | --- |
+| Serial No. | The row's place in the list, counted across pages | `Sr.No` — `forloop.counter`, which restarted on every page |
+| Bill No. | `B-2209`, beside the caret that opens the bill | `invoice.id`, a link to `resource_invoice` |
+| Period | `1 – 30 Sept 2026`, the month and year said once | `from_date – to_date` |
+| Job Count | **New.** The jobs the bill pays for | — |
+| Amount | `1,608.66 NZD`, number first; ≈ USD on hover | `formatVatAndBonusIncludedAMount`, bonus and deduction in |
+| Payment Status | `Paid` / `Pending`, `status.css`'s pills; the paid or due date on hover | `get_status_display` |
+
+**Totals are tiles above the table**, the dashboard's `.rp-stat`, so the two pages read alike:
+Total Job Count (and the bills it spans), Total Earned (≈ USD) and Total Paid (and what is still
+pending). Tiles rather than a row under the columns: they stay on screen on a phone, where the
+table scrolls sideways, and they do not disappear with a hidden column. They add up **every bill
+the period, status and search let through, on all pages** — the original's `total_earnings` took
+the search into account the same way.
+
+**Filters sit in the toolbar, beside the search:**
+
+- **Period** — All time, Last 3 / 6 / 12 months, a calendar year, or a custom range of months. A
+  chosen period turns the button navy and gives it its own ×.
+- **Payment status** — All / Pending / Paid, `base.css`'s segmented control, each with a count of
+  what it would show and the pill's own dot.
+
+**Search takes a bill number or a job number** — `B-2209`, `2209`, `J-47894` or `47894`. A bill
+found through one of its jobs carries a chip naming that job, and the matching digits are marked.
+When a job number finds exactly one bill, that bill opens with the job highlighted in it.
+
+**A row opens to the bill**, in the Invitations panel: the jobs it pays for (Job No., project,
+service, amount; the list scrolls on its own past seven rows) and a summary — issued, due or paid
+on, paid by, the bonus and deduction when there are any, the total and ≈ USD. *Open bill* and *PDF*
+stand in for the original's link to the bill page.
+
+The view is kept in the URL (`?period=2025&status=paid&q=2209`), and `earnings.html?bill=B-2201`
+opens one bill in its place in the list. The dashboard's *Bill … was paid* now links there.
+
+**The numbers agree with the other pages.** `data.js` files one bill a month since March 2021, as
+the monthly run in `celery_tasks/bills.py` does:
+
+- The newest bill, B-2209, holds the jobs My Jobs shows as *Billed*, so **Pending equals the Balance
+  in the profile menu**, 1,608.66 NZD — the same sum `tr_account_balance` makes.
+- The one before, B-2201, holds the *Settled* jobs; it is the payment in the dashboard's activity.
+- The eleven before that are the dashboard's paid-per-month figures, and **Total Paid for all time
+  is the dashboard's 104,812.45 NZD**.
+- *Approved* jobs carry B-2216, the next bill, not issued yet — the dashboard counts them as *not
+  billed yet* too.
+
+Only the jobs My Jobs still lists open a job page; older job numbers raise a toast.
+
+**Narrower screens:** the six columns give back their spare width before the table scrolls, so
+they fit a 1024px laptop with the sidebar open; a column resized by hand is left alone. On a phone
+the tiles go one a row, the status filter takes a row of its own, Bill No. stays pinned while the
+rest scrolls, and an open bill fits the screen.
+
+---
+
 ## Adding the next page
 
-1. Copy a placeholder page (e.g. `earnings.html`) and set `data-page` / `data-title` on `#rp-layout`.
+1. Copy a placeholder page (e.g. `professional-profile.html`) and set `data-page` / `data-title` on `#rp-layout`.
    `data-page` must match the `key` in `NAV` inside `assets/js/layout.js` for the active state to
    light up.
 2. Add its stylesheet under `assets/css/` and its script under `assets/js/`.
@@ -440,7 +509,7 @@ opening or collapsing the sidebar moves that line by 184px, which a viewport que
 | Key | Does |
 | --- | --- |
 | `/` | Jump to the search field |
-| `Esc` | Leave the search field, close any modal, the availability dropdown or the mobile drawer; on User Account, close the Delete popover first |
+| `Esc` | Leave the search field, close any modal, the availability dropdown or the mobile drawer; on User Account, close the Delete popover first; on My Earnings, close the period picker first |
 | `Enter` | Submit a bid, when the bid field has focus; send a chat message on the job page (`Shift+Enter` for a new line) |
 | `↑` / `↓` | Move between statuses in the availability dropdown |
 | `Enter` in Technology's search | Pick the first match, or add what was typed as your own tool |

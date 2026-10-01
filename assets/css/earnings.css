@@ -1,0 +1,1449 @@
+/* ============================================================
+   PAGE: My Earnings
+   Totals on top, then the bills. The tiles are dashboard.css's
+   .rp-stat; the table chrome, sort icon, empty state and open
+   row are jobs.css and invitations.css — all rebuilt here under
+   the same names, so this page renders from its own file. New:
+   the period picker, the status filter and the bill panel.
+   ============================================================ */
+
+/* min-width: 0 all the way down, or the table never gets its own scrollbar */
+#rp-earnings-table {
+    container: rpEarn / inline-size;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+}
+
+#rp-earnings-table .wrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+    background: var(--color-surface-white);
+}
+
+/* ── Totals: dashboard.css's tiles, a white tray around a grey well ─── */
+.rp-totals {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    padding: 20px 24px;
+}
+
+.rp-stat {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 12px;
+    background: var(--color-surface-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    transition: box-shadow var(--transition-fast);
+}
+
+.rp-stat:hover {
+    box-shadow: var(--shadow-sm);
+}
+
+.rp-stat__well {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 16px 16px 18px;
+    background: var(--color-surface-inset);
+    border-radius: var(--radius-md);
+    box-shadow: inset var(--shadow-sm);
+}
+
+.rp-stat__head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.rp-stat__icon {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: var(--color-surface-white);
+    color: var(--color-brand-navy);
+}
+
+.rp-stat__icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.rp-stat__label {
+    min-width: 0;
+    margin: 0;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.3;
+    color: var(--color-text-primary);
+    overflow-wrap: anywhere;
+}
+
+/* Tabular figures, so the count-up does not jitter the width */
+.rp-stat__value {
+    margin: 6px 0 0;
+    font-family: var(--font-heading);
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+}
+
+/* Number first, the unit after — the order the balance settled on */
+.rp-stat__unit {
+    margin-left: 6px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0;
+    color: var(--color-text-secondary);
+}
+
+.rp-stat__words {
+    margin: 0;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-stat__words strong {
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+@container rpEarn (max-width: 980px) {
+    .rp-totals {
+        gap: 12px;
+        padding: 16px;
+    }
+
+    .rp-stat__well {
+        padding: 14px 14px 16px;
+    }
+
+    /* A smaller mark keeps "Total Job Count" on one line beside its info button */
+    .rp-stat__head {
+        gap: 8px;
+    }
+
+    .rp-stat__icon {
+        width: 30px;
+        height: 30px;
+    }
+
+    .rp-stat__icon svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .rp-stat__label {
+        font-size: 13.5px;
+    }
+
+    .rp-stat__value {
+        font-size: 23px;
+    }
+}
+
+/* One a row on a phone, the figure beside the label, as the dashboard's tiles go */
+@container rpEarn (max-width: 640px) {
+    .rp-totals {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .rp-stat {
+        padding: 8px;
+    }
+
+    .rp-stat__well {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas: "head value" "head words";
+        align-items: center;
+        gap: 2px 12px;
+        padding: 12px 14px;
+    }
+
+    .rp-stat__head {
+        grid-area: head;
+    }
+
+    .rp-stat__value {
+        grid-area: value;
+        margin: 0;
+        font-size: 21px;
+        text-align: right;
+    }
+
+    .rp-stat__words {
+        grid-area: words;
+        text-align: right;
+    }
+}
+
+/* ── Info tip trigger and the tip — dashboard.css's ──────── */
+.rp-info {
+    flex: 0 0 auto;
+    display: inline-grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-full);
+    background: transparent;
+    color: var(--color-text-secondary);
+    cursor: help;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.rp-info svg {
+    width: 15px;
+    height: 15px;
+}
+
+.rp-info:hover,
+.rp-info[aria-expanded="true"] {
+    background: var(--color-surface-white);
+    color: var(--color-brand-navy);
+}
+
+.rp-info:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-gold);
+}
+
+.rp-tip {
+    position: fixed;
+    z-index: 3000;
+    top: 0;
+    left: 0;
+    max-width: 280px;
+    padding: 9px 12px;
+    border-radius: var(--radius-sm);
+    background: var(--color-brand-navy);
+    box-shadow: var(--shadow-md);
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--color-surface-white);
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.rp-tip.is-shown {
+    opacity: 1;
+    transform: none;
+}
+
+/* ── Toolbar: search, then the period and status filters ───── */
+.rp-earn-toolbar {
+    flex-wrap: wrap;
+    border-top: 1px solid var(--color-border);
+}
+
+.rp-earn-toolbar .dashboard_toolbar-search-wrap {
+    flex: 1 1 240px;
+}
+
+.rp-earn-filters {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+/* Search keeps a whole row once the filters would squeeze it */
+@container rpEarn (max-width: 900px) {
+    .rp-earn-toolbar .dashboard_toolbar-search-wrap {
+        flex-basis: 100%;
+    }
+
+    .rp-earn-toolbar__divider {
+        display: none;
+    }
+
+    .rp-earn-filters {
+        flex: 1 1 auto;
+    }
+}
+
+/* Phone: period and Columns share a row, the status filter takes the next one whole */
+@container rpEarn (max-width: 560px) {
+    .rp-earn-filters {
+        display: contents;
+    }
+
+    .rp-period-filter {
+        order: 1;
+        flex: 1 1 auto;
+    }
+
+    .rp-period-filter .rp-period-btn {
+        width: 100%;
+    }
+
+    .rp-period-btn__label {
+        display: none;
+    }
+
+    .rp-earn-toolbar #rpColumnsBtn {
+        order: 2;
+    }
+
+    .rp-earn-toolbar .rp-status-filter {
+        order: 3;
+        flex: 1 1 100%;
+    }
+
+    .rp-status-filter .rp-segment {
+        flex: 1 1 0;
+        justify-content: center;
+        padding: 0 6px;
+    }
+}
+
+/* ── Search: clear button and the "/" hint — jobs.css's ──── */
+.dashboard_toolbar-row .rp-clear-search {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--color-surface-subtle);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+}
+
+.dashboard_toolbar-row .rp-clear-search.is-visible {
+    display: flex;
+}
+
+.dashboard_toolbar-row .rp-clear-search svg {
+    width: 12px;
+    height: 12px;
+    position: static;
+    transform: none;
+}
+
+/* The search icon is positioned by toolbar.css; this keeps the clear button out of that rule */
+.dashboard_toolbar-search-wrap {
+    display: flex;
+    align-items: center;
+}
+
+.rp-kbd {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 1px 6px;
+    border: 1px solid var(--color-border);
+    border-bottom-width: 2px;
+    border-right-width: 2px;
+    border-radius: 5px;
+    background: var(--color-surface-white);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    pointer-events: none;
+}
+
+.dashboard_toolbar-search-wrap:focus-within .rp-kbd,
+.dashboard_toolbar-search-wrap:has(.rp-clear-search.is-visible) .rp-kbd {
+    display: none;
+}
+
+@media (max-width: 767px) {
+    .rp-kbd {
+        display: none;
+    }
+}
+
+/* ── Period ──────────────────────────────────────────────── */
+.rp-period-filter {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+}
+
+.rp-period-btn {
+    gap: 7px;
+    min-width: 0;
+}
+
+.rp-period-btn svg {
+    flex: 0 0 auto;
+    width: 17px;
+    height: 17px;
+}
+
+.rp-period-btn__label {
+    color: var(--color-text-secondary);
+}
+
+.rp-period-btn__value {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.rp-period-btn .rp-period-btn__caret {
+    width: 15px;
+    height: 15px;
+    margin-left: auto;
+    color: var(--color-text-secondary);
+    transition: transform var(--transition-fast);
+}
+
+.rp-period-filter.is-open .rp-period-btn {
+    border-color: var(--color-border-hover);
+    background: var(--color-surface-subtle);
+}
+
+.rp-period-filter.is-open .rp-period-btn__caret {
+    transform: rotate(180deg);
+}
+
+/* A chosen period reads in navy and gets its own clear button, like a filter chip */
+.rp-period-filter.is-set .rp-period-btn {
+    padding-right: 36px;
+    border-color: rgba(11, 38, 62, 0.32);
+    color: var(--color-brand-navy);
+}
+
+.rp-period-filter.is-set .rp-period-btn__value {
+    color: var(--color-brand-navy);
+}
+
+.rp-period-clear {
+    position: absolute;
+    right: 7px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--color-surface-subtle);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.rp-period-clear svg {
+    width: 12px;
+    height: 12px;
+}
+
+.rp-period-clear:hover {
+    background: var(--color-brand-navy);
+    color: var(--color-surface-white);
+}
+
+.rp-period-pop {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: 60;
+    width: 296px;
+    max-width: calc(100vw - 24px);
+    padding: 6px 6px 8px;
+    background: var(--color-surface-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    animation: rp-pop-in 0.16s ease;
+}
+
+.rp-period-pop[hidden] {
+    display: none;
+}
+
+@keyframes rp-pop-in {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.rp-period-pop__list {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.rp-period-opt {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    height: 34px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: var(--radius-xs);
+    background: transparent;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--color-text-primary);
+    text-align: left;
+    cursor: pointer;
+}
+
+.rp-period-opt svg {
+    width: 15px;
+    height: 15px;
+    color: var(--color-brand-navy);
+    opacity: 0;
+}
+
+.rp-period-opt:hover {
+    background: var(--color-surface-inset);
+}
+
+.rp-period-opt.is-active {
+    background: var(--color-surface-subtle);
+    font-weight: 500;
+    color: var(--color-brand-navy);
+}
+
+.rp-period-opt.is-active svg {
+    opacity: 1;
+}
+
+.rp-period-pop__title {
+    margin: 8px 4px 8px;
+    padding: 10px 6px 0;
+    border-top: 1px solid var(--color-border);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+}
+
+.rp-period-years {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 0 10px;
+}
+
+.rp-period-year {
+    height: 28px;
+    padding: 0 11px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    background: var(--color-surface-white);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.rp-period-year:hover {
+    border-color: var(--color-border-hover);
+    background: var(--color-surface-inset);
+}
+
+.rp-period-year.is-active {
+    border-color: var(--color-brand-navy);
+    background: var(--color-brand-navy);
+    color: var(--color-surface-white);
+}
+
+.rp-period-range {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    padding: 0 10px;
+}
+
+.rp-period-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.rp-period-field__label {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+}
+
+/* pagination.css's page-size select, one size up */
+.rp-period-select {
+    width: 100%;
+    height: 34px;
+    padding: 0 28px 0 10px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xs);
+    background: var(--color-surface-white)
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2371717a' viewBox='0 0 256 256'%3E%3Cpath d='M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z'/%3E%3C/svg%3E")
+        no-repeat right 9px center;
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.rp-period-select:hover {
+    border-color: var(--color-border-hover);
+    background-color: var(--color-surface-subtle);
+}
+
+.rp-period-select:focus-visible {
+    border-color: var(--color-brand-gold);
+    box-shadow: var(--focus-ring-gold);
+}
+
+.rp-period-range.is-active .rp-period-select {
+    border-color: rgba(11, 38, 62, 0.32);
+}
+
+.rp-period-apply {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(100% - 20px);
+    height: 34px;
+    margin: 10px 10px 2px;
+    border: 0;
+    border-radius: var(--radius-xs);
+    background: var(--color-brand-navy);
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--color-surface-white);
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.rp-period-apply:hover {
+    background: var(--color-brand-navy-hover);
+}
+
+.rp-period-apply:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-navy);
+}
+
+/* ── Payment status ──────────────────────────────────────── */
+.rp-status-filter {
+    flex: 0 0 auto;
+}
+
+/* The pill's own dot, so a segment and the pills it filters read alike */
+.rp-status-dot {
+    display: inline-flex;
+}
+
+.rp-status-dot .status-dot {
+    width: 6px;
+    height: 6px;
+}
+
+/* Navy, as the badges on the My Jobs tabs */
+.rp-status-filter .rp-segment.is-active .rp-segment-count {
+    background: var(--color-brand-navy);
+}
+
+/* ── Table: jobs.css and invitations.css's chrome ──────────── */
+
+/* #fff odd, #F8F8F8 even — counted over .rp-row only, since every bill is a row plus its panel */
+#new-customized-table tbody tr > td,
+#new-customized-table tbody tr:nth-child(even) > td {
+    background-color: var(--color-surface-white) !important;
+}
+
+#new-customized-table tbody tr:nth-child(even of .rp-row) > td {
+    background-color: var(--color-surface-inset) !important;
+}
+
+#new-customized-table tbody tr.rp-row:hover > td {
+    background-color: var(--color-surface-subtle) !important;
+}
+
+#new-customized-table tbody tr.rp-row.is-expanded > td {
+    background-color: var(--color-surface-subtle) !important;
+    border-bottom-color: transparent;
+    border-bottom-width: 0;
+}
+
+/* The navy bar the open panel carries, so row and panel read as one */
+#new-customized-table tbody tr.rp-row.is-expanded > td:first-child {
+    box-shadow: inset 3px 0 0 var(--color-brand-navy);
+}
+
+#new-customized-table tbody tr.rp-row {
+    cursor: pointer;
+}
+
+tr.rp-subrow:hover {
+    background-color: var(--color-surface-inset) !important;
+}
+
+/* Only Bill No. stays pinned: on a phone two pinned columns would leave no room for the rest */
+#new-customized-table .sticky-col {
+    position: sticky;
+    z-index: 5;
+}
+
+#new-customized-table .col-bill.sticky-col {
+    left: 0;
+}
+
+#new-customized-table thead th.sticky-col {
+    z-index: 11;
+}
+
+/* ── Cells ───────────────────────────────────────────────── */
+.rp-serial {
+    color: var(--color-text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+#new-customized-table td.col-jobs,
+#new-customized-table td.col-amount {
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-id-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rp-expand-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-xs);
+    background: var(--color-surface-inset);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+#new-customized-table tbody tr:nth-child(even of .rp-row) .rp-expand-btn {
+    background-color: var(--color-surface-white);
+}
+
+.rp-expand-btn svg {
+    width: 16px;
+    height: 16px;
+    transition: transform var(--transition-fast);
+}
+
+.rp-expand-btn:hover {
+    background: var(--color-surface-white);
+    color: var(--color-text-primary);
+}
+
+.rp-row.is-expanded .rp-expand-btn svg {
+    transform: rotate(90deg);
+}
+
+.rp-row.is-expanded .rp-expand-btn {
+    background: var(--color-brand-navy) !important;
+    color: var(--color-surface-white) !important;
+}
+
+.rp-job-id {
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--color-link);
+    text-decoration: none;
+}
+
+.rp-job-id:hover {
+    text-decoration: underline;
+}
+
+.rp-jobcount {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    max-width: 100%;
+    min-width: 0;
+}
+
+/* Why a bill is listed when the search hit one of its jobs, not its number */
+.rp-match {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    flex: 0 1 auto;
+    min-width: 0;
+    height: 20px;
+    margin-left: 4px;
+    padding: 0 8px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-subtle);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-brand-navy);
+    white-space: nowrap;
+}
+
+.rp-match__more {
+    color: var(--color-text-secondary);
+}
+
+.rp-mark {
+    padding: 0 1px;
+    border-radius: 3px;
+    background: rgba(149, 128, 73, 0.24);
+    color: inherit;
+}
+
+.rp-dot {
+    display: inline-block;
+    flex: 0 0 auto;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.5;
+}
+
+/* A bill opened from a link elsewhere is marked once, then settles into the open-row colour */
+@keyframes rp-flash {
+    0%,
+    35% {
+        box-shadow: inset 0 0 0 999px rgba(149, 128, 73, 0.2);
+    }
+
+    100% {
+        box-shadow: inset 0 0 0 999px rgba(149, 128, 73, 0);
+    }
+}
+
+@keyframes rp-flash-first {
+    0%,
+    35% {
+        box-shadow: inset 3px 0 0 var(--color-brand-navy), inset 0 0 0 999px rgba(149, 128, 73, 0.2);
+    }
+
+    100% {
+        box-shadow: inset 3px 0 0 var(--color-brand-navy), inset 0 0 0 999px rgba(149, 128, 73, 0);
+    }
+}
+
+#new-customized-table tbody tr.rp-row.is-flash > td {
+    animation: rp-flash 2.2s ease;
+}
+
+#new-customized-table tbody tr.rp-row.is-flash > td:first-child {
+    animation-name: rp-flash-first;
+}
+
+/* ── Sorting icon — templates/partials/_sorting_icon.html, as jobs.css ── */
+.rp-sort {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 5px;
+    color: #c2c0b6;
+    vertical-align: middle;
+}
+
+.rp-sort .sorting-icon {
+    width: 14px;
+    height: 14px;
+}
+
+.sorting-icon .down-triangle-icon,
+.sorting-icon .up-triangle-icon {
+    display: none;
+}
+
+th.is-asc .sorting-icon .order-icon,
+th.is-desc .sorting-icon .order-icon {
+    display: none;
+}
+
+th.is-asc .sorting-icon .up-triangle-icon,
+th.is-desc .sorting-icon .down-triangle-icon {
+    display: inline;
+}
+
+th.is-sorted .rp-sort {
+    color: var(--color-brand-navy);
+}
+
+th.is-sorted .label {
+    color: var(--color-text-primary);
+    font-weight: 600;
+}
+
+#new-customized-table thead th.order_by {
+    cursor: pointer;
+}
+
+#new-customized-table thead th.order_by:hover .label {
+    color: var(--color-text-primary);
+}
+
+#new-customized-table thead th .th-inner {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+
+#new-customized-table thead th.col-amount .th-inner {
+    justify-content: flex-end;
+}
+
+#new-customized-table thead th .label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ── Empty state: jobs.css's ───────────────────────────────── */
+#new-customized-table tbody td.rp-empty-cell {
+    padding: 0 !important;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    border-bottom: 0;
+}
+
+/* Pinned to the visible width, or it centres itself in the full column run */
+#new-customized-table tbody td.rp-empty-cell .rp-empty {
+    position: sticky;
+    left: 0;
+    width: var(--rp-detail-w, 100%);
+}
+
+.rp-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 56px 24px;
+    text-align: center;
+}
+
+.rp-empty__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    margin-bottom: 4px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-subtle);
+    color: var(--color-brand-gold);
+}
+
+.rp-empty__icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.rp-empty__title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.rp-empty__note {
+    max-width: 400px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+}
+
+.rp-empty__action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 30px;
+    margin-top: 6px;
+    padding: 0 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xs);
+    background: var(--color-surface-white);
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    cursor: pointer;
+}
+
+.rp-empty__action svg {
+    width: 13px;
+    height: 13px;
+}
+
+.rp-empty__action:hover {
+    background: var(--color-surface-subtle);
+}
+
+/* ── The open row: invitations.css's panel, holding one bill ─── */
+#new-customized-table tbody tr.rp-subrow > td {
+    padding: 0 !important;
+    background: var(--color-surface-subtle) !important;
+    border-bottom: 1px solid var(--color-border);
+    /* table.css clips and nowraps every cell; the panel must not be */
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    vertical-align: top;
+}
+
+tr.rp-subrow.is-hidden {
+    display: none;
+}
+
+/* Pinned to the visible width (--rp-detail-w, written by JS), so a phone never scrolls to find it */
+.rp-detail {
+    position: sticky;
+    left: 0;
+    width: var(--rp-detail-w, 100%);
+    padding: 14px 16px 18px;
+    box-shadow: inset 3px 0 0 var(--color-brand-navy);
+    animation: rp-detail-in 0.2s ease;
+}
+
+@media (max-width: 767px) {
+    .rp-detail {
+        padding: 10px;
+    }
+}
+
+@keyframes rp-detail-in {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.rp-panel {
+    container: rpPanel / inline-size;
+    background: var(--color-surface-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.rp-panel__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 12px;
+    padding: 12px 18px;
+    background: var(--color-surface-inset);
+    border-bottom: 1px solid var(--color-border);
+    box-shadow: inset 3px 0 0 var(--color-brand-navy);
+}
+
+.rp-panel__mark {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-md);
+    background: var(--color-surface-white);
+    color: var(--color-brand-navy);
+}
+
+.rp-panel__mark svg {
+    width: 17px;
+    height: 17px;
+}
+
+.rp-panel__titles {
+    flex: 1 1 160px;
+    min-width: 0;
+}
+
+.rp-panel__title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.3;
+    color: var(--color-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rp-panel__sub {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 2px 0 0;
+    font-size: 13.5px;
+    line-height: 1.3;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rp-panel__actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+@container rpPanel (max-width: 520px) {
+    .rp-panel__head {
+        padding: 12px 14px;
+    }
+
+    .rp-panel__actions {
+        flex: 1 1 100%;
+    }
+
+    .rp-panel__actions .rp-btn {
+        flex: 1 1 0;
+    }
+}
+
+/* Jobs on the left, the money on the right, once the panel has room for both */
+.rp-panel__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+}
+
+@container rpPanel (min-width: 760px) {
+    .rp-panel__body {
+        grid-template-columns: minmax(0, 1fr) 288px;
+    }
+}
+
+.rp-panel__main {
+    container: rpMain / inline-size;
+    min-width: 0;
+    padding: 14px 18px 16px;
+}
+
+.rp-panel__side {
+    min-width: 0;
+    border-top: 1px solid var(--color-border);
+}
+
+@container rpPanel (min-width: 760px) {
+    .rp-panel__side {
+        border-top: 0;
+        border-left: 1px solid var(--color-border);
+    }
+}
+
+@container rpPanel (max-width: 520px) {
+    .rp-panel__main {
+        padding: 12px 14px 14px;
+    }
+}
+
+.rp-section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 10px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--color-brand-navy);
+}
+
+.rp-section-count {
+    padding: 0 7px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-subtle);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0;
+    color: var(--color-text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── Jobs in the bill ────────────────────────────────────── */
+/* It scrolls on its own past seven rows, so a 40-job bill keeps the panel short */
+.rp-jobs__table {
+    position: relative;
+    max-height: 290px;
+    overflow-y: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    overscroll-behavior: contain;
+}
+
+.rp-jobs__row {
+    display: grid;
+    grid-template-columns: 76px minmax(0, 1fr) 108px 112px;
+    align-items: center;
+    gap: 12px;
+    min-height: 36px;
+    padding: 0 12px;
+    border-top: 1px solid var(--color-border);
+    font-size: 13.5px;
+    color: var(--color-text-primary);
+}
+
+.rp-jobs__row--head {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    min-height: 32px;
+    border-top: 0;
+    background: var(--color-surface-inset);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+}
+
+.rp-jobs__project,
+.rp-jobs__service {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.rp-jobs__service {
+    color: var(--color-text-secondary);
+}
+
+.rp-jobs__amount {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-jobs__row:not(.rp-jobs__row--head) .rp-jobs__amount {
+    font-weight: 500;
+}
+
+.rp-jobs__row.is-hit {
+    background: var(--color-surface-subtle);
+    box-shadow: inset 3px 0 0 var(--color-brand-gold);
+}
+
+@container rpMain (max-width: 480px) {
+    .rp-jobs__row {
+        grid-template-columns: 72px minmax(0, 1fr) 84px;
+        gap: 10px;
+        padding: 0 10px;
+    }
+
+    .rp-jobs__service {
+        display: none;
+    }
+}
+
+/* ── Summary ─────────────────────────────────────────────── */
+.rp-billsum {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px 18px 16px;
+}
+
+.rp-billsum .rp-section-title {
+    margin: 0;
+}
+
+.rp-facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 16px;
+    margin: 0;
+}
+
+.rp-fact {
+    min-width: 0;
+}
+
+.rp-fact dt {
+    margin: 0 0 1px;
+    font-size: 13px;
+    line-height: 1.3;
+    color: var(--color-text-secondary);
+}
+
+.rp-fact dd {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--color-text-primary);
+}
+
+.rp-sum {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    padding-top: 12px;
+    border-top: 1px solid var(--color-border);
+}
+
+.rp-sum__row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 13.5px;
+}
+
+.rp-sum__row dt {
+    min-width: 0;
+    color: var(--color-text-secondary);
+}
+
+.rp-sum__row dd {
+    margin: 0;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.rp-sum__note {
+    margin-left: 4px;
+    font-size: 12px;
+    color: var(--color-text-muted);
+}
+
+.rp-sum__row--total dt {
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.rp-sum__row--total dd {
+    font-family: var(--font-heading);
+    font-size: 17px;
+    color: var(--color-brand-navy);
+}
+
+.rp-sum__unit {
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-weight: 400;
+    color: var(--color-text-secondary);
+}
+
+.rp-sum__usd {
+    margin: -6px 0 0;
+    font-size: 12.5px;
+    text-align: right;
+    color: var(--color-text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── Buttons — one filled navy control per panel ─────────── */
+.rp-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 12px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-xs);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.rp-btn svg {
+    width: 15px;
+    height: 15px;
+}
+
+.rp-btn--primary {
+    background: var(--color-brand-navy);
+    color: var(--color-surface-white);
+}
+
+.rp-btn--primary:hover {
+    background: var(--color-brand-navy-hover);
+}
+
+.rp-btn--ghost {
+    border-color: var(--color-border);
+    background: var(--color-surface-white);
+    color: var(--color-text-primary);
+}
+
+.rp-btn--ghost:hover {
+    border-color: var(--color-border-hover);
+    background: var(--color-surface-subtle);
+}
+
+.rp-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-navy);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rp-detail,
+    .rp-period-pop,
+    .rp-tip,
+    .rp-stat,
+    #new-customized-table tbody tr.rp-row.is-flash > td {
+        animation: none;
+        transition: none;
+    }
+}

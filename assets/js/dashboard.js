@@ -550,7 +550,7 @@
         if (e.type === "invite") return 'New invitation <a href="invitations.html">' + e.job + "</a>";
         if (e.type === "delivered") return "You delivered " + job(e.job);
         if (e.type === "approved") return job(e.job) + " was approved";
-        if (e.type === "paid") return 'Bill <a href="earnings.html">' + e.bill + "</a> was paid · <strong>" + money(e.amount) + " " + esc(RP.USER.currency) + "</strong>";
+        if (e.type === "paid") return 'Bill <a href="earnings.html?bill=' + encodeURIComponent(e.bill) + '">' + e.bill + "</a> was paid · <strong>" + money(e.amount) + " " + esc(RP.USER.currency) + "</strong>";
         if (e.type === "lost") return "Your bid on " + e.job + " went to another resource";
         if (e.type === "declined") return "You declined " + e.job;
         return "";
