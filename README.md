@@ -121,9 +121,9 @@ the Personal details markup ports straight onto the customer profile's styleshee
 shell (`.modal-dialog`, `.modal-content` and the agile.css bridge) is replaced by the preview's
 `.rp-modal` panel — every `.pwd-*` rule is untouched.
 
-`earnings.css` does the same once more: the totals are `dashboard.css`'s `.rp-stat` tiles and the
-table chrome, sort icon, empty state and open row are `jobs.css` and `invitations.css`, all under
-their original class names.
+`earnings.css` does the same once more: the table chrome, sort icon, empty state and open row are
+`jobs.css` and `invitations.css`, all under their original class names. The totals under the
+table are the page's own `.rp-total`.
 
 `variables.css` is a copy too — it is the one file to re-sync if the tokens move.
 
@@ -363,15 +363,24 @@ reach it, as before: the original answers *Not allowed*, and the preview's resou
 | Bill No. | `B-2209`, beside the caret that opens the bill | `invoice.id`, a link to `resource_invoice` |
 | Period | `1 – 30 Sept 2026`, the month and year said once | `from_date – to_date` |
 | Job Count | **New.** The jobs the bill pays for | — |
-| Amount | `1,608.66 NZD`, number first; ≈ USD on hover | `formatVatAndBonusIncludedAMount`, bonus and deduction in |
+| Amount | `NZD 1,608.66`, currency first as on My Jobs and Invitations; ≈ USD on hover | `formatVatAndBonusIncludedAMount`, bonus and deduction in |
 | Payment Status | `Paid` / `Pending`, `status.css`'s pills; the paid or due date on hover | `get_status_display` |
 
-**Totals are tiles above the table**, the dashboard's `.rp-stat`, so the two pages read alike:
-Total Job Count (and the bills it spans), Total Earned (≈ USD) and Total Paid (and what is still
-pending). Tiles rather than a row under the columns: they stay on screen on a phone, where the
-table scrolls sideways, and they do not disappear with a hidden column. They add up **every bill
-the period, status and search let through, on all pages** — the original's `total_earnings` took
-the search into account the same way.
+**Totals close the list**, under the table on the right, where the original's *Total Earnings* line
+sat: Total Job Count (and the bills it spans), Total Earned (≈ USD) and Total Paid (and what is
+still pending), on the table header's grey. Below the table rather than above it, so the page reads
+filters → bills → their total and the bills are the first thing on screen, on a phone too. They sit
+outside the table, so they never scroll sideways or disappear with a hidden column. They add up
+**every bill the period, status and search let through, on all pages** — the original's
+`total_earnings` took the search into account the same way. An empty list hides them. Money reads
+currency first everywhere on the page — the column, the totals and the open bill — so a total
+reads like the figures above it.
+
+**Amount and Payment Status get a gutter**, since a right-aligned figure beside a left-aligned pill
+read as one cell: 28px after the figure and 18px before the pill once the columns reach their set
+widths, 12px and 14px when the screen squeezes them to their minimum — so the table still fits a
+1024px laptop without cutting `NZD 3,610.80`. Header and cells share the padding, so *Amount* ends
+where the figures end and *Payment Status* starts where the pills start.
 
 **Filters sit in the toolbar, beside the search:**
 
@@ -407,7 +416,7 @@ Only the jobs My Jobs still lists open a job page; older job numbers raise a toa
 
 **Narrower screens:** the six columns give back their spare width before the table scrolls, so
 they fit a 1024px laptop with the sidebar open; a column resized by hand is left alone. On a phone
-the tiles go one a row, the status filter takes a row of its own, Bill No. stays pinned while the
+the totals go one a row, the status filter takes a row of its own, Bill No. stays pinned while the
 rest scrolls, and an open bill fits the screen.
 
 ---

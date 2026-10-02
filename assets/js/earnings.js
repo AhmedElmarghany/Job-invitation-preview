@@ -15,7 +15,7 @@
 
     /* min: the narrowest a column goes before the table scrolls instead — its header still whole */
     var COLUMNS = [
-        { key: "col-serial", label: "Serial No.", width: 112, min: 104, fixed: true },
+        { key: "col-serial", label: "Sr No.", width: 112, min: 104, fixed: true },
         { key: "col-bill", label: "Bill No.", width: 140, min: 106, fixed: true, sticky: true, sort: "num" },
         { key: "col-period", label: "Period", width: 200, min: 134, sort: "from" },
         { key: "col-jobs", label: "Job Count", width: 190, min: 126, sort: "jobCount" },
@@ -38,16 +38,16 @@
 
     var TOTALS = [
         {
-            key: "jobs", label: "Total Job Count", icon: "briefcase-business",
-            tip: "Jobs in every bill listed below, on all pages. It follows the period, status and search."
+            key: "jobs", label: "Total Job Count",
+            tip: "Jobs in every bill listed above, on all pages. It follows the period, status and search."
         },
         {
-            key: "earned", label: "Total Earned", icon: "wallet",
-            tip: "What the bills listed below are worth, paid and pending, with bonuses and deductions."
+            key: "earned", label: "Total Earned",
+            tip: "What the bills listed above are worth, paid and pending, with bonuses and deductions."
         },
         {
-            key: "paid", label: "Total Paid", icon: "credit-card-check",
-            tip: "What the paid bills listed below have paid out. The rest is still pending."
+            key: "paid", label: "Total Paid",
+            tip: "What the paid bills listed above have paid out. The rest is still pending."
         }
     ];
 
@@ -350,61 +350,55 @@
 
     /* ── Totals ──────────────────────────────────────────── */
 
-    function tileMarkup(def, t) {
+    /* Money reads currency first, as the Amount column above it does; a count reads number first */
+    function totalMarkup(def, t) {
         var currency = escapeHtml(RP.USER.currency);
-        var value, unit, words;
+        var unit = function (text) {
+            return '<span class="rp-total__unit">' + text + "</span>";
+        };
+        var value, sub;
 
         if (def.key === "jobs") {
-            value = counter(t.jobs, "jobs");
-            unit = plural(t.jobs, "job", "jobs");
-            words = "in <strong>" + counter(t.bills, "bills") + "</strong> " + plural(t.bills, "bill", "bills");
+            value = counter(t.jobs, "jobs") + " " + unit(plural(t.jobs, "job", "jobs"));
+            sub = "in <strong>" + counter(t.bills, "bills") + "</strong> " + plural(t.bills, "bill", "bills");
         } else if (def.key === "earned") {
-            value = counter(t.earned, "earned", 2);
-            unit = currency;
-            words = "≈ " + counter(t.earned * RP.USD_RATE, "earned-usd", 2) + " USD";
+            value = unit(currency) + " " + counter(t.earned, "earned", 2);
+            sub = "≈ USD " + counter(t.earned * RP.USD_RATE, "earned-usd", 2);
         } else {
-            value = counter(t.paid, "paid", 2);
-            unit = currency;
-            words =
+            value = unit(currency) + " " + counter(t.paid, "paid", 2);
+            sub =
                 t.pending > 0.004
-                    ? "<strong>" + counter(t.pending, "pending", 2) + "</strong> " + currency + " pending"
+                    ? currency + " <strong>" + counter(t.pending, "pending", 2) + "</strong> pending"
                     : "Nothing pending";
         }
 
         return (
-            '<section class="rp-stat rp-stat--' +
-            def.key +
-            '" id="total-' +
+            '<section class="rp-total" id="total-' +
             def.key +
             '" aria-labelledby="total-' +
             def.key +
             '-label">' +
-            '<div class="rp-stat__well"><div class="rp-stat__head">' +
-            '<span class="rp-stat__icon" aria-hidden="true">' +
-            icon(def.icon) +
-            "</span>" +
-            '<h2 class="rp-stat__label" id="total-' +
+            '<div class="rp-total__head">' +
+            '<h2 class="rp-total__label" id="total-' +
             def.key +
             '-label">' +
             def.label +
             "</h2>" +
             info(def.tip, "About " + def.label.toLowerCase()) +
             "</div>" +
-            '<p class="rp-stat__value">' +
+            '<p class="rp-total__value">' +
             value +
-            '<span class="rp-stat__unit">' +
-            unit +
-            "</span></p>" +
-            '<p class="rp-stat__words">' +
-            words +
-            "</p></div></section>"
+            "</p>" +
+            '<p class="rp-total__sub">' +
+            sub +
+            "</p></section>"
         );
     }
 
     function renderTotals(list) {
         var t = totalsOf(list);
         els.totals.innerHTML = TOTALS.map(function (def) {
-            return tileMarkup(def, t);
+            return totalMarkup(def, t);
         }).join("");
         countUp(els.totals);
     }
@@ -694,12 +688,12 @@
         },
         "col-amount": function (bill) {
             return (
-                '<span title="≈ ' +
+                '<span title="≈ USD ' +
                 money(bill.amount * RP.USD_RATE) +
-                ' USD"><span class="price-row-value">' +
-                money(bill.amount) +
-                '</span> <span class="price-row-unit">' +
+                '"><span class="price-row-unit">' +
                 escapeHtml(RP.USER.currency) +
+                '</span> <span class="price-row-value">' +
+                money(bill.amount) +
                 "</span></span>"
             );
         },
@@ -907,13 +901,14 @@
             '<dl class="rp-sum">' +
             lines +
             '<div class="rp-sum__row rp-sum__row--total"><dt>Total</dt><dd>' +
-            money(bill.amount) +
-            ' <span class="rp-sum__unit">' +
+            '<span class="rp-sum__unit">' +
             currency +
-            "</span></dd></div></dl>" +
-            '<p class="rp-sum__usd">≈ ' +
+            "</span> " +
+            money(bill.amount) +
+            "</dd></div></dl>" +
+            '<p class="rp-sum__usd">≈ USD ' +
             money(bill.amount * RP.USD_RATE) +
-            " USD</p></div>"
+            "</p></div>"
         );
     }
 
@@ -1514,7 +1509,7 @@
         return bill;
     }
 
-    /* Only as far as needed, so the totals stay in view when the bill is near the top */
+    /* Only as far as needed, so the toolbar stays in view when the bill is near the top */
     function revealLinked(bill) {
         var tr = els.tbody.querySelector('tr.rp-row[data-id="' + bill.id + '"]');
         if (!tr) return;

@@ -1,10 +1,10 @@
 /* ============================================================
    PAGE: My Earnings
-   Totals on top, then the bills. The tiles are dashboard.css's
-   .rp-stat; the table chrome, sort icon, empty state and open
-   row are jobs.css and invitations.css — all rebuilt here under
-   the same names, so this page renders from its own file. New:
-   the period picker, the status filter and the bill panel.
+   The bills, then their totals, as an invoice ends on its total.
+   The table chrome, sort icon, empty state and open row are
+   jobs.css and invitations.css — rebuilt here under the same
+   names, so this page renders from its own file. New: the period
+   picker, the status filter, the totals and the bill panel.
    ============================================================ */
 
 /* min-width: 0 all the way down, or the table never gets its own scrollbar */
@@ -25,89 +25,63 @@
     background: var(--color-surface-white);
 }
 
-/* ── Totals: dashboard.css's tiles, a white tray around a grey well ─── */
+/* ── Totals: under the bills they add up, at the right like the original's Total Earnings ─── */
+/* The table header's grey, so the bills read between two grey bands */
 .rp-totals {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
-    padding: 20px 24px;
-}
-
-.rp-stat {
     display: flex;
-    flex-direction: column;
-    min-width: 0;
-    padding: 12px;
-    background: var(--color-surface-white);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    transition: box-shadow var(--transition-fast);
-}
-
-.rp-stat:hover {
-    box-shadow: var(--shadow-sm);
-}
-
-.rp-stat__well {
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    padding: 16px 16px 18px;
+    width: fit-content;
+    max-width: calc(100% - 20px);
+    margin: 16px 10px 20px auto;
+    padding: 14px 0 15px;
     background: var(--color-surface-inset);
     border-radius: var(--radius-md);
-    box-shadow: inset var(--shadow-sm);
 }
 
-.rp-stat__head {
+/* An empty list has nothing to add up, and its empty state already says so */
+#rp-earnings-table:has(.rp-empty-cell) .rp-totals {
+    display: none;
+}
+
+.rp-total {
+    min-width: 0;
+    padding: 0 24px;
+}
+
+.rp-total + .rp-total {
+    border-left: 1px solid var(--color-border);
+}
+
+.rp-total__head {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 4px;
     min-width: 0;
 }
 
-.rp-stat__icon {
-    flex: 0 0 auto;
-    display: grid;
-    place-items: center;
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
-    background: var(--color-surface-white);
-    color: var(--color-brand-navy);
-}
-
-.rp-stat__icon svg {
-    width: 18px;
-    height: 18px;
-}
-
-.rp-stat__label {
-    min-width: 0;
+.rp-total__label {
     margin: 0;
-    font-size: 14px;
-    font-weight: 400;
+    font-size: 12.5px;
+    font-weight: 500;
     line-height: 1.3;
-    color: var(--color-text-primary);
-    overflow-wrap: anywhere;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
 }
 
 /* Tabular figures, so the count-up does not jitter the width */
-.rp-stat__value {
-    margin: 6px 0 0;
+.rp-total__value {
+    margin: 4px 0 0;
     font-family: var(--font-heading);
-    font-size: 28px;
+    font-size: 20px;
     font-weight: 500;
-    line-height: 1.1;
+    line-height: 1.15;
     letter-spacing: -0.01em;
     color: var(--color-text-primary);
     font-variant-numeric: tabular-nums;
-    overflow-wrap: anywhere;
+    white-space: nowrap;
 }
 
-/* Number first, the unit after — the order the balance settled on */
-.rp-stat__unit {
-    margin-left: 6px;
+/* Grey and in the body face, as the table's .price-row-unit */
+.rp-total__unit {
     font-family: var(--font-body);
     font-size: 13px;
     font-weight: 400;
@@ -115,86 +89,56 @@
     color: var(--color-text-secondary);
 }
 
-.rp-stat__words {
-    margin: 0;
-    font-size: 13px;
+.rp-total__sub {
+    margin: 3px 0 0;
+    font-size: 12.5px;
     color: var(--color-text-secondary);
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
 }
 
-.rp-stat__words strong {
+.rp-total__sub strong {
     font-weight: 500;
     color: var(--color-text-primary);
 }
 
-@container rpEarn (max-width: 980px) {
-    .rp-totals {
-        gap: 12px;
-        padding: 16px;
-    }
-
-    .rp-stat__well {
-        padding: 14px 14px 16px;
-    }
-
-    /* A smaller mark keeps "Total Job Count" on one line beside its info button */
-    .rp-stat__head {
-        gap: 8px;
-    }
-
-    .rp-stat__icon {
-        width: 30px;
-        height: 30px;
-    }
-
-    .rp-stat__icon svg {
-        width: 16px;
-        height: 16px;
-    }
-
-    .rp-stat__label {
-        font-size: 13.5px;
-    }
-
-    .rp-stat__value {
-        font-size: 23px;
-    }
-}
-
-/* One a row on a phone, the figure beside the label, as the dashboard's tiles go */
+/* Phone: full width, one total a row with its figure at the end */
 @container rpEarn (max-width: 640px) {
     .rp-totals {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 10px;
-        padding: 12px;
+        flex-direction: column;
+        width: auto;
+        max-width: none;
+        margin: 12px 12px 16px;
+        padding: 2px 14px;
     }
 
-    .rp-stat {
-        padding: 8px;
-    }
-
-    .rp-stat__well {
+    .rp-total {
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto;
-        grid-template-areas: "head value" "head words";
+        grid-template-areas: "head value" "head sub";
         align-items: center;
-        gap: 2px 12px;
-        padding: 12px 14px;
+        column-gap: 12px;
+        padding: 12px 0;
     }
 
-    .rp-stat__head {
+    .rp-total + .rp-total {
+        border-left: 0;
+        border-top: 1px solid var(--color-border);
+    }
+
+    .rp-total__head {
         grid-area: head;
     }
 
-    .rp-stat__value {
+    .rp-total__value {
         grid-area: value;
         margin: 0;
-        font-size: 21px;
+        font-size: 18px;
         text-align: right;
     }
 
-    .rp-stat__words {
-        grid-area: words;
+    .rp-total__sub {
+        grid-area: sub;
         text-align: right;
     }
 }
@@ -258,7 +202,6 @@
 /* ── Toolbar: search, then the period and status filters ───── */
 .rp-earn-toolbar {
     flex-wrap: wrap;
-    border-top: 1px solid var(--color-border);
 }
 
 .rp-earn-toolbar .dashboard_toolbar-search-wrap {
@@ -694,6 +637,11 @@
 
 /* ── Table: jobs.css and invitations.css's chrome ──────────── */
 
+/* table.css leaves 4rem under the table; here the totals take that place */
+#rp-earnings-table #new-customized-table {
+    margin-bottom: 0;
+}
+
 /* #fff odd, #F8F8F8 even — counted over .rp-row only, since every bill is a row plus its panel */
 #new-customized-table tbody tr > td,
 #new-customized-table tbody tr:nth-child(even) > td {
@@ -750,6 +698,29 @@ tr.rp-subrow:hover {
 #new-customized-table td.col-jobs,
 #new-customized-table td.col-amount {
     font-variant-numeric: tabular-nums;
+}
+
+/* Right-aligned figures beside left-aligned pills read as one cell; header and cell share this gutter */
+#new-customized-table thead th.col-amount,
+#new-customized-table tbody td.col-amount {
+    padding-right: 12px !important;
+}
+
+#new-customized-table tbody td.col-status {
+    padding-left: 14px !important;
+}
+
+/* The full gutter only once the columns reach their set widths; at their narrowest it would cut the figure */
+@container rpEarn (min-width: 1002px) {
+    #new-customized-table thead th.col-amount,
+    #new-customized-table tbody td.col-amount {
+        padding-right: 28px !important;
+    }
+
+    #new-customized-table thead th.col-status,
+    #new-customized-table tbody td.col-status {
+        padding-left: 18px !important;
+    }
 }
 
 .rp-id-cell {
@@ -1441,7 +1412,6 @@ tr.rp-subrow.is-hidden {
     .rp-detail,
     .rp-period-pop,
     .rp-tip,
-    .rp-stat,
     #new-customized-table tbody tr.rp-row.is-flash > td {
         animation: none;
         transition: none;
