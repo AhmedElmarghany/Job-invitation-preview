@@ -121,9 +121,9 @@ the Personal details markup ports straight onto the customer profile's styleshee
 shell (`.modal-dialog`, `.modal-content` and the agile.css bridge) is replaced by the preview's
 `.rp-modal` panel — every `.pwd-*` rule is untouched.
 
-`earnings.css` does the same once more: the table chrome, sort icon, empty state and open row are
-`jobs.css` and `invitations.css`, all under their original class names. The totals under the
-table are the page's own `.rp-total`.
+`earnings.css` does the same once more: the totals are `dashboard.css`'s `.rp-stat` tiles and the
+table chrome, sort icon, empty state and open row are `jobs.css` and `invitations.css`, all under
+their original class names.
 
 `variables.css` is a copy too — it is the one file to re-sync if the tokens move.
 
@@ -359,35 +359,41 @@ reach it, as before: the original answers *Not allowed*, and the preview's resou
 
 | Column | Shows | In the original |
 | --- | --- | --- |
-| Serial No. | The row's place in the list, counted across pages | `Sr.No` — `forloop.counter`, which restarted on every page |
+| Sr No. | The row's place in the list, counted across pages | `Sr.No` — `forloop.counter`, which restarted on every page |
 | Bill No. | `B-2209`, beside the caret that opens the bill | `invoice.id`, a link to `resource_invoice` |
-| Period | `1 – 30 Sept 2026`, the month and year said once | `from_date – to_date` |
+| Period | `1 Sept 2026 – 30 Sept 2026`, both dates in full | `from_date – to_date` |
 | Job Count | **New.** The jobs the bill pays for | — |
 | Amount | `NZD 1,608.66`, currency first as on My Jobs and Invitations; ≈ USD on hover | `formatVatAndBonusIncludedAMount`, bonus and deduction in |
-| Payment Status | `Paid` / `Pending`, `status.css`'s pills; the paid or due date on hover | `get_status_display` |
+| Payment Status | `Pending` in `status.css`'s orange `.status-processing`, `Paid` in `.status-paid`; the paid or due date on hover | `get_status_display` |
 
-**Totals close the list**, under the table on the right, where the original's *Total Earnings* line
-sat: Total Job Count (and the bills it spans), Total Earned (≈ USD) and Total Paid (and what is
-still pending), on the table header's grey. Below the table rather than above it, so the page reads
-filters → bills → their total and the bills are the first thing on screen, on a phone too. They sit
-outside the table, so they never scroll sideways or disappear with a hidden column. They add up
-**every bill the period, status and search let through, on all pages** — the original's
-`total_earnings` took the search into account the same way. An empty list hides them. Money reads
-currency first everywhere on the page — the column, the totals and the open bill — so a total
-reads like the figures above it.
+`.status-pending` is not used for bills: its brown stays with the job page's *Waiting for files* and
+the account page's *Pending verification*.
+
+**Totals close the list**, under the table where the original's *Total Earnings* line sat: the
+dashboard's `.rp-stat` tiles — Total Job Count (and the bills it spans), Total Earned (≈ USD) and
+Total Paid (and what is still pending) — in a centred row no wider than three tiles (300px each),
+rather than across the page. Below the table rather than above it, so the page reads filters →
+bills → their total and the bills are the first thing on screen, on a phone too. They sit outside
+the table, so they never scroll sideways or disappear with a hidden column. They add up **every
+bill the period, status and search let through, on all pages** — the original's `total_earnings`
+took the search into account the same way. An empty list hides them. The tiles read value then
+unit, as on the dashboard (`106,421.11 NZD`); the Amount column and the open bill lead with the
+currency (`NZD 1,608.66`).
 
 **Amount and Payment Status get a gutter**, since a right-aligned figure beside a left-aligned pill
 read as one cell: 28px after the figure and 18px before the pill once the columns reach their set
-widths, 12px and 14px when the screen squeezes them to their minimum — so the table still fits a
-1024px laptop without cutting `NZD 3,610.80`. Header and cells share the padding, so *Amount* ends
-where the figures end and *Payment Status* starts where the pills start.
+widths, 12px and 14px when the screen squeezes them to their minimum, so `NZD 3,610.80` is never
+cut. Header and cells share the padding, so *Amount* ends where the figures end and *Payment
+Status* starts where the pills start.
 
-**Filters sit in the toolbar, beside the search:**
+**The toolbar** runs search → payment status → period → Columns:
 
-- **Period** — All time, Last 3 / 6 / 12 months, a calendar year, or a custom range of months. A
-  chosen period turns the button navy and gives it its own ×.
-- **Payment status** — All / Pending / Paid, `base.css`'s segmented control, each with a count of
-  what it would show and the pill's own dot.
+- **Payment status**, beside the search — All / Pending / Paid, `base.css`'s segmented control.
+  Pending and Paid carry the pill's own dot; only Pending carries a count, since it is the one still
+  waiting on money.
+- **Period**, beside Columns — All time, Last 3 / 6 / 12 months, a calendar year, or a custom range
+  of months. A chosen period turns the button navy and gives it its own red ×. The picker opens
+  leftwards, since the button sits at the end of the row.
 
 **Search takes a bill number or a job number** — `B-2209`, `2209`, `J-47894` or `47894`. A bill
 found through one of its jobs carries a chip naming that job, and the matching digits are marked.
@@ -415,9 +421,12 @@ the monthly run in `celery_tasks/bills.py` does:
 Only the jobs My Jobs still lists open a job page; older job numbers raise a toast.
 
 **Narrower screens:** the six columns give back their spare width before the table scrolls, so
-they fit a 1024px laptop with the sidebar open; a column resized by hand is left alone. On a phone
-the totals go one a row, the status filter takes a row of its own, Bill No. stays pinned while the
-rest scrolls, and an open bill fits the screen.
+they fit from about 1070px with the sidebar open (1024px with it collapsed) — the full-date period
+made its column ~70px wider; below that the table scrolls sideways with Bill No. pinned. A column
+resized by hand is left alone. On a phone the tiles go one a row, the status filter takes a row of
+its own and the period shares the next with Columns, Bill No. stays pinned while the rest
+scrolls, and an open bill fits the screen — its title and period take the first row, the pill
+joins the buttons under them.
 
 ---
 

@@ -13,14 +13,14 @@
     var icon = RP.icon;
     var LOCALE = "en-NZ";
 
-    /* min: the narrowest a column goes before the table scrolls instead — its header still whole */
+    /* min: the narrowest a column goes before the table scrolls instead — its header and longest value still whole */
     var COLUMNS = [
-        { key: "col-serial", label: "Sr No.", width: 112, min: 104, fixed: true },
-        { key: "col-bill", label: "Bill No.", width: 140, min: 106, fixed: true, sticky: true, sort: "num" },
-        { key: "col-period", label: "Period", width: 200, min: 134, sort: "from" },
-        { key: "col-jobs", label: "Job Count", width: 190, min: 126, sort: "jobCount" },
+        { key: "col-serial", label: "Sr No.", width: 84, min: 78, fixed: true },
+        { key: "col-bill", label: "Bill No.", width: 140, min: 104, fixed: true, sticky: true, sort: "num" },
+        { key: "col-period", label: "Period", width: 210, min: 204, sort: "from" },
+        { key: "col-jobs", label: "Job Count", width: 190, min: 124, sort: "jobCount" },
         { key: "col-amount", label: "Amount", width: 160, min: 114, sort: "amount", align: "right" },
-        { key: "col-status", label: "Payment Status", width: 180, min: 164, sort: "rank" }
+        { key: "col-status", label: "Payment Status", width: 180, min: 162, sort: "rank" }
     ];
 
     var PRESETS = [
@@ -38,15 +38,15 @@
 
     var TOTALS = [
         {
-            key: "jobs", label: "Total Job Count",
+            key: "jobs", label: "Total Job Count", icon: "briefcase-business",
             tip: "Jobs in every bill listed above, on all pages. It follows the period, status and search."
         },
         {
-            key: "earned", label: "Total Earned",
+            key: "earned", label: "Total Earned", icon: "wallet",
             tip: "What the bills listed above are worth, paid and pending, with bonuses and deductions."
         },
         {
-            key: "paid", label: "Total Paid",
+            key: "paid", label: "Total Paid", icon: "credit-card-check",
             tip: "What the paid bills listed above have paid out. The rest is still pending."
         }
     ];
@@ -100,11 +100,9 @@
         return monthShort(date) + " " + date.getFullYear();
     }
 
-    /* The month and year are said once unless the period crosses them: "1 – 30 Sep 2026" */
+    /* Both dates in full, "1 Feb 2025 – 28 Feb 2025": a bare "1 – 31 Aug 2026" read as confusing */
     function fmtPeriod(from, to) {
-        if (from.getFullYear() !== to.getFullYear()) return fmtDate(from) + " – " + fmtDate(to);
-        if (from.getMonth() !== to.getMonth()) return from.getDate() + " " + monthShort(from) + " – " + fmtDate(to);
-        return from.getDate() + " – " + fmtDate(to);
+        return fmtDate(from) + " – " + fmtDate(to);
     }
 
     function escapeHtml(value) {
@@ -350,55 +348,60 @@
 
     /* ── Totals ──────────────────────────────────────────── */
 
-    /* Money reads currency first, as the Amount column above it does; a count reads number first */
-    function totalMarkup(def, t) {
+    /* The dashboard's tile, value then unit; only the Amount column leads with the currency */
+    function tileMarkup(def, t) {
         var currency = escapeHtml(RP.USER.currency);
         var unit = function (text) {
-            return '<span class="rp-total__unit">' + text + "</span>";
+            return '<span class="rp-stat__unit">' + text + "</span>";
         };
-        var value, sub;
+        var value, words;
 
         if (def.key === "jobs") {
-            value = counter(t.jobs, "jobs") + " " + unit(plural(t.jobs, "job", "jobs"));
-            sub = "in <strong>" + counter(t.bills, "bills") + "</strong> " + plural(t.bills, "bill", "bills");
+            value = counter(t.jobs, "jobs") + unit(plural(t.jobs, "job", "jobs"));
+            words = "in <strong>" + counter(t.bills, "bills") + "</strong> " + plural(t.bills, "bill", "bills");
         } else if (def.key === "earned") {
-            value = unit(currency) + " " + counter(t.earned, "earned", 2);
-            sub = "≈ USD " + counter(t.earned * RP.USD_RATE, "earned-usd", 2);
+            value = counter(t.earned, "earned", 2) + unit(currency);
+            words = "≈ " + counter(t.earned * RP.USD_RATE, "earned-usd", 2) + " USD";
         } else {
-            value = unit(currency) + " " + counter(t.paid, "paid", 2);
-            sub =
+            value = counter(t.paid, "paid", 2) + unit(currency);
+            words =
                 t.pending > 0.004
-                    ? currency + " <strong>" + counter(t.pending, "pending", 2) + "</strong> pending"
+                    ? "<strong>" + counter(t.pending, "pending", 2) + "</strong> " + currency + " pending"
                     : "Nothing pending";
         }
 
         return (
-            '<section class="rp-total" id="total-' +
+            '<section class="rp-stat rp-stat--' +
+            def.key +
+            '" id="total-' +
             def.key +
             '" aria-labelledby="total-' +
             def.key +
             '-label">' +
-            '<div class="rp-total__head">' +
-            '<h2 class="rp-total__label" id="total-' +
+            '<div class="rp-stat__well"><div class="rp-stat__head">' +
+            '<span class="rp-stat__icon" aria-hidden="true">' +
+            icon(def.icon) +
+            "</span>" +
+            '<h2 class="rp-stat__label" id="total-' +
             def.key +
             '-label">' +
             def.label +
             "</h2>" +
             info(def.tip, "About " + def.label.toLowerCase()) +
             "</div>" +
-            '<p class="rp-total__value">' +
+            '<p class="rp-stat__value">' +
             value +
             "</p>" +
-            '<p class="rp-total__sub">' +
-            sub +
-            "</p></section>"
+            '<p class="rp-stat__words">' +
+            words +
+            "</p></div></section>"
         );
     }
 
     function renderTotals(list) {
         var t = totalsOf(list);
         els.totals.innerHTML = TOTALS.map(function (def) {
-            return totalMarkup(def, t);
+            return tileMarkup(def, t);
         }).join("");
         countUp(els.totals);
     }
@@ -467,9 +470,9 @@
                       RP.BILL_STATUS[status.key].pill +
                       '" aria-hidden="true"><span class="status-dot"></span></span>') +
                 status.label +
-                '<span class="rp-segment-count">' +
-                count[status.key] +
-                "</span></button>"
+                /* Only Pending carries a number: it is the one still waiting on money */
+                (status.key === "pending" ? '<span class="rp-segment-count">' + count.pending + "</span>" : "") +
+                "</button>"
             );
         }).join("");
 
@@ -917,7 +920,7 @@
             '<div class="rp-detail"><div class="rp-panel">' +
             '<div class="rp-panel__head">' +
             '<span class="rp-panel__mark" aria-hidden="true">' +
-            icon("receipt") +
+            icon("receipt-filled") +
             "</span>" +
             '<div class="rp-panel__titles">' +
             '<p class="rp-panel__title">Bill ' +

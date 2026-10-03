@@ -2165,8 +2165,9 @@
         return bills;
     })();
 
+    /* A pending bill wears the orange of status.css, not .status-pending's brown, which jobs and certificates keep */
     RP.BILL_STATUS = {
-        pending: { label: "Pending", pill: "status-pending" },
+        pending: { label: "Pending", pill: "status-processing" },
         paid: { label: "Paid", pill: "status-paid" }
     };
 

@@ -47,17 +47,19 @@
 
         <div class="dashboard_toolbar-divider rp-earn-toolbar__divider"></div>
 
-        <div class="rp-earn-filters">
-          <div class="rp-period-filter" id="rpPeriod"></div>
-          <div class="rp-segmented rp-status-filter" id="rpStatus" role="group" aria-label="Filter by payment status"></div>
-        </div>
+        <div class="rp-segmented rp-status-filter" id="rpStatus" role="group" aria-label="Filter by payment status"></div>
 
         <div class="dashboard_toolbar-divider rp-earn-toolbar__divider"></div>
 
-        <button class="dashboard_toolbar-btn" id="rpColumnsBtn" type="button" title="Choose columns">
-          <span data-rp-icon="columns"></span>
-          <span class="text-label">Columns</span>
-        </button>
+        <!-- The period sits with Columns, at the end of the row -->
+        <div class="rp-earn-tools">
+          <div class="rp-period-filter" id="rpPeriod"></div>
+
+          <button class="dashboard_toolbar-btn" id="rpColumnsBtn" type="button" title="Choose columns">
+            <span data-rp-icon="columns"></span>
+            <span class="text-label">Columns</span>
+          </button>
+        </div>
       </div>
 
       <!-- Table -->
