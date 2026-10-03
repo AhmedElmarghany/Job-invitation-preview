@@ -577,7 +577,7 @@
             '<div class="rp-ai' +
             (status === "completed" ? "" : " rp-ai--" + status) +
             '"><span class="rp-ai__mark">' +
-            icon("sparkles") +
+            icon("ai-file") +
             '</span><div class="rp-ai__text"><p class="rp-ai__name" title="' +
             esc(file.name) +
             '">' +
