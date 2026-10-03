@@ -968,6 +968,148 @@
     }
 }
 
+/* ── AI translation ──────────────────────────────────────── */
+/* A file row raised a step: the navy edge and filled mark set it apart from Files */
+.rp-ai {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-inset);
+    box-shadow: inset 3px 0 0 var(--color-brand-navy);
+}
+
+.rp-ai + .rp-ai {
+    margin-top: 8px;
+}
+
+.rp-ai__mark {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: var(--radius-md);
+    background: var(--color-brand-navy);
+    color: var(--color-surface-white);
+}
+
+.rp-ai__mark svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Not ready yet, so the mark steps back to the plain file icon */
+.rp-ai--processing .rp-ai__mark,
+.rp-ai--error .rp-ai__mark {
+    background: var(--color-surface-white);
+    color: var(--color-brand-navy);
+}
+
+.rp-ai__text {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.rp-ai__name {
+    margin: 0;
+    font-size: 14.5px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rp-ai__meta {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 3px 0 0;
+    font-size: 12.5px;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+}
+
+.rp-ai__actions {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rp-ai__actions .rp-button--icon {
+    width: 32px;
+    padding: 0;
+}
+
+.rp-ai__progress {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 190px;
+}
+
+.rp-ai__pct {
+    font-size: 12.5px;
+    color: var(--color-text-secondary);
+}
+
+.rp-ai__pct strong {
+    font-weight: 500;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-ai__progress .rp-bar > span {
+    transition: width 0.6s ease;
+}
+
+.rp-ai__failed {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: var(--radius-full);
+    background: var(--color-status-danger-bg);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--color-status-danger);
+}
+
+.rp-ai__failed svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* Below this the actions take their own row, Compare stretching beside Download */
+@container rpCard (max-width: 480px) {
+    .rp-ai {
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 12px 14px;
+    }
+
+    /* A zero basis keeps the name beside its mark instead of wrapping under it */
+    .rp-ai__text {
+        flex-basis: 0;
+    }
+
+    .rp-ai__actions {
+        flex: 1 1 100%;
+    }
+
+    .rp-ai__actions .rp-button--primary {
+        flex: 1 1 auto;
+    }
+
+    .rp-ai__progress {
+        width: 100%;
+    }
+}
+
 /* ── Instructions ────────────────────────────────────────── */
 .rp-instr {
     display: flex;

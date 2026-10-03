@@ -185,7 +185,8 @@ makes and gives each one a place:
 | --- | --- | --- |
 | Overview | Six steps — Assigned, In progress, Delivered, Approved, Billed, Settled — then the facts | The facts table; the steps are new |
 | Instructions | Comments from the project manager and from the customer | The two comment rows |
-| Files | *To work on*: source, original, template, brief. *For reference*: reference, pre-translated, AI translation | Template / Original / Source / Pre-Translated / AI Translation / Reference rows |
+| Files | *To work on*: source, original, template, brief. *For reference*: reference, pre-translated | Template / Original / Source / Pre-Translated / Reference rows |
+| AI translation | Its own section and tab: the file, its pair and size, **Compare** (source and AI output side by side) and download; while it is generated, its progress in place of the buttons | The AI Translation row, `ai_translation_cell.html` |
 | Glossaries | Name with its ID (`#150`), client or public, term count, the pair in full ("English → Arabic"), View terms and CSV | Glossaries card, per-language services only |
 | Delivery | The previous job's checklist to verify, this job's checklist, the upload; afterwards the delivered files and the submitted checklist | Delivery and Completed files cards |
 | Chat | The job's thread with the project manager | `chat/order_and_job_chat.html` |
@@ -204,7 +205,8 @@ The status decides the page, the way `section_2.html` does:
 
 Two more worth opening: `J-47953` is DTP after a Translation job — the client's original, the
 previous resource's delivery as the source, and their checklist to verify. `J-47982` has an AI
-translation: Compare opens the source and the AI output side by side.
+translation: Compare opens the source and the AI output side by side. On `J-47607` it is still being
+generated — the bar fills on its own and Compare takes its place, as the real page's status polling does.
 
 The upload keeps the original rule — locked until every checklist item is answered, Done or
 N/A. The Verified ticks on the previous job's list do not gate it, as before. Colours follow the
@@ -516,11 +518,15 @@ one white card with a hairline border, an inset head carrying a navy rule, small
 section titles, label-over-value rows, and a single filled navy control per decision.
 **Navy is the primary**; gold is left for accents only — the file tags and the focus rings.
 
-It is built to fit a laptop. The whole panel lands at roughly 330px for an invitation, 355px for a
+It is built to fit a laptop. The whole panel lands at roughly 330px for an invitation, 360px for a
 bid request and 425px for an interpreting job. Two things keep it there: the identity moves into
 the head so the fact grid does not repeat it, and Files sits beside Instructions instead of under
 it. Both column splits are **container queries** on the panel's own width, not media queries —
 opening or collapsing the sidebar moves that line by 184px, which a viewport query cannot see.
+
+On a bid request the bid leads the decision side: *Your bid* with the countdown, the price field
+and **Submit bid**, then *Not interested*. The suggested range is only a reference, so it is one quiet
+line at the bottom — label and value on one row, like the Total on an Earnings bill.
 
 ## Keyboard
 

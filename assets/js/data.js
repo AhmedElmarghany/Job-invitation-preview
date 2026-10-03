@@ -1685,6 +1685,7 @@
         var code = LANG_CODE[job.target] || "xx";
         var work = [];
         var reference = [];
+        var ai = [];
 
         if (job.service === "Interpreting") {
             work.push({ kind: "brief", name: "appointment-brief.pdf", size: size(id, 60, 180), tag: "Brief", hint: "Venue, timing and who you will interpret for" });
@@ -1719,16 +1720,16 @@
             if (id % 5 === 1) {
                 reference.push({ kind: "pretranslated", name: base + "-pretranslated.docx", size: size(id + 2, 150, 700), tag: "Pre-translated", hint: "Machine pre-translation — review it before you rely on it" });
             }
+            /* Its own list, as section_2.html keeps ai_file apart from ref_files; only open work can still be generating */
             if (id % 3 === 0 || id % 5 === 2) {
-                reference.push({
+                ai.push({
                     kind: "ai", name: base + "-ai-" + code + ".docx", size: size(id + 4, 150, 700), tag: "AI translation",
-                    hint: "Compare it side by side with the source",
-                    ai: id % 7 === 0 ? { status: "processing", progress: 64 } : { status: "completed" }
+                    ai: id % 7 === 0 && job.tab !== "completed" ? { status: "processing", progress: 64 } : { status: "completed" }
                 });
             }
         }
 
-        return { work: work, reference: reference };
+        return { work: work, reference: reference, ai: ai };
     }
 
     function checklistFor(service, answered, seed) {

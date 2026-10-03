@@ -263,6 +263,7 @@
             { id: "overview", label: "Overview", icon: "info" },
             d.pmNote || d.customerNote ? { id: "instructions", label: "Instructions", icon: "list-todo" } : null,
             { id: "files", label: "Files", icon: "folder", count: allFiles().length },
+            d.files.ai.length ? { id: "ai", label: "AI translation", icon: "sparkles" } : null,
             d.glossaries.length ? { id: "glossaries", label: "Glossaries", icon: "book-marked", count: d.glossaries.length } : null,
             { id: "delivery", label: "Delivery", icon: "upload" },
             { id: "chat", label: "Chat", icon: "messages", count: d.chat.length }
@@ -524,6 +525,98 @@
             fileGroup("For reference", d.files.reference, "reference") +
             "</div></section>"
         );
+    }
+
+    /* A section of its own, not a line under For reference: for most jobs it is the draft the work starts from */
+    function aiCard() {
+        if (!d.files.ai.length) return "";
+
+        return (
+            '<section class="rp-card" id="ai">' +
+            cardHead("sparkles", "AI translation") +
+            '<div class="rp-card__body">' +
+            d.files.ai.map(aiItem).join("") +
+            "</div></section>"
+        );
+    }
+
+    function aiItem(file, i) {
+        var status = file.ai ? file.ai.status : "completed";
+        var ref = "ai:" + i;
+        var actions;
+
+        if (status === "processing") {
+            actions =
+                '<div class="rp-ai__progress" data-ai-progress="' +
+                i +
+                '"><span class="rp-ai__pct">Generating · <strong>' +
+                file.ai.progress +
+                "%</strong></span>" +
+                '<span class="rp-bar"><span style="width:' +
+                file.ai.progress +
+                '%"></span></span></div>';
+        } else if (status === "error") {
+            actions = '<span class="rp-ai__failed">' + icon("circle-alert") + "Could not be generated</span>";
+        } else {
+            actions =
+                '<button class="rp-button rp-button--primary rp-button--sm" type="button" data-act="view" data-file="' +
+                ref +
+                '" title="Open it side by side with the source">' +
+                icon("columns-2") +
+                "Compare</button>" +
+                '<button class="rp-button rp-button--outline rp-button--sm rp-button--icon" type="button" data-act="download" data-file="' +
+                ref +
+                '" aria-label="Download ' +
+                esc(file.name) +
+                '" title="Download">' +
+                icon("download") +
+                "</button>";
+        }
+
+        return (
+            '<div class="rp-ai' +
+            (status === "completed" ? "" : " rp-ai--" + status) +
+            '"><span class="rp-ai__mark">' +
+            icon("sparkles") +
+            '</span><div class="rp-ai__text"><p class="rp-ai__name" title="' +
+            esc(file.name) +
+            '">' +
+            esc(file.name) +
+            '</p><p class="rp-ai__meta">' +
+            pair() +
+            (file.size ? dot() + file.size : "") +
+            '</p></div><div class="rp-ai__actions">' +
+            actions +
+            "</div></div>"
+        );
+    }
+
+    /* The real page polls ai_translation_status; here the bar fills on its own, then Compare appears */
+    function watchGeneration() {
+        var pending = d.files.ai.filter(function (file) {
+            return file.ai && file.ai.status === "processing";
+        });
+        if (!pending.length) return;
+
+        var timer = global.setInterval(function () {
+            pending.forEach(function (file) {
+                file.ai.progress = Math.min(100, file.ai.progress + 3 + Math.floor(Math.random() * 4));
+                var bar = document.querySelector('[data-ai-progress="' + d.files.ai.indexOf(file) + '"]');
+                if (bar) {
+                    bar.querySelector("strong").textContent = file.ai.progress + "%";
+                    bar.querySelector(".rp-bar > span").style.width = file.ai.progress + "%";
+                }
+                if (file.ai.progress === 100) file.ai.status = "completed";
+            });
+
+            if (pending.every(function (file) {
+                return file.ai.status === "completed";
+            })) {
+                global.clearInterval(timer);
+                refresh("ai", aiCard());
+                RP.toast("The AI translation is ready to compare with the source.", "success");
+            }
+        }, 1500);
     }
 
     function glossariesCard() {
@@ -1157,6 +1250,7 @@
             overviewCard() +
             instructionsCard() +
             filesCard() +
+            aiCard() +
             glossariesCard() +
             deliveryCard() +
             chatCard() +
@@ -1599,6 +1693,7 @@
 
         d = RP.jobDetail(job);
         renderAll();
+        watchGeneration();
 
         var hash = global.location.hash.slice(1);
         if (hash && document.getElementById(hash)) {

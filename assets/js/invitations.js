@@ -550,26 +550,40 @@
         );
     }
 
+    /* The bid is the decision, so it leads; the suggested range is only a reference line under it */
+    function bidCard(row) {
+        return (
+            '<div class="rp-offer rp-offer--bid">' +
+            '<div class="rp-offer__head">' +
+            '<span class="rp-offer__label">Your bid</span>' +
+            countdownMarkup(row) +
+            "</div>" +
+            paymentAlert(row) +
+            offerActions(row) +
+            '<dl class="rp-offer__lines">' +
+            '<div class="rp-offer__line"><dt>Suggested range</dt><dd>' +
+            row.currencyCode +
+            " " +
+            money(row.bid.suggestedMin) +
+            " – " +
+            money(row.bid.suggestedMax) +
+            "</dd></div></dl></div>"
+        );
+    }
+
     function offerCard(row) {
+        if (row.status === "new_bid") return bidCard(row);
+
         var head =
-            row.amount == null
-                ? '<span class="rp-offer__label">Suggested range</span>' +
-                  '<p class="rp-offer__amount">' +
-                  row.currencyCode +
-                  " " +
-                  money(row.bid.suggestedMin) +
-                  "–" +
-                  money(row.bid.suggestedMax) +
-                  "</p>"
-                : '<span class="rp-offer__label">' +
-                  (row.status === "bid_sent" ? "Your bid" : "Your payout") +
-                  "</span>" +
-                  '<p class="rp-offer__amount">' +
-                  row.currencyCode +
-                  " " +
-                  money(row.amount) +
-                  (row.usd ? '<span class="rp-offer__usd">≈ USD ' + money(row.usd) + "</span>" : "") +
-                  "</p>";
+            '<span class="rp-offer__label">' +
+            (row.status === "bid_sent" ? "Your bid" : "Your payout") +
+            "</span>" +
+            '<p class="rp-offer__amount">' +
+            row.currencyCode +
+            " " +
+            money(row.amount) +
+            (row.usd ? '<span class="rp-offer__usd">≈ USD ' + money(row.usd) + "</span>" : "") +
+            "</p>";
 
         return (
             '<div class="rp-offer">' +

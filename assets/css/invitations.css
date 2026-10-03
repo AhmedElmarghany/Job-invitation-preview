@@ -1069,6 +1069,87 @@ button.rp-file:focus-visible .rp-file__dl {
     text-underline-offset: 2px;
 }
 
+/* ── Bid request: the bid leads, the suggested range trails as a reference line ── */
+.rp-offer__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 22px;
+}
+
+.rp-offer__head .rp-offer__label {
+    flex: 1 1 auto;
+}
+
+.rp-offer__head .rp-countdown {
+    margin: 0;
+}
+
+.rp-offer--bid .rp-bid {
+    grid-template-columns: minmax(0, 1fr);
+    margin: 10px 0 12px;
+    padding-top: 0;
+}
+
+/* The one field that matters here, so it is white, bordered and set in the panel's figure face */
+.rp-offer--bid .rp-bid__field {
+    height: 46px;
+    padding: 0 14px;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface-white);
+}
+
+.rp-offer--bid .rp-bid__field:focus-within {
+    border-color: var(--color-brand-gold);
+}
+
+.rp-offer--bid .rp-bid__prefix {
+    font-size: 12.5px;
+}
+
+.rp-offer--bid .rp-bid__field input {
+    font-family: var(--font-heading);
+    font-size: 17px;
+    color: var(--color-brand-navy);
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-offer--bid .rp-cta--primary {
+    height: 42px;
+}
+
+/* Label and value on one line, as the Total on an Earnings bill */
+.rp-offer__lines {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: auto 0 0;
+    padding-top: 12px;
+    border-top: 1px solid var(--color-border);
+}
+
+.rp-offer__line {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 13px;
+}
+
+.rp-offer__line dt {
+    min-width: 0;
+    color: var(--color-text-secondary);
+}
+
+.rp-offer__line dd {
+    margin: 0;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
 /* ── Resolved states ─────────────────────────────────────── */
 .rp-resolved {
     display: flex;
