@@ -288,10 +288,22 @@ entry opens it, and its head links back to User Account. It is built like User A
 sticky jump tabs with a scroll-spy, cards on the left and a sticky aside that stacks below ~1100px
 of content width (Needs your attention first, At a glance last).
 
-The head keeps User Account's photo (same photo dialog), name and ID chip. **Native language** and
-**Joining date** are read-only facts beside the name, label over value, not the old form fields —
-a resource could change neither. The verified mark, *Freelancer* and *Company preferred* (bid
-requests reach them first; it was a switch the resource could see) sit on the name.
+The head has two tiers. The first is who: User Account's photo (same photo dialog) and name, the
+verified mark, *Freelancer*, the ID chip and *Company preferred* (bid requests reach them first; it
+was a switch the resource could see), with the User Account link at the end — on a phone, its icon
+alone. The second is one inset band of four read-only facts, label over value, never form fields:
+
+| Fact | Shows | Comes from |
+| --- | --- | --- |
+| Availability | The topbar pill's status and colour; **Change** opens the topbar's dropdown | `Translator.work_status` |
+| Native language | Arabic | `native_language`, set by staff |
+| Preferred currency | `USD via Wise`; *Pending verification* in amber while the default method is unverified | The default verified payment method |
+| Joining date | 8 Mar 2021 | `date_joined` |
+
+Availability leads because it is the one the resource changes and the one that decides whether
+invitations arrive. Four columns on a wide head, two by two from 760px of head width down. The
+facts repaint when a payment method becomes the default, so the band, the Payment method card and
+the attention list never disagree; At a glance no longer repeats the currency.
 
 | Section | Holds | In the original |
 | --- | --- | --- |
@@ -300,7 +312,7 @@ requests reach them first; it was a switch the resource could see) sit on the na
 | Billing details | The address as label over value, or *Same as your primary address* linking to User Account; Edit opens the form; Tax read-only | `resource/billing_details.html` |
 | Payment method | A card per method: the default framed in navy, Verified or Pending verification, Make default; a method not added yet is a dashed row | `resource/preferred_payment_method.html`, `method_Forms/` |
 | Emails | The mail sent to the resource, unread in bold with a dot, read in a dialog | `customer/emails.html` |
-| Aside | Needs your attention: rejected or expiring certificates, an unverified default method. At a glance: pairs used of 6, services, certificates, specialities, preferred currency, paid by, vendor manager | — |
+| Aside | Needs your attention: rejected or expiring certificates, an unverified default method. At a glance: pairs used of 6, services, certificates, specialities, vendor manager | — |
 
 **Pairs instead of a table with an expanding row.** A certificate belongs to a language pair (and one
 service), the freelancer limit counts pairs, and a translator thinks in pairs. Grouping by pair puts

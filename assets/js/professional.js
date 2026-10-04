@@ -451,12 +451,39 @@
                 ? '<span class="rp-preferred" tabindex="0" data-tip="Bid requests reach you before they go out to all freelancers.">' + icon("star") + "Company preferred</span>"
                 : "") +
             "</p></div>" +
-            '<dl class="rp-prohead__facts">' +
-            '<div class="rp-prohead__fact"><dt>' + icon("languages") + "Native language</dt><dd>" + esc(PRO.nativeLanguage) + "</dd></div>" +
-            '<div class="rp-prohead__fact"><dt>' + icon("calendar") + "Joining date</dt><dd>" + fmtDate(PRO.joined) + "</dd></div>" +
-            "</dl>" +
-            '<div class="rp-prohead__actions"><a class="rp-button rp-button--outline" href="account.html">' + icon("user-round") + "User Account</a></div>" +
-            "</div></div>"
+            '<div class="rp-prohead__actions"><a class="rp-button rp-button--outline" href="account.html" title="User Account">' + icon("user-round") +
+            '<span class="rp-prohead__actionlabel">User Account</span></a></div>' +
+            "</div>" +
+            '<dl class="rp-prohead__facts" data-head-facts>' + factsMarkup() + "</dl>" +
+            "</div>"
+        );
+    }
+
+    function headFact(iconName, label, value) {
+        return '<div class="rp-prohead__fact"><dt>' + icon(iconName) + label + "</dt><dd>" + value + "</dd></div>";
+    }
+
+    /* Live status first, then who the resource is, how they are paid and how long they have been with us */
+    function factsMarkup() {
+        var av = (RP.AVAILABILITY || {})[RP.USER.availability] || { label: RP.USER.availability };
+        var def = defaultMethod();
+        var cur = preferredCurrency();
+        var currency = cur
+            ? esc(cur) + '<span class="rp-prohead__hint">via ' + METHODS[def.code].label + "</span>"
+            : def
+            ? '<span class="rp-prohead__pending">Pending verification</span><span class="rp-prohead__hint">' + METHODS[def.code].label + "</span>"
+            : '<span class="rp-prohead__hint">Not set</span><button type="button" class="rp-linkbtn" data-act="goto" data-target="payment">Add a method</button>';
+
+        return (
+            headFact(
+                "clock",
+                "Availability",
+                '<span class="rp-avstate rp-avstate--' + RP.USER.availability + '">' + esc(av.label) + "</span>" +
+                    '<button type="button" class="rp-linkbtn" data-act="availability" aria-haspopup="dialog">Change</button>'
+            ) +
+            headFact("languages", "Native language", esc(PRO.nativeLanguage)) +
+            headFact("coin-circle", "Preferred currency", currency) +
+            headFact("calendar", "Joining date", fmtDate(PRO.joined))
         );
     }
 
@@ -1139,8 +1166,6 @@
         var verified = P.certificates.filter(function (c) {
             return certState(c) === "verified";
         }).length;
-        var def = defaultMethod();
-        var cur = preferredCurrency();
         var vm = PRO.vendorManager;
         var muted = function (text) {
             return '<span class="rp-srow__muted">' + text + "</span>";
@@ -1153,8 +1178,6 @@
             srow("Services", PRO.prices.length + (pending ? " " + muted(pending + " pending") : "")) +
             srow("Certificates", P.certificates.length + " " + muted(verified + " verified")) +
             srow("Specialities", PRO.specialities.length + " " + muted("of " + MAX_SPECIALITIES)) +
-            srow("Preferred currency", cur || muted(def ? "Pending" : "Not set")) +
-            srow("Paid by", def ? METHODS[def.code].label : muted("Not set")) +
             srow(
                 "Vendor manager",
                 esc(vm.name) + '<button type="button" class="rp-iconbtn" data-act="message-vm" aria-label="Message ' + esc(vm.name) + '" title="Message">' +
@@ -1200,11 +1223,22 @@
         collectSections();
     }
 
-    /* Tabs and aside read the same records the cards do */
+    /* Tabs, head facts and aside read the same records the cards do */
     function refreshSummary() {
         els.tabs.innerHTML = tabsMarkup(currentSection());
+        var facts = els.head.querySelector("[data-head-facts]");
+        if (facts) facts.innerHTML = factsMarkup();
         var aside = els.pro.querySelector(".rp-pro__aside");
         if (aside) aside.innerHTML = asideMarkup();
+    }
+
+    /* The topbar scrolls away with the page, so it is brought back before its dropdown opens */
+    function openAvailability() {
+        global.scrollTo({ top: 0, behavior: reduced() ? "auto" : "smooth" });
+        setTimeout(function () {
+            var pill = document.getElementById("rpAvailabilityBtn");
+            if (pill) pill.click();
+        }, reduced() ? 0 : 380);
     }
 
     function paintAvatars() {
@@ -2389,6 +2423,7 @@
         if (act === "mail") return openMail(id);
         if (act === "mail-more") return showMoreMail();
         if (act === "goto") return goTo(btn.dataset.target);
+        if (act === "availability") return openAvailability();
         if (act === "message-vm") return RP.toast("A message to " + PRO.vendorManager.name + " would open in Messaging.", "info");
         if (act === "view-file") {
             e.preventDefault();

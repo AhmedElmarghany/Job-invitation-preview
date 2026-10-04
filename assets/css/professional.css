@@ -138,7 +138,7 @@
     overflow-wrap: anywhere;
 }
 
-/* The verified mark wears the Verified pill's green, so the two read as one fact */
+/* Blue, as verified profiles are marked across the web, so it reads as a badge and not a status */
 .rp-verified {
     flex: 0 0 auto;
     display: inline-grid;
@@ -209,19 +209,34 @@
     box-shadow: var(--focus-ring-gold);
 }
 
-/* Read-only facts, label over value like a field, so they never pass for inputs */
-.rp-prohead__facts {
+.rp-prohead__actions {
     flex: 0 0 auto;
     display: flex;
-    margin: 0;
+    align-items: center;
+    gap: 8px;
+}
+
+/* One inset band under the name, label over value, so the four read as facts and never as fields */
+.rp-prohead__facts {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin: 16px 0 0;
+    padding: 12px 0;
+    border-radius: var(--radius-md);
+    background: var(--color-surface-inset);
 }
 
 .rp-prohead__fact {
     display: flex;
     flex-direction: column;
-    gap: 3px;
-    padding: 2px 22px;
+    gap: 4px;
+    min-width: 0;
+    padding: 0 18px;
     border-left: 1px solid var(--color-border);
+}
+
+.rp-prohead__fact:first-child {
+    border-left: 0;
 }
 
 .rp-prohead__fact dt {
@@ -239,19 +254,61 @@
 }
 
 .rp-prohead__fact dd {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 2px 8px;
+    min-width: 0;
     margin: 0;
     font-size: 15px;
     font-weight: 500;
+    line-height: 1.4;
     color: var(--color-text-primary);
-    white-space: nowrap;
 }
 
-.rp-prohead__actions {
-    flex: 0 0 auto;
-    display: flex;
+.rp-prohead__fact .rp-linkbtn {
+    font-size: 13px;
+}
+
+.rp-prohead__hint {
+    font-size: 12.5px;
+    font-weight: 400;
+    color: var(--color-text-secondary);
+}
+
+.rp-prohead__pending {
+    color: var(--color-status-warning);
+}
+
+/* The topbar pill's colours, so the two always read as one status */
+.rp-avstate {
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
-    margin-left: 6px;
+    gap: 6px;
+    color: var(--av-color);
+}
+
+.rp-avstate::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--av-dot);
+}
+
+.rp-avstate--AV {
+    --av-color: #0f766e;
+    --av-dot: #10a37f;
+}
+
+.rp-avstate--BS {
+    --av-color: #b45309;
+    --av-dot: #e08a1e;
+}
+
+.rp-avstate--NA {
+    --av-color: #52525b;
+    --av-dot: #a1a1aa;
 }
 
 .rp-dot {
@@ -276,62 +333,61 @@
     color: var(--color-text-secondary);
 }
 
-/* The facts drop under the name, lined up with it rather than with the photo */
-@container rpHead (max-width: 880px) {
-    .rp-prohead__row {
-        flex-wrap: wrap;
-        row-gap: 12px;
-    }
-
-    .rp-prohead__titles {
-        flex: 1 1 calc(100% - 80px - 190px);
-    }
-
+/* Two by two before a fourth column would cut "Preferred currency" short */
+@container rpHead (max-width: 760px) {
     .rp-prohead__facts {
-        order: 3;
-        flex: 1 1 100%;
-        margin-left: 80px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        padding: 0;
     }
 
-    .rp-prohead__fact:first-child {
-        padding-left: 0;
+    .rp-prohead__fact {
+        padding: 11px 16px;
+    }
+
+    .rp-prohead__fact:nth-child(odd) {
         border-left: 0;
+    }
+
+    .rp-prohead__fact:nth-child(n + 3) {
+        border-top: 1px solid var(--color-border);
     }
 }
 
+/* On a phone the link keeps only its icon, so the name keeps the line beside the photo */
 @container rpHead (max-width: 560px) {
+    .rp-prohead__row {
+        align-items: flex-start;
+    }
+
     .rp-prohead__avatar {
         width: 52px;
         height: 52px;
-    }
-
-    /* A long name would otherwise wrap below the photo instead of beside it */
-    .rp-prohead__titles {
-        flex: 1 1 calc(100% - 68px);
     }
 
     .rp-prohead__title {
         font-size: 19px;
     }
 
+    .rp-prohead__actions .rp-button {
+        width: 40px;
+        padding: 0;
+    }
+
+    .rp-prohead__actionlabel {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+    }
+
     .rp-prohead__facts {
-        order: 2;
-        margin-left: 0;
+        margin-top: 14px;
     }
 
     .rp-prohead__fact {
-        flex: 1 1 0;
-        padding: 0 14px;
-    }
-
-    .rp-prohead__actions {
-        order: 4;
-        flex: 1 1 100%;
-        margin-left: 0;
-    }
-
-    .rp-prohead__actions .rp-button {
-        flex: 1 1 auto;
+        padding: 10px 12px;
     }
 }
 
