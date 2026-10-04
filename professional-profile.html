@@ -4,35 +4,55 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Professional Profile · Resource Portal</title>
+  <meta name="description" content="Redesign preview of the AGATO resource portal — the resource's services, rates, certificates and how they are paid.">
   <link rel="icon" href="assets/img/logo.png">
 
   <link rel="stylesheet" href="assets/css/variables.css">
   <link rel="stylesheet" href="assets/css/base.css">
   <link rel="stylesheet" href="assets/css/sidebar.css">
   <link rel="stylesheet" href="assets/css/topbar.css">
+  <link rel="stylesheet" href="assets/css/navigation-tabs.css">
+  <link rel="stylesheet" href="assets/css/status.css">
   <link rel="stylesheet" href="assets/css/logout-modal.css">
+  <link rel="stylesheet" href="assets/css/professional.css">
 </head>
 <body>
 
   <!-- Sidebar + topbar + modals are injected here by assets/js/layout.js -->
   <div id="rp-layout" data-page="professional" data-title="Professional Profile"></div>
 
-  <main class="rp-page">
-    <div class="rp-stub">
-      <span class="rp-stub-icon">
-        <span data-rp-icon="professional-profile"></span>
-      </span>
-      <h1 class="rp-stub-title">Professional Profile</h1>
-      <p class="rp-stub-note">Not designed yet. Languages, services, rates, certifications and payment methods belong on this page.</p>
-      <a class="rp-stub-link" href="invitations.html">
-        <span data-rp-icon="arrow-right"></span>
-        Go to Job Invitations
-      </a>
+  <main class="rp-page rp-propage">
+
+    <!-- Photo, name, native language, joining date and the User Account link — filled by professional.js -->
+    <header class="rp-prohead" id="rpProHead"></header>
+
+    <!-- Section tabs, used as a jump list like User Account -->
+    <nav class="navigation-tabs rp-protabs" id="rpProNav" aria-label="Profile sections">
+      <button class="navigation-tabs-fade-left" type="button" aria-label="Scroll tabs left" tabindex="-1" aria-hidden="true">
+        <span class="navigation-tabs-chevron" data-rp-icon="chevron-left"></span>
+      </button>
+      <div class="navigation-tabs-inner" id="rpProTabs"></div>
+      <button class="navigation-tabs-fade-right" type="button" aria-label="Scroll tabs right" tabindex="-1" aria-hidden="true">
+        <span class="navigation-tabs-chevron" data-rp-icon="chevron-right"></span>
+      </button>
+    </nav>
+
+    <!-- Sections on the left, what needs you and the profile at a glance on the right -->
+    <div class="rp-prowrap">
+      <div class="rp-pro" id="rpPro"></div>
     </div>
+
   </main>
+
+  <!-- Every dialog on the page shares this one: services, rates, certificates, methods, emails, photo -->
+  <div class="rp-modal" id="rpModal" role="dialog" aria-modal="true" aria-labelledby="rpModalTitle" aria-hidden="true">
+    <div class="rp-modal__panel" id="rpModalPanel"></div>
+  </div>
 
   <script src="assets/js/icons.js"></script>
   <script src="assets/js/data.js"></script>
   <script src="assets/js/layout.js"></script>
+  <script src="assets/js/navigation-tabs.js"></script>
+  <script src="assets/js/professional.js"></script>
 </body>
 </html>

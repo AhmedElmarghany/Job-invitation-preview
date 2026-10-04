@@ -652,7 +652,7 @@
             '<button type="button" class="rp-linkbtn" data-act="view-file" data-name="' + esc(c.file) + '">View certificate</button></p>' +
             (c.status === "rejected" && c.reason
                 ? '<div class="rp-callout rp-callout--danger">' + icon("circle-alert") + "<span><strong>Rejection reason:</strong> " + esc(c.reason) +
-                  ' <a href="professional-profile.html#translator_prices">Replace the file</a></span></div>'
+                  ' <a href="professional-profile.html?highlight_cert=' + c.id + '#translator_prices">Replace the file</a></span></div>'
                 : "") +
             "</div>" +
             '<div class="rp-entry__side"><span class="status-pill ' + status.pill + '"><span class="status-dot"></span><span class="status-text">' +

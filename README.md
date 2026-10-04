@@ -38,7 +38,7 @@ Nothing inside the folder refers to the folder name, so renaming is safe.
 | `job.html` | **Built.** A single job — opens from a Job ID on My Jobs (`job.html?id=J-47990`). |
 | `dashboard.html` | **Built.** Dashboard — the resource's home; the logo and the first sidebar entry open it. |
 | `earnings.html` | **Built.** My Earnings — every bill, paid and pending, with its totals. |
-| `professional-profile.html` | Placeholder |
+| `professional-profile.html` | **Built.** Professional Profile — services and rates by language pair with their certificates, specialities, billing details, payment methods and emails. |
 | `account.html` | **Built.** User Account — the resource's own profile, opened from their name and photo in the sidebar. |
 
 The sidebar, topbar, availability control, profile menu and logout modal are **final** and shared
@@ -57,7 +57,7 @@ resource portal preview/
 ├── account.html                built page — the resource's own profile (User Account)
 ├── dashboard.html              built page — the resource's home, ?period=month|quarter|year|all
 ├── earnings.html               built page — the bills, ?period=…&status=…&q=… or ?bill=B-…
-├── professional-profile.html   placeholder
+├── professional-profile.html   built page — services, rates, certificates, payment, ?highlight_cert=…
 └── assets/
     ├── css/
     │   ├── variables.css       design tokens — copied from config/static/css/variables.css
@@ -77,6 +77,7 @@ resource portal preview/
     │   ├── account.css         page-specific: profile head, field grid, records, technology, terms
     │   ├── dashboard.css       page-specific: job tiles, revenue pipeline, meters, due soon, feed
     │   ├── earnings.css        page-specific: totals, period picker, status filter, bill panel
+    │   ├── professional.css    page-specific: profile head with facts, pair blocks, certificates, method cards, emails
     │   └── password-modal.css  copied from config/static/css/password-modal.css (shell swapped)
     ├── js/
     │   ├── icons.js            inline Lucide set — RP.icon('name')
@@ -90,6 +91,7 @@ resource portal preview/
     │   ├── account.js          the profile: jump tabs, inline edit, dialogs, profile strength
     │   ├── dashboard.js        the home: period switch, count-up, tips, meters that repaint from data-value
     │   ├── earnings.js         the bills: period and status filters, search, totals, the open bill
+    │   ├── professional.js     the work profile: pair blocks, rate and certificate dialogs, specialities, payment
     │   └── password-policy.js  copied from config/static/js/password-policy.js
     ├── fonts/                  IBM Plex Sans + Serif (woff2)
     └── img/                    logo.png, placeholder-headshot.png
@@ -124,6 +126,11 @@ shell (`.modal-dialog`, `.modal-content` and the agile.css bridge) is replaced b
 `earnings.css` does the same once more: the totals are `dashboard.css`'s `.rp-stat` tiles and the
 table chrome, sort icon, empty state and open row are `jobs.css` and `invitations.css`, all under
 their original class names.
+
+`professional.css` rebuilds User Account's head, jump tabs, cards, `.pd-*` fields, aside, confirm
+popover and modal from `account.css`, under the same names. Specialities wear Technology's
+`.rp-tech*` groups and `.rp-toggle` chips, and the pair block's head is the Invitations panel's inset
+head with its navy rule.
 
 `variables.css` is a copy too — it is the one file to re-sync if the tokens move.
 
@@ -270,6 +277,71 @@ receipt). The default is an update waiting for agreement, as `is_expired` shows 
 **In the preview**, saving, uploading, the photo, the password and agreeing change the page in
 memory only — the header, sidebar and topbar pick up a new name or photo, and profile strength
 recounts. Reading the terms, viewing a file and the phone links raise a toast. Reloading resets it.
+
+---
+
+## Professional profile
+
+`professional-profile.html` is what the resource offers and how they are paid, redesigned from
+`templates/translation/singleResource.html` as a resource sees it. The sidebar's Professional Profile
+entry opens it, and its head links back to User Account. It is built like User Account: a head,
+sticky jump tabs with a scroll-spy, cards on the left and a sticky aside that stacks below ~1100px
+of content width (Needs your attention first, At a glance last).
+
+The head keeps User Account's photo (same photo dialog), name and ID chip. **Native language** and
+**Joining date** are read-only facts beside the name, label over value, not the old form fields —
+a resource could change neither. The verified mark, *Freelancer* and *Company preferred* (bid
+requests reach them first; it was a switch the resource could see) sit on the name.
+
+| Section | Holds | In the original |
+| --- | --- | --- |
+| Services & prices | One block per language pair — its services with rate, status and actions, then its certificates. Single-language and language-independent services follow in blocks of their own | `resources_prices/table.html` and its certificate sub-row, `addPriceForm.html`, the certificate modal |
+| Specialities | **Own section and tab.** Up to ten, in six groups like Technology on User Account; Edit swaps in the toggles | The Specialties picker inside Resource Details |
+| Billing details | The address as label over value, or *Same as your primary address* linking to User Account; Edit opens the form; Tax read-only | `resource/billing_details.html` |
+| Payment method | A card per method: the default framed in navy, Verified or Pending verification, Make default; a method not added yet is a dashed row | `resource/preferred_payment_method.html`, `method_Forms/` |
+| Emails | The mail sent to the resource, unread in bold with a dot, read in a dialog | `customer/emails.html` |
+| Aside | Needs your attention: rejected or expiring certificates, an unverified default method. At a glance: pairs used of 6, services, certificates, specialities, preferred currency, paid by, vendor manager | — |
+
+**Pairs instead of a table with an expanding row.** A certificate belongs to a language pair (and one
+service), the freelancer limit counts pairs, and a translator thinks in pairs. Grouping by pair puts
+each pair's certificates under its rates, so a rejected or expiring one is on screen without opening
+anything. Inside a block the rows keep a table's columns — service, rate, status, actions — so rates
+still compare at a glance, and search, the status filter and a six-cell pair meter sit above them.
+
+**Changed on the way:**
+
+- One *Add services* dialog builds a list and saves it in one go, as the old modal did. Opened from a
+  pair, it starts on that pair and the first service the pair has no rate for. A duplicate rate and a
+  seventh pair are refused before saving, the latter with a link to message the vendor manager.
+- A rate shows NZD first, then ≈ the currency it was typed in (or USD), as the old two lines did.
+  New rates are *Pending approval* in `.status-pending`'s brown; *Active* is the Verified green.
+- A verified certificate expiring within 60 days gets **Renew**, which adds the renewed one; the
+  old one then reads *Renewal sent* and stops asking. A rejected one shows its reason and
+  **Replace the file**. Verified certificates are locked, as before.
+- A verified payment method opens read-only, with the old notice and a link to the vendor manager.
+  *Make default* asks first. An unverified default turns Preferred currency to pending and raises an
+  attention item, as the old amber card did.
+- Billing's *Same as my primary address* locks the fields to User Account's address; unticked, they
+  start from it. Tax and resource type are shown read-only — the original hid them from a resource.
+
+**Left out, because the original shows them to staff or full-timers only:** internal notes,
+productivity, calendar, schedule and leaves, chat, category, created by, account status, the
+verified switch and *Payment details verified by admin*.
+
+**The numbers agree with the other pages.** English → Arabic translation at NZD 0.0550 a word is
+the rate on invitation J-48210, interpreting at NZD 70.00 an hour the one on the interpreting
+invitations; Wise is the default because it paid the last thirty bills on My Earnings; the
+certificates are User Account's own records; the B-2201 email carries that bill's amount.
+
+`?highlight_cert=334` flags a certificate, as on the old page, and `#translator_prices` — the old
+anchor — lands on Services & prices. User Account's *Replace the file* now links with the
+certificate's ID, and the Invitations notice about a missing payment method lands on Payment method.
+
+Settings > Industries has no category, so the six speciality groups are this preview's own.
+
+**In the preview**, every add, edit, delete, upload and default changes the page in memory only; the
+tabs, the attention list and At a glance recount. Viewing a file and messaging the vendor manager
+raise a toast. Reloading resets it.
 
 ---
 
@@ -434,7 +506,7 @@ joins the buttons under them.
 
 ## Adding the next page
 
-1. Copy a placeholder page (e.g. `professional-profile.html`) and set `data-page` / `data-title` on `#rp-layout`.
+1. Copy a page's shell (e.g. `account.html`) and set `data-page` / `data-title` on `#rp-layout`.
    `data-page` must match the `key` in `NAV` inside `assets/js/layout.js` for the active state to
    light up.
 2. Add its stylesheet under `assets/css/` and its script under `assets/js/`.
@@ -506,6 +578,9 @@ Two maps:
 Used as `RP.icon("jobs")` in JS, or `<span data-rp-icon="jobs"></span>` anywhere in the HTML —
 `icons.js` fills those in on load.
 
+Brand marks come from Phosphor (`whatsapp`, `paypal`). Wise has a mark in neither library, so its
+payment card wears Lucide's `arrow-right-left` until the real logo is pasted in.
+
 **Sorting** is the one exception: the table header uses
 `templates/partials/_sorting_icon.html` verbatim — same three path pairs, same class names. The
 partial's inline `display: none` is gone: `.is-asc` / `.is-desc` on the `<th>` choose the pair, so
@@ -532,8 +607,9 @@ line at the bottom — label and value on one row, like the Total on an Earnings
 
 | Key | Does |
 | --- | --- |
-| `/` | Jump to the search field |
-| `Esc` | Leave the search field, close any modal, the availability dropdown or the mobile drawer; on User Account, close the Delete popover first; on My Earnings, close the period picker first |
-| `Enter` | Submit a bid, when the bid field has focus; send a chat message on the job page (`Shift+Enter` for a new line) |
+| `/` | Jump to the search field; on Professional Profile, the services search |
+| `Esc` | Leave the search field, close any modal, the availability dropdown or the mobile drawer; on User Account and Professional Profile, close the Delete popover first; on My Earnings, close the period picker first |
+| `Enter` | Submit a bid, when the bid field has focus; send a chat message on the job page (`Shift+Enter` for a new line); in Add services' rate, add the service to the list |
 | `↑` / `↓` | Move between statuses in the availability dropdown |
 | `Enter` in Technology's search | Pick the first match, or add what was typed as your own tool |
+| `Enter` in Specialities' search | Pick the first match that still has room |

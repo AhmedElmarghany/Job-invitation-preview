@@ -121,6 +121,8 @@
         languages: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-languages"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>`,
 
         "badge-check": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-badge-check"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/><path d="m9 12 2 2 4-4"/></svg>`,
+        
+        "badge-check-filled": `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256"><path d="M225.86,102.82c-3.77-3.94-7.67-8-9.14-11.57-1.36-3.27-1.44-8.69-1.52-13.94-.15-9.76-.31-20.82-8-28.51s-18.75-7.85-28.51-8c-5.25-.08-10.67-.16-13.94-1.52-3.56-1.47-7.63-5.37-11.57-9.14C146.28,23.51,138.44,16,128,16s-18.27,7.51-25.18,14.14c-3.94,3.77-8,7.67-11.57,9.14C88,40.64,82.56,40.72,77.31,40.8c-9.76.15-20.82.31-28.51,8S41,67.55,40.8,77.31c-.08,5.25-.16,10.67-1.52,13.94-1.47,3.56-5.37,7.63-9.14,11.57C23.51,109.72,16,117.56,16,128s7.51,18.27,14.14,25.18c3.77,3.94,7.67,8,9.14,11.57,1.36,3.27,1.44,8.69,1.52,13.94.15,9.76.31,20.82,8,28.51s18.75,7.85,28.51,8c5.25.08,10.67.16,13.94,1.52,3.56,1.47,7.63,5.37,11.57,9.14C109.72,232.49,117.56,240,128,240s18.27-7.51,25.18-14.14c3.94-3.77,8-7.67,11.57-9.14,3.27-1.36,8.69-1.44,13.94-1.52,9.76-.15,20.82-.31,28.51-8s7.85-18.75,8-28.51c.08-5.25.16-10.67,1.52-13.94,1.47-3.56,5.37-7.63,9.14-11.57C232.49,146.28,240,138.44,240,128S232.49,109.73,225.86,102.82Zm-52.2,6.84-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35a8,8,0,0,1,11.32,11.32Z"></path></svg>`,
 
         "spell-check": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-spell-check"><path d="m6 16 6-12 6 12"/><path d="M8 12h8"/><path d="m16 20 2 2 4-4"/></svg>`,
 
@@ -159,6 +161,8 @@
         "book-marked": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-marked"><path d="M10 2v8l3-3 3 3V2"/><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/></svg>`,
 
         receipt: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-receipt"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/></svg>`,
+        
+        "receipt-new": `<svg width="198px" height="198px" viewBox="0 0 24.00 24.00" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_iconCarrier"> <path d="M16.755 2H7.24502C6.08614 2 5.50671 2 5.03939 2.16261C4.15322 2.47096 3.45748 3.18719 3.15795 4.09946C3 4.58055 3 5.17705 3 6.37006V20.3742C3 21.2324 3.985 21.6878 4.6081 21.1176C4.97417 20.7826 5.52583 20.7826 5.8919 21.1176L6.375 21.5597C7.01659 22.1468 7.98341 22.1468 8.625 21.5597C9.26659 20.9726 10.2334 20.9726 10.875 21.5597C11.5166 22.1468 12.4834 22.1468 13.125 21.5597C13.7666 20.9726 14.7334 20.9726 15.375 21.5597C16.0166 22.1468 16.9834 22.1468 17.625 21.5597L18.1081 21.1176C18.4742 20.7826 19.0258 20.7826 19.3919 21.1176C20.015 21.6878 21 21.2324 21 20.3742V6.37006C21 5.17705 21 4.58055 20.842 4.09946C20.5425 3.18719 19.8468 2.47096 18.9606 2.16261C18.4933 2 17.9139 2 16.755 2Z" stroke="currentColor" stroke-width="1.5"></path> <path d="M10.5 11L17 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path> <path d="M7 11H7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path> <path d="M7 7.5H7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path> <path d="M7 14.5H7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path> <path d="M10.5 7.5H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path> <path d="M10.5 14.5H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path> </g></svg>`,
         
         "receipt-filled": `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10.75 1.02734C11.0254 1.02739 11.2953 1.10756 11.5273 1.25586L12.2266 1.70508C12.3078 1.75696 12.4036 1.78511 12.5 1.78516C12.5965 1.78516 12.6911 1.75697 12.7725 1.70508L13.4717 1.25586C13.7036 1.10986 13.976 1.03218 14.25 1.0332C14.5731 1.0332 14.8828 1.16026 15.1113 1.38867C15.3396 1.61709 15.4686 1.92706 15.4688 2.25V15.75C15.4686 16.0731 15.3398 16.3839 15.1113 16.6123C14.8833 16.8401 14.5742 16.9673 14.252 16.9678C13.978 16.9688 13.7074 16.893 13.4756 16.7471L12.7725 16.2949C12.6912 16.2431 12.5964 16.2158 12.5 16.2158C12.4035 16.2159 12.3089 16.2439 12.2275 16.2959L11.5283 16.7451C11.2963 16.8933 11.0253 16.9726 10.75 16.9727C10.4746 16.9727 10.2047 16.8933 9.97266 16.7451L9.27246 16.2949C9.19113 16.243 9.09647 16.2158 9 16.2158C8.9034 16.2158 8.80894 16.2439 8.72754 16.2959L8.02832 16.7451C7.79623 16.8933 7.52539 16.9727 7.25 16.9727C6.97467 16.9726 6.70469 16.8933 6.47266 16.7451L5.77246 16.2949C5.69113 16.2429 5.59652 16.2159 5.5 16.2158C5.40343 16.2158 5.30892 16.2439 5.22754 16.2959L4.52832 16.7451C4.29647 16.891 4.02391 16.9688 3.75 16.9678C3.42806 16.967 3.1165 16.8399 2.88867 16.6123C2.66023 16.3839 2.53138 16.0731 2.53125 15.75V2.25C2.53138 1.92706 2.66038 1.61709 2.88867 1.38867C3.11721 1.16026 3.42688 1.03125 3.75 1.03125C4.024 1.03023 4.29251 1.10791 4.52441 1.25391L5.22656 1.70508C5.30792 1.75701 5.40348 1.78516 5.5 1.78516C5.57225 1.78512 5.64367 1.76982 5.70898 1.74023L5.77246 1.70508L6.47168 1.25586C6.70376 1.10756 6.97458 1.02739 7.25 1.02734C7.52548 1.02734 7.7952 1.10753 8.02734 1.25586L8.72656 1.70508C8.80792 1.75701 8.90348 1.78516 9 1.78516C9.09652 1.78516 9.19111 1.75701 9.27246 1.70508L9.97168 1.25586C10.2038 1.10753 10.4745 1.02734 10.75 1.02734ZM9 4.78125C8.74128 4.78125 8.53151 4.99134 8.53125 5.25V5.53125H7.5C6.97785 5.53125 6.47663 5.73919 6.10742 6.1084C5.73863 6.47745 5.53138 6.97826 5.53125 7.5C5.53138 8.02186 5.73848 8.5235 6.10742 8.89258C6.47661 9.26164 6.97797 9.46875 7.5 9.46875H8.53125V11.5312H6C5.74128 11.5312 5.53151 11.7413 5.53125 12C5.53151 12.2587 5.74128 12.4688 6 12.4688H8.53125V12.75C8.53151 13.0087 8.74128 13.2188 9 13.2188C9.25872 13.2188 9.46849 13.0087 9.46875 12.75V12.4688H10.5C11.022 12.4688 11.5234 12.2616 11.8926 11.8926C12.2615 11.5235 12.4686 11.0219 12.4688 10.5C12.4686 9.97826 12.2614 9.47745 11.8926 9.1084C11.5234 8.73919 11.0221 8.53125 10.5 8.53125H9.46875V6.46875H12C12.2587 6.46875 12.4685 6.25866 12.4688 6C12.4685 5.74134 12.2587 5.53125 12 5.53125H9.46875V5.25C9.46849 4.99134 9.25872 4.78125 9 4.78125ZM10.5 9.46875C10.7735 9.46875 11.0361 9.57809 11.2295 9.77148C11.4225 9.96472 11.5311 10.2269 11.5312 10.5C11.5311 10.7732 11.4226 11.0362 11.2295 11.2295C11.0361 11.4227 10.7734 11.5312 10.5 11.5312H9.46875V9.46875H10.5ZM8.53125 6.46875V8.53125H7.5C7.22661 8.53125 6.96388 8.42274 6.77051 8.22949C6.57738 8.03623 6.46888 7.77321 6.46875 7.5C6.46888 7.2269 6.57753 6.96472 6.77051 6.77148C6.9639 6.57809 7.2265 6.46875 7.5 6.46875H8.53125Z" fill="#0B263E"/></svg>`,
 
@@ -290,7 +294,40 @@
 
         "calendar-range": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-range preview-icon"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M16 2v3"/><path d="M3 9h18"/><path d="M8 2v3"/><path d="M17 13h-6"/><path d="M13 17H7"/><path d="M7 13h.01"/><path d="M17 17h.01"/></svg>`,
 
+        /* ── Professional profile ──────────────────────── */
+
+        banknote: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-banknote"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>`,
+
+        tags: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tags"><path d="m15 5 6.3 6.3a2.4 2.4 0 0 1 0 3.4L17 19"/><path d="M9.586 5.586A2 2 0 0 0 8.172 5H3a1 1 0 0 0-1 1v5.172a2 2 0 0 0 .586 1.414L8.29 18.29a2.426 2.426 0 0 0 3.42 0l3.58-3.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="6.5" cy="9.5" r=".5" fill="currentColor"/></svg>`,
+
+        star: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>`,
+
+        "circle-help": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-help"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>`,
+
+        "refresh-cw": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-refresh-cw"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>`,
+
+        percent: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-percent"><line x1="19" x2="5" y1="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>`,
+
+        landmark: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-landmark"><line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg>`,
+
+        /* Wise has no mark in either library; a transfer arrow stands in for it */
+        "arrow-right-left": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right-left"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg>`,
+
+        wise: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 150" class="lucide lucide-wise"><defs><style>.cls-1{fill: none;}.cls-2 {fill: #163300;}</style></defs><path class="cls-1" d="M0,0H150V150H0V0Z"/><polygon class="cls-2" points="46.59 53.25 12.26 93.38 73.58 93.38 80.46 74.46 54.19 74.46 70.24 55.89 70.3 55.4 59.86 37.43 106.82 37.43 70.42 137.61 95.33 137.61 139.3 16.86 25.72 16.86 46.6 53.24 46.59 53.25"/></svg>`,
+
+        /* Speciality groups */
+
+        scale: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-scale"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>`,
+
+        "heart-pulse": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart-pulse"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/></svg>`,
+
+        cpu: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cpu"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></svg>`,
+
+        megaphone: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-megaphone"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>`,
+
         /* ── Phosphor, where Lucide has no brand icons ───── */
+
+        paypal: `<svg xmlns="http://www.w3.org/2000/svg" fill="#ffffff" viewBox="0 0 48 48" class="lucide lucide-paypal"><g clip-path="url(#a)"><path fill="#002991" d="M38.914 13.35c0 5.574-5.144 12.15-12.927 12.15H18.49l-.368 2.322L16.373 39H7.056l5.605-36h15.095c5.083 0 9.082 2.833 10.555 6.77a9.687 9.687 0 0 1 .603 3.58z"/><path fill="#60CDFF" d="M44.284 23.7A12.894 12.894 0 0 1 31.53 34.5h-5.206L24.157 48H14.89l1.483-9 1.75-11.178.367-2.322h7.497c7.773 0 12.927-6.576 12.927-12.15 3.825 1.974 6.055 5.963 5.37 10.35z"/><path fill="#008CFF" d="M38.914 13.35C37.31 12.511 35.365 12 33.248 12h-12.64L18.49 25.5h7.497c7.773 0 12.927-6.576 12.927-12.15z"/></g><defs><clipPath id="a"><path fill="#fff" d="M7.056 3h37.35v45H7.056z"/></clipPath></defs></svg>`,
 
         whatsapp: `<svg viewBox="0 0 50 50" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#67C15E" class="ph ph-whatsapp-logo"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <defs> </defs> <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"> <g transform="translate(-700.000000, -360.000000)" fill="#67C15E"> <path d="M723.993033,360 C710.762252,360 700,370.765287 700,383.999801 C700,389.248451 701.692661,394.116025 704.570026,398.066947 L701.579605,406.983798 L710.804449,404.035539 C714.598605,406.546975 719.126434,408 724.006967,408 C737.237748,408 748,397.234315 748,384.000199 C748,370.765685 737.237748,360.000398 724.006967,360.000398 L723.993033,360.000398 L723.993033,360 Z M717.29285,372.190836 C716.827488,371.07628 716.474784,371.034071 715.769774,371.005401 C715.529728,370.991464 715.262214,370.977527 714.96564,370.977527 C714.04845,370.977527 713.089462,371.245514 712.511043,371.838033 C711.806033,372.557577 710.056843,374.23638 710.056843,377.679202 C710.056843,381.122023 712.567571,384.451756 712.905944,384.917648 C713.258648,385.382743 717.800808,392.55031 724.853297,395.471492 C730.368379,397.757149 732.00491,397.545307 733.260074,397.27732 C735.093658,396.882308 737.393002,395.527239 737.971421,393.891043 C738.54984,392.25405 738.54984,390.857171 738.380255,390.560912 C738.211068,390.264652 737.745308,390.095816 737.040298,389.742615 C736.335288,389.389811 732.90737,387.696673 732.25849,387.470894 C731.623543,387.231179 731.017259,387.315995 730.537963,387.99333 C729.860819,388.938653 729.198006,389.89831 728.661785,390.476494 C728.238619,390.928051 727.547144,390.984595 726.969123,390.744481 C726.193254,390.420348 724.021298,389.657798 721.340985,387.273388 C719.267356,385.42535 717.856938,383.125756 717.448104,382.434484 C717.038871,381.729275 717.405907,381.319529 717.729948,380.938852 C718.082653,380.501232 718.421026,380.191036 718.77373,379.781688 C719.126434,379.372738 719.323884,379.160897 719.549599,378.681068 C719.789645,378.215575 719.62006,377.735746 719.450874,377.382942 C719.281687,377.030139 717.871269,373.587317 717.29285,372.190836 Z" id="Whatsapp"> </path> </g> </g> </g></svg>`
 
@@ -354,7 +391,10 @@
         });
     }
 
-    function adopt(raw, extraClass) {
+    /* Brand marks whose own colours are the point, so they skip the currentColor rewrite */
+    var KEEP_COLOUR = { paypal: true };
+
+    function adopt(raw, extraClass, keep) {
         var svg = String(raw).trim();
 
         /* editors often leave a prologue or a comment on top */
@@ -372,11 +412,11 @@
 
         return (
             "<svg" +
-            recolour(open[1].replace(DROP, "")) +
+            (keep ? open[1].replace(DROP, "") : recolour(open[1].replace(DROP, ""))) +
             ' class="' +
             cls +
             '" aria-hidden="true" focusable="false">' +
-            recolour(svg.slice(open[0].length))
+            (keep ? svg.slice(open[0].length) : recolour(svg.slice(open[0].length)))
         );
     }
 
@@ -392,7 +432,7 @@
             return "";
         }
 
-        return adopt(raw, extraClass);
+        return adopt(raw, extraClass, KEEP_COLOUR[name]);
     }
 
     /* <span data-rp-icon="search"></span> anywhere in the HTML */

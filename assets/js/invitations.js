@@ -546,7 +546,7 @@
             '<p class="rp-alert">' +
             icon("warning") +
             "<span>Add a payment method on your " +
-            '<a href="professional-profile.html">professional profile</a> before accepting.</span></p>'
+            '<a href="professional-profile.html#payment">professional profile</a> before accepting.</span></p>'
         );
     }
 

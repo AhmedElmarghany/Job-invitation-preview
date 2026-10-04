@@ -2238,6 +2238,139 @@
         ]
     };
 
+    /* ── Professional profile: what translation/singleResource.html shows a resource about their own work ── */
+
+    /* Settings > Industries. The model has no category, so these groups are the preview's own */
+    RP.SPECIALITY_GROUPS = [
+        { key: "legal", label: "Legal and government", icon: "scale", items: ["Legal", "Immigration", "Government", "Contracts", "Patents and IP", "Court and tribunal"] },
+        { key: "medical", label: "Medical and life sciences", icon: "heart-pulse", items: ["Medical", "Pharmaceutical", "Clinical trials", "Medical devices", "Healthcare", "Veterinary"] },
+        { key: "business", label: "Business and finance", icon: "briefcase-business", items: ["Financial", "Banking", "Insurance", "Accounting", "Real estate", "Human resources"] },
+        { key: "tech", label: "Technology and engineering", icon: "cpu", items: ["IT / Software", "Technical", "Telecommunications", "Automotive", "Energy", "Construction", "Aerospace / Defence"] },
+        { key: "marketing", label: "Marketing and media", icon: "megaphone", items: ["Marketing", "Advertising", "E-commerce", "Media and entertainment", "Gaming", "Travel and tourism"] },
+        { key: "education", label: "Education and culture", icon: "graduation-cap", items: ["Education", "Academic", "Literature", "Social Science", "Religion", "Art and culture"] }
+    ];
+
+    /* The company's languages, with the code a language tile shows */
+    RP.LANGUAGES = [
+        { name: "Arabic", code: "AR" }, { name: "Chinese", code: "ZH" }, { name: "Dutch", code: "NL" }, { name: "English", code: "EN" },
+        { name: "Farsi", code: "FA" }, { name: "French", code: "FR" }, { name: "German", code: "DE" }, { name: "Hindi", code: "HI" },
+        { name: "Italian", code: "IT" }, { name: "Japanese", code: "JA" }, { name: "Korean", code: "KO" }, { name: "Russian", code: "RU" },
+        { name: "Samoan", code: "SM" }, { name: "Spanish", code: "ES" }, { name: "Tongan", code: "TO" }, { name: "Turkish", code: "TR" },
+        { name: "Urdu", code: "UR" }
+    ];
+
+    /* Sub-services: the unit a rate is per, and whether it is priced per pair, per language or once */
+    RP.SERVICES = [
+        { key: "Translation", name: "Translation", unit: "word", base: "pair", certifiable: true },
+        { key: "Proofreading", name: "Proofreading", unit: "word", base: "pair" },
+        { key: "Certified", name: "Certified translation", unit: "document", base: "pair", certifiable: true },
+        { key: "PostEditing", name: "Post-editing (MTPE)", unit: "word", base: "pair" },
+        { key: "Transcreation", name: "Transcreation", unit: "word", base: "pair" },
+        { key: "Subtitling", name: "Subtitling", unit: "minute", base: "pair" },
+        { key: "Interpreting", name: "Interpreting", unit: "hour", base: "pair", certifiable: true, interpreting: true },
+        { key: "DTP", name: "DTP", unit: "page", base: "single" },
+        { key: "Transcription", name: "Transcription", unit: "minute", base: "single" },
+        { key: "Formatting", name: "Formatting", unit: "hour", base: "none" }
+    ];
+
+    RP.INTERPRETING = { modes: ["Onsite", "Telephone", "Video remote"], types: ["Consecutive", "Simultaneous", "Whispered", "Liaison"] };
+
+    /* 1 NZD in each company currency, for the rate a resource types in another one */
+    RP.FX = { NZD: 1, USD: RP.USD_RATE, AUD: 0.9105, EUR: 0.5562, GBP: 0.4721 };
+
+    /* What the certificate form offers once a country is picked */
+    RP.CERT_NAMES = {
+        AU: ["NAATI Certified Translator", "NAATI Certified Interpreter", "NAATI Recognised Practising Translator"],
+        CA: ["CTTIC Certified Translator", "OTTIAQ Certified Translator"],
+        NZ: ["NAATI Certified Translator", "NZSTI Full Member"],
+        AE: ["Legal Translator Licence (MOJ)", "Court Interpreter Licence"],
+        GB: ["Diploma in Translation (CIOL)", "Diploma in Public Service Interpreting (CIOL)", "ITI Qualified Member"],
+        US: ["ATA Certified Translator", "CCHI Certified Healthcare Interpreter", "Federally Certified Court Interpreter"]
+    };
+
+    var PAID_BILL = RP.BILLS[1];
+
+    RP.PRO = {
+        nativeLanguage: "Arabic",
+        joined: new Date(2021, 2, 8),
+        category: "Freelancer",
+        verified: true,
+        companyPreferred: true,
+        pairLimit: 6,
+        vendorManager: { name: "Leah Morrison", role: "Vendor Manager", email: "leah.morrison@agato.example" },
+
+        specialities: ["Legal", "Immigration", "Medical", "Pharmaceutical", "Technical", "Marketing", "Education"],
+
+        /* Rates are kept in NZD, the company currency; `entered` is the currency they were typed in */
+        prices: [
+            { id: 701, service: "Translation", source: "English", target: "Arabic", price: 0.055, entered: "NZD", status: "active", updated: new Date(2026, 6, 14) },
+            { id: 702, service: "Proofreading", source: "English", target: "Arabic", price: 0.022, entered: "NZD", status: "active", updated: new Date(2026, 6, 14) },
+            { id: 703, service: "Certified", source: "English", target: "Arabic", price: 45, entered: "NZD", status: "active", updated: new Date(2025, 10, 3) },
+            { id: 704, service: "PostEditing", source: "English", target: "Arabic", price: 0.03, entered: "USD", status: "active", updated: new Date(2026, 3, 22) },
+            { id: 705, service: "Transcreation", source: "English", target: "Arabic", price: 0.085, entered: "NZD", status: "pending", updated: new Date(NOW - 2 * DAY) },
+            { id: 706, service: "Subtitling", source: "English", target: "Arabic", price: 4.5, entered: "NZD", status: "active", updated: new Date(2025, 8, 9) },
+            { id: 711, service: "Translation", source: "Arabic", target: "English", price: 0.06, entered: "NZD", status: "active", updated: new Date(2026, 6, 14) },
+            { id: 712, service: "Interpreting", source: "Arabic", target: "English", mode: "Onsite", type: "Consecutive", price: 70, entered: "NZD", status: "active", updated: new Date(2025, 4, 30) },
+            { id: 713, service: "Interpreting", source: "Arabic", target: "English", mode: "Video remote", type: "Simultaneous", price: 85, entered: "NZD", status: "pending", updated: new Date(NOW - 5 * DAY) },
+            { id: 721, service: "DTP", language: "Arabic", price: 6, entered: "NZD", status: "active", updated: new Date(2024, 1, 18) },
+            { id: 722, service: "Transcription", language: "Arabic", price: 3.2, entered: "NZD", status: "active", updated: new Date(2024, 1, 18) },
+            { id: 731, service: "Formatting", price: 28, entered: "NZD", status: "active", updated: new Date(2023, 9, 2) }
+        ],
+
+        /* Billing Details: while sameAsPrimary is on, the address is User Account's */
+        billing: { sameAsPrimary: true, country: "AE", city: "Dubai", state: "Dubai", address: "Apartment 1204, Building 7, Al Marsa Street, Dubai Marina", zip: "", type: "Individual", taxRegistered: false },
+
+        /* ResourceLivePaymentMethod rows. Wise has paid the last thirty bills, PayPal the ones before */
+        payment: [
+            { code: "WISE", isDefault: true, verified: true, currency: "USD", holder: "Ahmed Elmarghany", email: "ahmedelmarghany01@gmail.com", added: new Date(2024, 2, 18), verifiedOn: new Date(2024, 2, 20) },
+            { code: "PAYPAL", isDefault: false, verified: true, currency: "USD", holder: "Ahmed Elmarghany", email: "ahmed.elmarghany@outlook.com", added: new Date(2021, 2, 9), verifiedOn: new Date(2021, 2, 11) }
+        ],
+
+        /* The mail the company sent this resource, as filter_email_by_customer lists it */
+        emails: [
+            {
+                id: 18, cat: "invitations", from: "Sara Whitfield", fromEmail: "sara.whitfield@agato.example", at: new Date(NOW - 3 * HOUR), unread: true,
+                subject: "New job invitation: Cardiac monitor — instructions for use (batch 12)",
+                body: ["Hi Ahmed,", "You have a new invitation for J-48210, a Medical translation from English into Arabic: 2,700 words, NZD 148.50.", "It expires in about six hours. Accept or decline it from Job Invitations.", "Thanks,\nSara"]
+            },
+            {
+                id: 17, cat: "rates", from: "AGATO Vendor Team", fromEmail: "vendors@agato.example", at: new Date(NOW - 2 * DAY + 2 * HOUR), unread: true,
+                subject: "Your Transcreation rate is waiting for approval",
+                body: ["Dear Ahmed,", "Thank you for adding Transcreation, English → Arabic, at NZD 0.0850 per word. A vendor manager will review it shortly.", "Your other rates stay active in the meantime.", "Kind regards,\nAGATO Vendor Team"]
+            },
+            {
+                id: 16, cat: "payments", from: "AGATO Accounts", fromEmail: "accounts@agato.example", at: PAID_BILL.paidOn,
+                subject: "Bill " + PAID_BILL.id + " has been paid",
+                body: ["Dear Ahmed,", "We have paid bill " + PAID_BILL.id + ", NZD " + PAID_BILL.amount.toLocaleString("en-NZ", MONEY_FMT) + ", into your Wise account.", "It can take up to two working days to reach you, depending on your bank.", "Kind regards,\nAGATO Accounts"]
+            },
+            {
+                id: 15, cat: "certificates", from: "AGATO Vendor Team", fromEmail: "vendors@agato.example", at: new Date(NOW - 3 * DAY),
+                subject: "Your Court Interpreter Licence was rejected",
+                body: ["Dear Ahmed,", "We could not verify the Court Interpreter Licence you added for Arabic → English interpreting. The scan is cut off at the bottom, so the expiry date cannot be read.", "Please upload the whole page from Services & prices on your Professional Profile.", "Kind regards,\nAGATO Vendor Team"]
+            },
+            {
+                id: 14, cat: "certificates", from: "AGATO Vendor Team", fromEmail: "vendors@agato.example", at: new Date(NOW - 13 * DAY),
+                subject: "Your NAATI certificate expires in 60 days",
+                body: ["Dear Ahmed,", "Your NAATI Certified Translator credential (CPN8XQ2A) for English → Arabic expires in 60 days.", "Once it is renewed, add the new certificate on your Professional Profile so your certified work is not interrupted.", "Kind regards,\nAGATO Vendor Team"]
+            },
+            {
+                id: 13, cat: "account", from: "AGATO", fromEmail: "no-reply@agato.example", at: RP.PROFILE.terms.updatedOn,
+                subject: "We've updated our Terms & Conditions and Privacy Policy",
+                body: ["Dear Ahmed,", "We have updated our Terms & Conditions and Privacy Policy. Please read them and confirm your agreement on your User Account.", "Kind regards,\nAGATO"]
+            },
+            {
+                id: 12, cat: "payments", from: "AGATO Accounts", fromEmail: "accounts@agato.example", at: new Date(2024, 2, 20, 11, 6),
+                subject: "Your Wise account is verified",
+                body: ["Dear Ahmed,", "We have verified the Wise account you added. It is now your default payment method, and your bills are paid in USD.", "Kind regards,\nAGATO Accounts"]
+            },
+            {
+                id: 11, cat: "account", from: "AGATO Vendor Team", fromEmail: "vendors@agato.example", at: new Date(2021, 2, 8, 9, 12),
+                subject: "Welcome to AGATO, Ahmed",
+                body: ["Dear Ahmed,", "Welcome aboard. Your next steps are on your Professional Profile: add your services and rates, your certificates and a payment method.", "We look forward to working with you.", "Kind regards,\nAGATO Vendor Team"]
+            }
+        ]
+    };
+
     /* The sidebar badge counts what still needs a decision. */
     RP.USER.invitationCount = RP.INVITATIONS.filter(function (row) {
         return row.status === "new_invite" || row.status === "new_bid";
