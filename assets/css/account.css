@@ -245,6 +245,30 @@
     z-index: 40;
 }
 
+/* White at rest; the quotation header's frosted glass only while the tabs are stuck to the top */
+@supports (container-type: scroll-state) {
+    .rp-accttabs {
+        container-type: scroll-state;
+        background: transparent;
+    }
+
+    .rp-accttabs__bg {
+        position: absolute;
+        inset: 0;
+        background: var(--color-surface-white);
+        transition: background-color var(--transition-base);
+        pointer-events: none;
+    }
+
+    @container scroll-state(stuck: top) {
+        .rp-accttabs__bg {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px) saturate(180%);
+            -webkit-backdrop-filter: blur(8px) saturate(180%);
+        }
+    }
+}
+
 /* Tab labels line up with the cards: the link's own 14px padding is taken off the gutter */
 .rp-accttabs .navigation-tabs-inner {
     max-width: var(--acct-max);
