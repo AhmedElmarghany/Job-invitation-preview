@@ -456,39 +456,20 @@
                 ? '<span class="rp-preferred" tabindex="0" data-tip="Bid requests reach you before they go out to all freelancers.">' + icon("star") + "Company preferred</span>"
                 : "") +
             "</p></div>" +
+            statusMarkup() +
             '<div class="rp-prohead__actions"><a class="rp-button rp-button--outline" href="account.html" title="User Account">' + icon("user-round") +
             '<span class="rp-prohead__actionlabel">User Account</span></a></div>' +
-            "</div>" +
-            '<dl class="rp-prohead__facts" data-head-facts>' + factsMarkup() + "</dl>" +
-            "</div>"
+            "</div></div>"
         );
     }
 
-    function headFact(iconName, label, value) {
-        return '<div class="rp-prohead__fact"><dt>' + icon(iconName) + label + "</dt><dd>" + value + "</dd></div>";
-    }
-
-    /* Live status first, then who the resource is, how they are paid and how long they have been with us */
-    function factsMarkup() {
+    /* Under the topbar's own pill, so Change opens a dropdown right above the status it changes */
+    function statusMarkup() {
         var av = (RP.AVAILABILITY || {})[RP.USER.availability] || { label: RP.USER.availability };
-        var def = defaultMethod();
-        var cur = preferredCurrency();
-        var currency = cur
-            ? esc(cur) + '<span class="rp-prohead__hint">via ' + METHODS[def.code].label + "</span>"
-            : def
-            ? '<span class="rp-prohead__pending">Pending verification</span><span class="rp-prohead__hint">' + METHODS[def.code].label + "</span>"
-            : '<span class="rp-prohead__hint">Not set</span><button type="button" class="rp-linkbtn" data-act="goto" data-target="payment">Add a method</button>';
-
         return (
-            headFact(
-                "clock",
-                "Availability",
-                '<span class="rp-avstate rp-avstate--' + RP.USER.availability + '">' + esc(av.label) + "</span>" +
-                    '<button type="button" class="rp-linkbtn" data-act="availability" aria-haspopup="dialog">Change</button>'
-            ) +
-            headFact("languages", "Native language", esc(PRO.nativeLanguage)) +
-            headFact("coin-circle", "Preferred currency", currency) +
-            headFact("calendar", "Joining date", fmtDate(PRO.joined))
+            '<div class="rp-prohead__status">' +
+            '<span class="rp-prohead__statusvalue"><span class="rp-avstate rp-avstate--' + RP.USER.availability + '">' + esc(av.label) + "</span>" +
+            '</span></div>'
         );
     }
 
@@ -1253,11 +1234,9 @@
         collectSections();
     }
 
-    /* Tabs, head facts and aside read the same records the cards do */
+    /* Tabs and aside read the same records the cards do */
     function refreshSummary() {
         els.tabs.innerHTML = tabsMarkup(currentSection());
-        var facts = els.head.querySelector("[data-head-facts]");
-        if (facts) facts.innerHTML = factsMarkup();
         var aside = els.pro.querySelector(".rp-pro__aside");
         if (aside) aside.innerHTML = asideMarkup();
         fitAside();

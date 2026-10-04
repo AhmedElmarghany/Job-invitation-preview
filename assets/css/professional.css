@@ -28,7 +28,7 @@
 .rp-prohead__inner {
     max-width: var(--pro-max);
     margin: 0 auto;
-    padding: 14px var(--pro-pad) 18px;
+    padding: 18px var(--pro-pad) 30px;
 }
 
 .rp-crumbs {
@@ -63,16 +63,19 @@
     font-weight: 500;
 }
 
+/* Who on the left; on the right the status and the way out, as one band */
 .rp-prohead__row {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    grid-template-areas: "avatar titles status actions";
     align-items: center;
-    gap: 16px;
+    column-gap: 16px;
     margin-top: 12px;
 }
 
 .rp-prohead__avatar {
+    grid-area: avatar;
     position: relative;
-    flex: 0 0 auto;
     width: 64px;
     height: 64px;
 }
@@ -120,7 +123,7 @@
 }
 
 .rp-prohead__titles {
-    flex: 1 1 auto;
+    grid-area: titles;
     min-width: 0;
 }
 
@@ -210,36 +213,22 @@
 }
 
 .rp-prohead__actions {
-    flex: 0 0 auto;
+    grid-area: actions;
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
-/* One inset band under the name, label over value, so the four read as facts and never as fields */
-.rp-prohead__facts {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    margin: 16px 0 0;
-    padding: 12px 0;
-    border-radius: var(--radius-md);
-    background: var(--color-surface-inset);
-}
-
-.rp-prohead__fact {
+/* Label over value behind a hairline, so the status reads as a fact of the profile, not a control */
+.rp-prohead__status {
+    grid-area: status;
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    min-width: 0;
-    padding: 0 18px;
-    border-left: 1px solid var(--color-border);
+    gap: 3px;
+    padding: 2px 8px 2px 20px;
 }
 
-.rp-prohead__fact:first-child {
-    border-left: 0;
-}
-
-.rp-prohead__fact dt {
+.rp-prohead__statuslabel {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -248,36 +237,23 @@
     white-space: nowrap;
 }
 
-.rp-prohead__fact dt svg {
+.rp-prohead__statuslabel svg {
     width: 14px;
     height: 14px;
 }
 
-.rp-prohead__fact dd {
+.rp-prohead__statusvalue {
     display: flex;
     align-items: baseline;
-    flex-wrap: wrap;
-    gap: 2px 8px;
-    min-width: 0;
-    margin: 0;
+    gap: 8px;
     font-size: 15px;
     font-weight: 500;
     line-height: 1.4;
-    color: var(--color-text-primary);
+    white-space: nowrap;
 }
 
-.rp-prohead__fact .rp-linkbtn {
+.rp-prohead__statusvalue .rp-linkbtn {
     font-size: 13px;
-}
-
-.rp-prohead__hint {
-    font-size: 12.5px;
-    font-weight: 400;
-    color: var(--color-text-secondary);
-}
-
-.rp-prohead__pending {
-    color: var(--color-status-warning);
 }
 
 /* The topbar pill's colours, so the two always read as one status */
@@ -333,32 +309,40 @@
     color: var(--color-text-secondary);
 }
 
-/* Two by two before a fourth column would cut "Preferred currency" short */
+/* Without room beside the name, the status becomes its third line, the dot and word saying enough */
 @container rpHead (max-width: 760px) {
-    .rp-prohead__facts {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+    .rp-prohead__row {
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        grid-template-areas: "avatar titles actions" "avatar status status";
+        align-items: start;
+        row-gap: 8px;
+    }
+
+    .rp-prohead__actions {
+        align-self: center;
+    }
+
+    .rp-prohead__status {
         padding: 0;
-    }
-
-    .rp-prohead__fact {
-        padding: 11px 16px;
-    }
-
-    .rp-prohead__fact:nth-child(odd) {
         border-left: 0;
     }
 
-    .rp-prohead__fact:nth-child(n + 3) {
-        border-top: 1px solid var(--color-border);
+    .rp-prohead__statuslabel {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+    }
+
+    .rp-prohead__statusvalue {
+        font-size: 14px;
     }
 }
 
 /* On a phone the link keeps only its icon, so the name keeps the line beside the photo */
 @container rpHead (max-width: 560px) {
-    .rp-prohead__row {
-        align-items: flex-start;
-    }
-
     .rp-prohead__avatar {
         width: 52px;
         height: 52px;
@@ -366,6 +350,10 @@
 
     .rp-prohead__title {
         font-size: 19px;
+    }
+
+    .rp-prohead__actions {
+        align-self: start;
     }
 
     .rp-prohead__actions .rp-button {
@@ -380,14 +368,6 @@
         overflow: hidden;
         clip: rect(0, 0, 0, 0);
         white-space: nowrap;
-    }
-
-    .rp-prohead__facts {
-        margin-top: 14px;
-    }
-
-    .rp-prohead__fact {
-        padding: 10px 12px;
     }
 }
 

@@ -288,24 +288,19 @@ entry opens it, and its head links back to User Account. It is built like User A
 sticky jump tabs with a scroll-spy, cards on the left and a sticky aside that stacks below ~1100px
 of content width (Needs your attention first, At a glance last).
 
-The head has two tiers. The first is who: User Account's photo (same photo dialog) and name, the
-verified mark, *Freelancer*, the ID and *Company preferred* (bid requests reach them first; it
-was a switch the resource could see), with the User Account link at the end — on a phone, its icon
-alone. The ID reads **ID #202**, as the old page's *Resource ID #202* did, rather than the system key
-`T-202` (the topbar menu and User Account still show `T-202`). The second tier is one inset band of
-four read-only facts, label over value, never form fields:
+The head is one band, as compact as User Account's. On the left, who: User Account's photo (same
+photo dialog) and name, the verified mark, *Freelancer*, the ID and *Company preferred* (bid requests
+reach them first; it was a switch the resource could see). The ID reads **ID #202**, as the old
+page's *Resource ID #202* did, rather than the system key `T-202` (the topbar menu and User Account
+still show `T-202`). On the right, the status and the way out:
 
-| Fact | Shows | Comes from |
-| --- | --- | --- |
-| Availability | The topbar pill's status and colour; **Change** opens the topbar's dropdown | `Translator.work_status` |
-| Native language | Arabic | `native_language`, set by staff |
-| Preferred currency | `USD via Wise`; *Pending verification* in amber while the default method is unverified | The default verified payment method |
-| Joining date | 8 Mar 2021 | `date_joined` |
+- **Availability** — label over value behind a hairline, in the topbar pill's colours, with
+  **Change**. It sits under the topbar's own pill, so the dropdown Change opens is right above it.
+  Native language, preferred currency and joining date live in At a glance, not here.
+- **User Account** — on a phone, its icon alone.
 
-Availability leads because it is the one the resource changes and the one that decides whether
-invitations arrive. Four columns on a wide head, two by two from 760px of head width down. The
-facts repaint when a payment method becomes the default, so the band, the Payment method card,
-At a glance and the attention list never disagree.
+Below 760px of head width the status has no room beside the name, so it becomes the name's third
+line — `● Available · Change`, the label hidden, the dot and word saying enough.
 
 **At a glance** opens on an ID card, as User Account's Account card opens on Resource ID: `#202` in
 the serif with a copy button, *Freelancer* and *Company preferred*, then native language, preferred
