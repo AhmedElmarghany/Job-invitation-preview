@@ -289,9 +289,11 @@ sticky jump tabs with a scroll-spy, cards on the left and a sticky aside that st
 of content width (Needs your attention first, At a glance last).
 
 The head has two tiers. The first is who: User Account's photo (same photo dialog) and name, the
-verified mark, *Freelancer*, the ID chip and *Company preferred* (bid requests reach them first; it
+verified mark, *Freelancer*, the ID and *Company preferred* (bid requests reach them first; it
 was a switch the resource could see), with the User Account link at the end — on a phone, its icon
-alone. The second is one inset band of four read-only facts, label over value, never form fields:
+alone. The ID reads **ID #202**, as the old page's *Resource ID #202* did, rather than the system key
+`T-202` (the topbar menu and User Account still show `T-202`). The second tier is one inset band of
+four read-only facts, label over value, never form fields:
 
 | Fact | Shows | Comes from |
 | --- | --- | --- |
@@ -302,8 +304,15 @@ alone. The second is one inset band of four read-only facts, label over value, n
 
 Availability leads because it is the one the resource changes and the one that decides whether
 invitations arrive. Four columns on a wide head, two by two from 760px of head width down. The
-facts repaint when a payment method becomes the default, so the band, the Payment method card and
-the attention list never disagree; At a glance no longer repeats the currency.
+facts repaint when a payment method becomes the default, so the band, the Payment method card,
+At a glance and the attention list never disagree.
+
+**At a glance** opens on an ID card, as User Account's Account card opens on Resource ID: `#202` in
+the serif with a copy button, *Freelancer* and *Company preferred*, then native language, preferred
+currency and joining date on the same tile. Under the tile, the work: language pairs used of 6,
+services, certificates, specialities and the vendor manager. In the aside it reads top to bottom;
+stacked full width, the ID sits beside its three facts and the counts make one row under them. The
+aside stays sticky only while it fits the window — measured, since the card grew.
 
 | Section | Holds | In the original |
 | --- | --- | --- |
@@ -312,7 +321,7 @@ the attention list never disagree; At a glance no longer repeats the currency.
 | Billing details | The address as label over value, or *Same as your primary address* linking to User Account; Edit opens the form; Tax read-only | `resource/billing_details.html` |
 | Payment method | A card per method: the default framed in navy, Verified or Pending verification, Make default; a method not added yet is a dashed row | `resource/preferred_payment_method.html`, `method_Forms/` |
 | Emails | The mail sent to the resource, unread in bold with a dot, read in a dialog | `customer/emails.html` |
-| Aside | Needs your attention: rejected or expiring certificates, an unverified default method. At a glance: pairs used of 6, services, certificates, specialities, vendor manager | — |
+| Aside | Needs your attention: rejected or expiring certificates, an unverified default method. At a glance: the ID card (resource ID with copy, category, company preferred, native language, preferred currency, joining date), then pairs used of 6, services, certificates, specialities, vendor manager | — |
 
 **Pairs instead of a table with an expanding row.** A certificate belongs to a language pair (and one
 service), the freelancer limit counts pairs, and a translator thinks in pairs. Grouping by pair puts

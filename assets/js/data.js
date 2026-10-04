@@ -2323,7 +2323,7 @@
         /* ResourceLivePaymentMethod rows. Wise has paid the last thirty bills, PayPal the ones before */
         payment: [
             { code: "WISE", isDefault: true, verified: true, currency: "USD", holder: "Ahmed Elmarghany", email: "ahmedelmarghany01@gmail.com", added: new Date(2024, 2, 18), verifiedOn: new Date(2024, 2, 20) },
-            { code: "PAYPAL", isDefault: false, verified: true, currency: "USD", holder: "Ahmed Elmarghany", email: "ahmed.elmarghany@outlook.com", added: new Date(2021, 2, 9), verifiedOn: new Date(2021, 2, 11) }
+            { code: "PAYPAL", isDefault: false, verified: true, currency: "USD", holder: "Ahmed Elmarghany", email: "ahmedelmarghany01@gmail.com", added: new Date(2021, 2, 9), verifiedOn: new Date(2021, 2, 11) }
         ],
 
         /* The mail the company sent this resource, as filter_email_by_customer lists it */

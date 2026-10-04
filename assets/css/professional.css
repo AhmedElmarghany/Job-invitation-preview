@@ -449,11 +449,15 @@
     top: calc(var(--tabs-h) + 20px);
 }
 
-/* A sticky column taller than the screen would hide its own bottom */
+/* A sticky column taller than the screen would hide its own bottom; is-loose is the measured case */
 @media (max-height: 760px) {
     .rp-pro__aside {
         position: static;
     }
+}
+
+.rp-pro__aside.is-loose {
+    position: static;
 }
 
 /* Stacked where User Account stacks: the price rows need the width the aside would take */
@@ -3267,7 +3271,92 @@
     height: 14px;
 }
 
-/* Full width once stacked: the to-dos in two columns, the facts in one row */
+.rp-srow__pending {
+    font-size: 13px;
+    color: var(--color-status-warning);
+}
+
+/* The ID card: who the resource is on a tile of its own, so the work counts under it read apart */
+.rp-idcard {
+    margin-bottom: 6px;
+    padding: 12px 14px;
+    border-radius: var(--radius-md);
+    background: var(--color-surface-inset);
+}
+
+.rp-idcard__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.rp-idcard__label {
+    font-size: 12.5px;
+    color: var(--color-text-secondary);
+}
+
+.rp-idcard__head .rp-iconbtn {
+    width: 26px;
+    height: 26px;
+    margin: -3px -5px -3px 0;
+    border-color: transparent;
+    background: transparent;
+}
+
+.rp-idcard__head .rp-iconbtn:hover {
+    background: var(--color-surface-white);
+    border-color: var(--color-border);
+}
+
+.rp-idcard__head .rp-iconbtn svg {
+    width: 14px;
+    height: 14px;
+}
+
+.rp-idcard__no {
+    margin: 2px 0 10px;
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: 0.01em;
+    color: var(--color-brand-navy);
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-idcard__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+}
+
+.rp-idcard__facts {
+    margin-top: 12px;
+    padding-top: 2px;
+    border-top: 1px solid var(--color-border);
+}
+
+.rp-idcard__facts .rp-srow {
+    min-height: 36px;
+    padding: 6px 0;
+}
+
+.rp-idcard__facts .rp-srow:last-child {
+    padding-bottom: 0;
+}
+
+.rp-glance__work .rp-srow {
+    min-height: 40px;
+    padding: 7px 0;
+}
+
+.rp-glance__work .rp-srow:last-child {
+    padding-bottom: 0;
+}
+
+/* Stacked full width: to-dos in two columns, the ID beside its facts, the counts in a row under */
 @container rpCard (min-width: 600px) {
     .rp-attn .rp-todo {
         display: grid;
@@ -3280,13 +3369,27 @@
         width: 100%;
     }
 
-    .rp-glance .rp-srows {
+    .rp-idcard {
         display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-columns: minmax(170px, 1.6fr) repeat(3, minmax(0, 1fr));
+        column-gap: 24px;
+        align-items: start;
+        margin-bottom: 18px;
+        padding: 14px 18px;
+    }
+
+    .rp-idcard__facts {
+        display: contents;
+    }
+
+    .rp-glance__work {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
         gap: 14px 24px;
     }
 
-    .rp-glance .rp-srow {
+    .rp-idcard__facts .rp-srow,
+    .rp-glance__work .rp-srow {
         flex-direction: column;
         align-items: flex-start;
         justify-content: flex-start;
@@ -3296,7 +3399,8 @@
         border-bottom: 0;
     }
 
-    .rp-glance .rp-srow dd {
+    .rp-idcard__facts .rp-srow dd,
+    .rp-glance__work .rp-srow dd {
         justify-content: flex-start;
         text-align: left;
     }

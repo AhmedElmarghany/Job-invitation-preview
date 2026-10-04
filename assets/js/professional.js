@@ -109,6 +109,11 @@
         return '<span class="rp-dot" aria-hidden="true"></span>';
     }
 
+    /* T- is the system's prefix; people know a resource by the number, as the old "Resource ID #202" showed it */
+    function resourceNo() {
+        return "#" + String(RP.USER.resourceId).replace(/^\D*-?/, "");
+    }
+
     /* Per-word rates need four places to mean anything; hourly ones read better with two */
     function money(value) {
         var places = value < 1 ? 4 : 2;
@@ -446,7 +451,7 @@
             '<div class="rp-prohead__titles"><h1 class="rp-prohead__title">' + esc(RP.USER.fullName) +
             (PRO.verified ? '<span class="rp-verified" tabindex="0" role="img" aria-label="Verified resource" data-tip="Verified resource">' + icon("badge-check-filled") + "</span>" : "") +
             "</h1>" +
-            '<p class="rp-prohead__meta"><span class="rp-tag">' + esc(PRO.category) + '</span><span class="rp-idchip">' + esc(RP.USER.resourceId) + "</span>" +
+            '<p class="rp-prohead__meta"><span class="rp-tag">' + esc(PRO.category) + '</span><span class="rp-idchip">ID ' + resourceNo() + "</span>" +
             (PRO.companyPreferred
                 ? '<span class="rp-preferred" tabindex="0" data-tip="Bid requests reach you before they go out to all freelancers.">' + icon("star") + "Company preferred</span>"
                 : "") +
@@ -1159,6 +1164,7 @@
         return '<div class="rp-srow"><dt>' + label + "</dt><dd>" + value + "</dd></div>";
     }
 
+    /* The ID card leads, as Resource ID does on User Account: who the resource is, then their work */
     function glanceCard() {
         var pending = PRO.prices.filter(function (p) {
             return p.status === "pending";
@@ -1167,13 +1173,36 @@
             return certState(c) === "verified";
         }).length;
         var vm = PRO.vendorManager;
+        var def = defaultMethod();
+        var cur = preferredCurrency();
         var muted = function (text) {
             return '<span class="rp-srow__muted">' + text + "</span>";
         };
+        var currency = cur
+            ? esc(cur) + " " + muted("via " + METHODS[def.code].label)
+            : def
+            ? '<span class="rp-srow__pending">Pending verification</span>'
+            : muted("Not set");
 
         return (
             '<section class="rp-card rp-glance">' + cardHead("id-card", "At a glance") +
-            '<div class="rp-card__body"><dl class="rp-srows">' +
+            '<div class="rp-card__body">' +
+            '<div class="rp-idcard"><div class="rp-idcard__id">' +
+            '<div class="rp-idcard__head"><span class="rp-idcard__label">Resource ID</span>' +
+            '<button type="button" class="rp-iconbtn" data-act="copy-id" aria-label="Copy resource ID" title="Copy">' + icon("copy") + "</button></div>" +
+            '<p class="rp-idcard__no">' + resourceNo() + "</p>" +
+            '<p class="rp-idcard__tags"><span class="rp-tag">' + esc(PRO.category) + "</span>" +
+            (PRO.companyPreferred
+                ? '<span class="rp-preferred is-tip-end" tabindex="0" data-tip="Bid requests reach you before they go out to all freelancers.">' + icon("star") +
+                  "Company preferred</span>"
+                : "") +
+            "</p></div>" +
+            '<dl class="rp-srows rp-idcard__facts">' +
+            srow("Native language", esc(PRO.nativeLanguage)) +
+            srow("Preferred currency", currency) +
+            srow("Joining date", fmtDate(PRO.joined)) +
+            "</dl></div>" +
+            '<dl class="rp-srows rp-glance__work">' +
             srow("Language pairs", pairKeys().length + " " + muted("of " + PRO.pairLimit)) +
             srow("Services", PRO.prices.length + (pending ? " " + muted(pending + " pending") : "")) +
             srow("Certificates", P.certificates.length + " " + muted(verified + " verified")) +
@@ -1214,6 +1243,7 @@
         var main = servicesCard() + specialitiesCard() + billingCard() + paymentCard() + emailsCard();
         els.pro.innerHTML = '<div class="rp-pro__main">' + main + '</div><aside class="rp-pro__aside" aria-label="Profile summary">' + asideMarkup() + "</aside>";
         collectSections();
+        fitAside();
     }
 
     /* Swaps one card in place, so the reader keeps their scroll */
@@ -1230,6 +1260,29 @@
         if (facts) facts.innerHTML = factsMarkup();
         var aside = els.pro.querySelector(".rp-pro__aside");
         if (aside) aside.innerHTML = asideMarkup();
+        fitAside();
+    }
+
+    function copyId() {
+        var id = resourceNo();
+        var done = function () {
+            RP.toast("Resource ID " + id + " copied.", "success");
+        };
+        if (global.navigator.clipboard && global.navigator.clipboard.writeText) {
+            global.navigator.clipboard.writeText(id).then(done, done);
+        } else {
+            done();
+        }
+    }
+
+    /* A sticky aside taller than the window would hide its own foot, so it only sticks while it fits */
+    function fitAside() {
+        var aside = els.pro.querySelector(".rp-pro__aside");
+        if (!aside) return;
+        aside.classList.remove("is-loose");
+        var style = global.getComputedStyle(aside);
+        if (style.display === "contents") return;
+        aside.classList.toggle("is-loose", aside.offsetHeight + (parseFloat(style.top) || 0) + 16 > global.innerHeight);
     }
 
     /* The topbar scrolls away with the page, so it is brought back before its dropdown opens */
@@ -2424,6 +2477,7 @@
         if (act === "mail-more") return showMoreMail();
         if (act === "goto") return goTo(btn.dataset.target);
         if (act === "availability") return openAvailability();
+        if (act === "copy-id") return copyId();
         if (act === "message-vm") return RP.toast("A message to " + PRO.vendorManager.name + " would open in Messaging.", "info");
         if (act === "view-file") {
             e.preventDefault();
@@ -2600,6 +2654,10 @@
             },
             { passive: true }
         );
+
+        /* The sidebar's slide changes the width after resize has fired, so the layout itself is watched */
+        if (global.ResizeObserver) new global.ResizeObserver(fitAside).observe(els.pro);
+        global.addEventListener("resize", fitAside);
 
         global.addEventListener("beforeunload", function (e) {
             if (!dirty.specialities && !dirty.billing) return;
