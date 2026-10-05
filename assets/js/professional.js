@@ -580,7 +580,7 @@
 
         return (
             '<li class="rp-cert" id="cert-' + c.id + '">' +
-            '<span class="rp-cert__icon" aria-hidden="true">' + icon("award") + "</span>" +
+            '<span class="rp-cert__icon" aria-hidden="true">' + icon("certificate-colour") + "</span>" +
             '<div class="rp-cert__body"><button type="button" class="rp-cert__name" data-act="cert-details" data-id="' + c.id + '">' + hl(c.name, q) + "</button>" +
             '<p class="rp-cert__meta"><span>' + esc(def ? def.name : c.service) + "</span>" + dot() + "<span>ID " + esc(c.certId) + "</span>" + dot() +
             "<span>" + expiry + "</span>" +

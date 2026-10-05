@@ -1970,6 +1970,7 @@
     border-top: 0;
 }
 
+/* A full-colour certificate on a cream tile, so credentials stand out from the navy service icons */
 .rp-cert__icon {
     grid-area: icon;
     display: grid;
@@ -1977,13 +1978,13 @@
     width: 36px;
     height: 36px;
     border-radius: var(--radius-sm);
-    background: var(--color-brand-navy);
-    color: var(--color-surface-white);
+    background: #fff3d6;
+    box-shadow: inset 0 0 0 1px #eed9a3;
 }
 
 .rp-cert__icon svg {
-    width: 18px;
-    height: 18px;
+    width: 26px;
+    height: 26px;
 }
 
 .rp-cert__body {

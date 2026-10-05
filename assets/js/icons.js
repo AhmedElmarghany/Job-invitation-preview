@@ -318,6 +318,9 @@
 
         landmark: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-landmark"><line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg>`,
 
+        /* Our own full-colour certificate: navy sheet, gold seal, red ribbon */
+        "certificate-colour": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="lucide lucide-certificate-colour"><rect x="2" y="3.5" width="20" height="14" rx="2.2" fill="#FFFFFF" stroke="#0B263E" stroke-width="1.6"/><path d="M5.6 7.6h9.2" stroke="#0B263E" stroke-width="1.6" stroke-linecap="round"/><path d="M5.6 10.8h5.6" stroke="#93A4B7" stroke-width="1.6" stroke-linecap="round"/><path d="M14.5 16.2 13.6 21.4 16.5 19.9 19.4 21.4 18.5 16.2Z" fill="#D7263D"/><circle cx="16.5" cy="14.4" r="3.7" fill="#F2B632" stroke="#FFFFFF" stroke-width="1.2"/><circle cx="16.5" cy="14.4" r="1.6" fill="#FFE7A0"/></svg>`,
+
         /* Wise has no mark in either library; a transfer arrow stands in for it */
         "arrow-right-left": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right-left"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg>`,
 
@@ -400,7 +403,7 @@
     }
 
     /* Brand marks whose own colours are the point, so they skip the currentColor rewrite */
-    var KEEP_COLOUR = { paypal: true };
+    var KEEP_COLOUR = { paypal: true, "certificate-colour": true };
 
     function adopt(raw, extraClass, keep) {
         var svg = String(raw).trim();
