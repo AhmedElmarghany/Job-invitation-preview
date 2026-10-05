@@ -311,7 +311,7 @@ aside stays sticky only while it fits the window — measured, since the card gr
 
 | Section | Holds | In the original |
 | --- | --- | --- |
-| Services & prices | One block per language pair — its services with rate, status and actions, then its certificates. Single-language and language-independent services follow in blocks of their own | `resources_prices/table.html` and its certificate sub-row, `addPriceForm.html`, the certificate modal |
+| Services & prices | One block per language pair — its services with rate, status and actions, then its certificates. Single-language and language-independent services follow in blocks of their own. Every block collapses; *Collapse all* folds them at once | `resources_prices/table.html` and its certificate sub-row, `addPriceForm.html`, the certificate modal |
 | Specialities | **Own section and tab.** Up to ten, in six groups like Technology on User Account; Edit swaps in the toggles | The Specialties picker inside Resource Details |
 | Billing details | The address as label over value, or *Same as your primary address* linking to User Account; Edit opens the form; Tax read-only | `resource/billing_details.html` |
 | Payment method | A card per method: the default framed in navy, Verified or Pending verification, Make default; a method not added yet is a dashed row | `resource/preferred_payment_method.html`, `method_Forms/` |
@@ -322,7 +322,15 @@ aside stays sticky only while it fits the window — measured, since the card gr
 service), the freelancer limit counts pairs, and a translator thinks in pairs. Grouping by pair puts
 each pair's certificates under its rates, so a rejected or expiring one is on screen without opening
 anything. Inside a block the rows keep a table's columns — service, rate, status, actions — so rates
-still compare at a glance, and search, the status filter and a six-cell pair meter sit above them.
+still compare at a glance. Search sits above them on the left, the status filter and *Collapse all*
+on the right. The six-pair limit is no longer a meter there: *How services and prices work* says it,
+with how many pairs are priced, and At a glance counts them.
+
+**Collapse.** Blocks open by default. The chevron at a block's right folds it (the whole head does,
+for a mouse); *Collapse all* folds every block and turns into *Expand all*, so a resource can close
+everything and open the one pair they work on. The state lives in memory only — a reload opens them
+all. A search or the status filter opens the blocks it finds, and a save or `?highlight_cert=` opens
+the block of the row it flags.
 
 **Changed on the way:**
 
@@ -330,7 +338,12 @@ still compare at a glance, and search, the status filter and a six-cell pair met
   pair, it starts on that pair and the first service the pair has no rate for. A duplicate rate and a
   seventh pair are refused before saving, the latter with a link to message the vendor manager.
 - A rate shows NZD first, then ≈ the currency it was typed in (or USD), as the old two lines did.
-  New rates are *Pending approval* in `.status-pending`'s brown; *Active* is the Verified green.
+  The date the old table printed under each rate is when the exchange rates were last updated, not
+  when the rate was changed, so it is said once, under the blocks: *≈ amounts are converted at the
+  exchange rates updated …* (`RP.FX_UPDATED`); hovering a ≈ line shows the rate it used.
+- New rates are *Pending approval* — on this page `.status-pending` is a calm blue (waiting on our
+  team), so it stays apart from the amber that asks the resource to act; *Active* is the Verified
+  green.
 - A verified certificate expiring within 60 days gets **Renew**, which adds the renewed one; the
   old one then reads *Renewal sent* and stops asking. A rejected one shows its reason and
   **Replace the file**. Verified certificates are locked, as before.

@@ -58,6 +58,7 @@
     var dirty = { specialities: false, billing: false };
     var specDraft = null;
     var view = { q: "", status: "all" };
+    var collapsed = {};
     var staged = [];
     var picked = { photo: null, file: null };
     var mailsShown = MAILS_PAGE;
@@ -280,7 +281,7 @@
     }
 
     function groupId(key) {
-        return "group-" + key.toLowerCase().replace(/[^a-z]+/g, "-").replace(/^-|-$/g, "");
+        return "group-" + (key === "*" ? "any" : key.toLowerCase().replace(/[^a-z]+/g, "-").replace(/^-|-$/g, ""));
     }
 
     function defaultMethod() {
@@ -525,25 +526,14 @@
         );
     }
 
-    function pairsMeter() {
-        var used = pairKeys().length;
-        var limit = PRO.pairLimit;
-        var cells = "";
-        for (var i = 0; i < limit; i++) cells += "<i" + (i < used ? ' class="is-on"' : "") + "></i>";
-        return (
-            '<div class="rp-pairs is-tip-end' + (used >= limit ? " is-full" : "") + '" tabindex="0" data-tip="Freelancers can price up to ' + limit +
-            ' language pairs. Message your vendor manager to add more."><span><strong>' + used + "</strong> of " + limit +
-            ' language pairs</span><span class="rp-pairs__meter" aria-hidden="true">' + cells + "</span></div>"
-        );
-    }
-
+    /* Its label and icon are set by paintCollapseAll, which reads the groups once they are on the page */
     function servicesBar() {
         return (
             '<div class="rp-svcbar"><label class="rp-search">' + icon("search") +
             '<input type="search" placeholder="Search by service or language" aria-label="Search services and languages" data-svc-search autocomplete="off" value="' +
             esc(view.q) + '"></label>' +
             '<div class="rp-segmented" role="group" aria-label="Filter by status" data-svc-segments>' + segmentsMarkup() + "</div>" +
-            pairsMeter() + "</div>"
+            '<button type="button" class="pd-edit-btn rp-svcbar__toggle" data-act="toggle-all"></button></div>'
         );
     }
 
@@ -551,22 +541,26 @@
         return (serviceDef(p.service).name + " " + (p.mode || "") + " " + (p.type || "")).toLowerCase();
     }
 
-    function convText(p) {
-        var code = p.entered && p.entered !== BASE ? p.entered : "USD";
-        return "≈ " + code + " " + money(inCurrency(p.price, code));
+    function convCode(p) {
+        return p.entered && p.entered !== BASE ? p.entered : "USD";
+    }
+
+    function fxWhen() {
+        return fmtDate(RP.FX_UPDATED) + ", " + fmtTime(RP.FX_UPDATED);
     }
 
     function priceRow(p, q) {
         var def = serviceDef(p.service);
         var st = PRICE_STATUS[p.status];
+        var code = convCode(p);
         return (
             '<li class="rp-svc" id="price-' + p.id + '">' +
             '<span class="rp-svc__icon" aria-hidden="true">' + icon(SERVICE_ICON[p.service] || "jobs") + "</span>" +
             '<div class="rp-svc__name"><p class="rp-svc__title">' + hl(def.name, q) +
-            (p.mode ? '<span class="rp-svc__mode">' + hl(p.mode, q) + " → " + hl(p.type, q) + "</span>" : "") + "</p>" +
-            '<p class="rp-svc__sub">Updated ' + fmtDate(p.updated) + "</p></div>" +
+            (p.mode ? '<span class="rp-svc__mode">' + hl(p.mode, q) + " → " + hl(p.type, q) + "</span>" : "") + "</p></div>" +
             '<div class="rp-svc__rate"><p class="rp-svc__price">' + BASE + " " + money(p.price) + ' <span class="rp-svc__unit">/ ' + def.unit + "</span></p>" +
-            '<p class="rp-svc__conv">' + convText(p) + "</p></div>" +
+            '<p class="rp-svc__conv" data-tip="1 NZD = ' + RP.FX[code] + " " + code + ", exchange rate of " + fxWhen() + '">≈ ' + code + " " +
+            money(inCurrency(p.price, code)) + "</p></div>" +
             '<div class="rp-svc__status">' + pill(st, st.tip) + "</div>" +
             '<div class="rp-svc__actions">' +
             '<button type="button" class="rp-iconbtn rp-iconbtn--ghost" data-act="edit-price" data-id="' + p.id + '" aria-label="Edit the ' +
@@ -610,35 +604,49 @@
         );
     }
 
-    function groupMarkup(g, q) {
+    function groupContent(g, q) {
         var labelHit = !!q && groupLabel(g).toLowerCase().indexOf(q) !== -1;
-        var rows = g.prices.filter(function (p) {
-            return (view.status === "all" || p.status === view.status) && (!q || labelHit || rowText(p).indexOf(q) !== -1);
-        });
         var allCerts = g.kind === "pair" ? certsFor(g.source, g.target) : [];
-        var certs =
-            view.status === "all"
-                ? allCerts.filter(function (c) {
-                      return !q || labelHit || c.name.toLowerCase().indexOf(q) !== -1;
-                  })
-                : [];
+        return {
+            rows: g.prices.filter(function (p) {
+                return (view.status === "all" || p.status === view.status) && (!q || labelHit || rowText(p).indexOf(q) !== -1);
+            }),
+            certs:
+                view.status === "all"
+                    ? allCerts.filter(function (c) {
+                          return !q || labelHit || c.name.toLowerCase().indexOf(q) !== -1;
+                      })
+                    : [],
+            allCerts: allCerts
+        };
+    }
+
+    function groupMarkup(g, q) {
+        var content = groupContent(g, q);
+        var rows = content.rows;
+        var certs = content.certs;
+        var allCerts = content.allCerts;
         if (!rows.length && !certs.length) return "";
 
         var mark;
         var title;
         var kind;
+        var name;
         if (g.kind === "pair") {
             mark = esc(langCode(g.source)) + icon("arrow-right") + esc(langCode(g.target));
             title = hl(g.source, q) + icon("arrow-right") + hl(g.target, q);
             kind = "Language pair";
+            name = g.source + " → " + g.target;
         } else if (g.kind === "single") {
             mark = esc(langCode(g.language));
             title = hl(g.language, q);
             kind = "Single language";
+            name = g.language;
         } else {
             mark = icon("globe");
             title = "Any language";
             kind = "Language independent";
+            name = "Any language";
         }
 
         var canCert =
@@ -647,29 +655,36 @@
                 g.prices.some(function (p) {
                     return serviceDef(p.service).certifiable;
                 }));
+        var gid = groupId(g.key);
+        var shut = !!collapsed[g.key];
 
+        /* The whole head toggles for a pointer; the chevron is the control a keyboard reaches */
         return (
-            '<article class="rp-svcgroup" id="' + groupId(g.key) + '">' +
-            '<header class="rp-svcgroup__head"><span class="rp-langmark" aria-hidden="true">' + mark + "</span>" +
+            '<article class="rp-svcgroup' + (shut ? " is-collapsed" : "") + '" id="' + gid + '" data-key="' + esc(g.key) + '">' +
+            '<header class="rp-svcgroup__head" data-act="toggle-group"><span class="rp-langmark" aria-hidden="true">' + mark + "</span>" +
             '<div class="rp-svcgroup__titles"><h3 class="rp-svcgroup__title">' + title + "</h3>" +
             '<p class="rp-svcgroup__meta"><span>' + kind + "</span>" + dot() + "<span>" + plural(g.prices.length, "service") + "</span>" +
             (allCerts.length ? dot() + "<span>" + plural(allCerts.length, "certificate") + "</span>" : "") + "</p></div>" +
             '<div class="rp-svcgroup__actions">' +
             '<button type="button" class="rp-chipbtn" data-act="add-services" data-group="' + esc(g.key) + '">' + icon("plus") + "Add service</button>" +
             (canCert ? '<button type="button" class="rp-chipbtn" data-act="add-cert" data-group="' + esc(g.key) + '">' + icon("award") + "Add certificate</button>" : "") +
-            "</div></header>" +
+            "</div>" +
+            '<button type="button" class="rp-iconbtn rp-iconbtn--ghost rp-svcgroup__toggle" data-act="toggle-group" data-name="' + esc(name) +
+            '" aria-expanded="' + !shut + '" aria-controls="' + gid + '-body" aria-label="' + (shut ? "Expand " : "Collapse ") + esc(name) + '" title="' +
+            (shut ? "Expand" : "Collapse") + '">' + icon("chevron-down") + "</button></header>" +
+            '<div class="rp-svcgroup__body" id="' + gid + '-body"' + (shut ? " inert" : "") + '><div class="rp-svcgroup__inner">' +
             (rows.length
                 ? '<ul class="rp-svclist">' + rows.map(function (p) {
                       return priceRow(p, q);
                   }).join("") + "</ul>"
                 : "") +
             (certs.length
-                ? '<div class="rp-certs"><p class="rp-certs__label">' + icon("award") + 'Certificates</p><ul class="rp-certlist">' +
+                ? '<div class="rp-certs"><p class="rp-certs__label">Certificates</p><ul class="rp-certlist">' +
                   certs.map(function (c) {
                       return certRow(c, q);
                   }).join("") + "</ul></div>"
                 : "") +
-            "</article>"
+            "</div></div></article>"
         );
     }
 
@@ -705,7 +720,8 @@
             ) +
             '<div class="rp-card__body">' +
             (has
-                ? servicesBar() + '<div class="rp-svcgroups" data-svc-groups>' + groupsMarkup() + "</div>"
+                ? servicesBar() + '<div class="rp-svcgroups" data-svc-groups>' + groupsMarkup() + "</div>" +
+                  '<p class="rp-svcfx">' + icon("clock") + "<span>≈ amounts are converted at the exchange rates updated " + fxWhen() + ".</span></p>"
                 : empty(
                       "banknote",
                       "No services yet",
@@ -719,10 +735,87 @@
 
     /* Filtering repaints the groups only, so the search field keeps its focus */
     function paintGroups() {
+        var q = view.q.trim().toLowerCase();
+        /* A filter opens the groups it finds, or a collapsed one would hide its own matches */
+        if (q || view.status !== "all") {
+            groupList().forEach(function (g) {
+                var found = groupContent(g, q);
+                if (found.rows.length || found.certs.length) delete collapsed[g.key];
+            });
+        }
         var host = document.querySelector("[data-svc-groups]");
         if (host) host.innerHTML = groupsMarkup();
         var segs = document.querySelector("[data-svc-segments]");
         if (segs) segs.innerHTML = segmentsMarkup();
+        paintCollapseAll();
+    }
+
+    /* ── Collapse: kept in memory only, so a reload opens every group again ── */
+
+    function everyShut(groups) {
+        return (
+            groups.length > 0 &&
+            Array.prototype.every.call(groups, function (el) {
+                return el.classList.contains("is-collapsed");
+            })
+        );
+    }
+
+    function setGroupOpen(el, open) {
+        var key = el.dataset.key;
+        if (open) delete collapsed[key];
+        else collapsed[key] = true;
+        if (el.classList.contains("is-collapsed") === !open) return;
+
+        var btn = el.querySelector(".rp-svcgroup__toggle");
+        var body = el.querySelector(".rp-svcgroup__body");
+        /* Clipped until the slide really ends; a timer could unclip it early on a slow or hidden tab */
+        if (!reduced()) {
+            el.classList.add("is-moving");
+            body.addEventListener("transitionend", function done(e) {
+                if (e.target !== body || e.propertyName !== "grid-template-rows") return;
+                body.removeEventListener("transitionend", done);
+                el.classList.remove("is-moving");
+            });
+        }
+        el.classList.toggle("is-collapsed", !open);
+        body.inert = !open;
+        btn.setAttribute("aria-expanded", String(open));
+        btn.setAttribute("aria-label", (open ? "Collapse " : "Expand ") + btn.dataset.name);
+        btn.title = open ? "Collapse" : "Expand";
+    }
+
+    function toggleGroup(el) {
+        setGroupOpen(el, el.classList.contains("is-collapsed"));
+        paintCollapseAll();
+    }
+
+    /* Collapse all reaches groups a filter hides too, so clearing the filter does not reopen them */
+    function toggleAll() {
+        var groups = document.querySelectorAll("#services .rp-svcgroup");
+        var open = everyShut(groups);
+        if (open) {
+            collapsed = {};
+        } else {
+            groupList().forEach(function (g) {
+                collapsed[g.key] = true;
+            });
+        }
+        groups.forEach(function (el) {
+            setGroupOpen(el, open);
+        });
+        paintCollapseAll();
+    }
+
+    function paintCollapseAll() {
+        var btn = document.querySelector('[data-act="toggle-all"]');
+        if (!btn) return;
+        var groups = document.querySelectorAll("#services .rp-svcgroup");
+        var shut = everyShut(groups);
+        var label = shut ? "Expand all" : "Collapse all";
+        btn.disabled = !groups.length;
+        btn.title = label;
+        btn.innerHTML = icon(shut ? "chevrons-up-down" : "chevrons-down-up") + '<span class="rp-svcbar__togglelabel">' + label + "</span>";
     }
 
     function setStatus(key) {
@@ -1223,6 +1316,7 @@
         els.tabs.innerHTML = tabsMarkup("services");
         var main = servicesCard() + specialitiesCard() + billingCard() + paymentCard() + emailsCard();
         els.pro.innerHTML = '<div class="rp-pro__main">' + main + '</div><aside class="rp-pro__aside" aria-label="Profile summary">' + asideMarkup() + "</aside>";
+        paintCollapseAll();
         collectSections();
         fitAside();
     }
@@ -1231,6 +1325,7 @@
     function refresh(id) {
         var el = document.getElementById(id);
         if (el) el.outerHTML = CARDS[id]();
+        if (id === "services") paintCollapseAll();
         collectSections();
     }
 
@@ -1331,6 +1426,11 @@
     function flash(id, keepFocus) {
         var el = document.getElementById(id);
         if (!el) return;
+        var shut = el.closest(".rp-svcgroup.is-collapsed");
+        if (shut) {
+            setGroupOpen(shut, true);
+            paintCollapseAll();
+        }
         el.classList.remove("is-flagged");
         void el.offsetWidth;
         el.classList.add("is-flagged");
@@ -1565,8 +1665,16 @@
             ["Per pair, per language or once", "Most services are priced per language pair, such as English → Arabic. DTP and transcription are priced per language, and formatting once, whatever the language."],
             ["Active and pending approval", "A new rate waits for a vendor manager to approve it. Jobs use it as soon as it is active."],
             ["Certificates", "A certificate belongs to a language pair and one service. Once it is verified it cannot be changed; when it is renewed, add the new one."],
-            ["Currency", "Rates are kept in NZD, the currency jobs are priced in. Type a rate in another currency and it is converted; the ≈ line shows what you typed."],
-            ["Up to " + PRO.pairLimit + " language pairs", "Freelancers can price up to " + PRO.pairLimit + " language pairs. Message your vendor manager if you need more."]
+            [
+                "Currency",
+                "Rates are kept in NZD, the currency jobs are priced in. Type a rate in another currency and it is converted; the ≈ line shows it in that currency, or in USD. " +
+                    "Exchange rates are updated daily, last on " + fxWhen() + "."
+            ],
+            [
+                "Up to " + PRO.pairLimit + " language pairs",
+                "Freelancers can price up to " + PRO.pairLimit + " language pairs, and you price " + pairKeys().length + " now. To add more, " +
+                    '<button type="button" class="rp-linkbtn" data-act="message-vm">message ' + esc(PRO.vendorManager.name) + "</button>, your vendor manager."
+            ]
         ];
         openModal(
             dialog({
@@ -1858,8 +1966,7 @@
                     service: x.service,
                     price: parseFloat(x.amount) / RP.FX[x.currency],
                     entered: x.currency,
-                    status: "pending",
-                    updated: new Date()
+                    status: "pending"
                 };
                 if (x.source) {
                     row.source = x.source;
@@ -1899,8 +2006,7 @@
                 note: esc(def.name) + (p.mode ? dot() + esc(p.mode + " → " + p.type) : "") + dot() + where,
                 form: "price",
                 id: p.id,
-                body: '<div class="pd-grid">' + rateField(code, amount.toFixed(amount < 1 ? 4 : 2), def.unit) + "</div>" +
-                    '<p class="pd-field-hint">Last changed ' + fmtDate(p.updated) + ".</p>",
+                body: '<div class="pd-grid">' + rateField(code, amount.toFixed(amount < 1 ? 4 : 2), def.unit) + "</div>",
                 submit: "Save rate"
             }),
             "rp-modal--confirm"
@@ -1922,7 +2028,6 @@
         dialogDone(form, function () {
             p.price = amount / RP.FX[code];
             p.entered = code;
-            p.updated = new Date();
             refresh("services");
             flash("price-" + p.id);
             RP.toast(serviceDef(p.service).name + " rate updated.", "success");
@@ -2431,6 +2536,12 @@
         if (act === "stage") return stage(form);
         if (act === "unstage") return unstage(form, Number(btn.dataset.index));
         if (act === "svc-status") return setStatus(btn.dataset.status);
+        if (act === "toggle-group") {
+            /* A drag that selected the pair's name is not a click on the head */
+            if (btn.tagName !== "BUTTON" && String(global.getSelection())) return;
+            return toggleGroup(btn.closest(".rp-svcgroup"));
+        }
+        if (act === "toggle-all") return toggleAll();
         if (act === "svc-clear") return clearFilters();
         if (act === "edit-price") return openEditPrice(id);
         if (act === "ask-delete") return askDelete(btn);

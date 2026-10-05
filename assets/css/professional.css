@@ -859,6 +859,12 @@
     --pill-color: #067647;
 }
 
+/* Waiting on our team, not on the resource: a calm blue, apart from the amber that asks them to act */
+.status-pending {
+    --pill-bg: #e8f1fb;
+    --pill-color: var(--color-status-notification);
+}
+
 .rp-soon {
     display: inline-flex;
     align-items: center;
@@ -1582,52 +1588,18 @@
     height: 6px;
 }
 
-/* Freelancers price up to six pairs; the meter shows the room left before asking for more */
-.rp-pairs {
-    display: flex;
-    align-items: center;
-    gap: 9px;
+/* Search on the left; the filter and Collapse all, which shape the list under them, on the right */
+.rp-svcbar .rp-segmented {
     margin-left: auto;
-    font-size: 12.5px;
-    color: var(--color-text-secondary);
-    white-space: nowrap;
-    cursor: help;
 }
 
-.rp-pairs strong {
-    font-weight: 600;
-    color: var(--color-brand-navy);
-    font-variant-numeric: tabular-nums;
+.rp-svcbar__toggle {
+    height: 36px;
 }
 
-.rp-pairs__meter {
-    display: flex;
-    gap: 3px;
-}
-
-.rp-pairs__meter i {
-    width: 12px;
-    height: 6px;
-    border-radius: 2px;
-    background: #e6e2d8;
-}
-
-.rp-pairs__meter i.is-on {
-    background: var(--color-brand-navy);
-}
-
-.rp-pairs.is-full strong {
-    color: var(--color-status-warning);
-}
-
-.rp-pairs.is-full .rp-pairs__meter i.is-on {
-    background: var(--color-status-warning);
-}
-
-.rp-pairs:focus-visible {
-    outline: none;
-    border-radius: var(--radius-xs);
-    box-shadow: var(--focus-ring-gold);
+.rp-svcbar__toggle:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .rp-svcgroups {
@@ -1647,14 +1619,65 @@
 
 /* The inset head with a navy rule, as the open record on Invitations wears it */
 .rp-svcgroup__head {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 11px 14px;
+    padding: 11px 10px 11px 14px;
     background: var(--color-surface-inset);
     border-bottom: 1px solid var(--color-border);
     border-radius: var(--radius-md) var(--radius-md) 0 0;
-    box-shadow: inset 3px 0 0 var(--color-brand-navy);
+    cursor: pointer;
+}
+
+/* Kept clear of the rounded corners, which would bend a full-height rule */
+.rp-svcgroup__head::before {
+    content: "";
+    position: absolute;
+    top: 12px;
+    bottom: 12px;
+    left: 0;
+    width: 3px;
+    background: var(--color-brand-navy);
+}
+
+.rp-svcgroup__toggle svg {
+    width: 16px;
+    height: 16px;
+    transform: rotate(180deg);
+    transition: transform var(--transition-base);
+}
+
+.rp-svcgroup.is-collapsed .rp-svcgroup__toggle svg {
+    transform: none;
+}
+
+/* Grid rows animate to 0fr, so the group closes to its content's real height without measuring it */
+.rp-svcgroup__body {
+    display: grid;
+    grid-template-rows: 1fr;
+    transition: grid-template-rows var(--transition-base);
+}
+
+.rp-svcgroup__inner {
+    min-height: 0;
+}
+
+.rp-svcgroup.is-collapsed .rp-svcgroup__body {
+    grid-template-rows: 0fr;
+}
+
+/* Clipped only while closed or moving, so the delete popover can still rise over the head */
+.rp-svcgroup.is-collapsed .rp-svcgroup__inner,
+.rp-svcgroup.is-moving .rp-svcgroup__inner {
+    overflow: hidden;
+}
+
+/* The head rounds off once the body has closed, not while it is still sliding up */
+.rp-svcgroup.is-collapsed .rp-svcgroup__head {
+    border-bottom-color: transparent;
+    border-radius: var(--radius-md);
+    transition: border-color 0s 0.28s, border-radius 0s 0.28s;
 }
 
 /* The pair's codes, so a long list of pairs scans by its first letters */
@@ -1789,12 +1812,6 @@
     color: var(--color-text-secondary);
 }
 
-.rp-svc__sub {
-    margin: 1px 0 0;
-    font-size: 12px;
-    color: var(--color-text-secondary);
-}
-
 .rp-svc__rate {
     grid-area: rate;
     min-width: 0;
@@ -1844,7 +1861,7 @@
     transform: translateX(14px);
 }
 
-/* The pill takes the date's line under the name, so a row stays two lines high */
+/* The pill drops under the name, so a row stays two lines high */
 @container rpGroup (max-width: 640px) {
     .rp-svc {
         grid-template-columns: 34px minmax(0, 1fr) auto auto;
@@ -1855,10 +1872,6 @@
 
     .rp-svc__icon {
         align-self: center;
-    }
-
-    .rp-svc__sub {
-        display: none;
     }
 
     .rp-svc__status {
@@ -1909,7 +1922,9 @@
         flex: 1 1 0;
     }
 
+    /* The chips take a line of their own; the chevron stays beside the name it folds */
     .rp-svcgroup__actions {
+        order: 1;
         flex: 1 1 100%;
         padding-left: 50px;
     }
@@ -1924,20 +1939,12 @@
 }
 
 .rp-certs__label {
-    display: flex;
-    align-items: center;
-    gap: 7px;
     margin: 0 0 2px;
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.07em;
     text-transform: uppercase;
     color: var(--color-text-secondary);
-}
-
-.rp-certs__label svg {
-    width: 14px;
-    height: 14px;
 }
 
 .rp-certlist {
@@ -1948,7 +1955,7 @@
 
 .rp-cert {
     display: grid;
-    grid-template-columns: 30px minmax(0, 1fr) auto auto;
+    grid-template-columns: 36px minmax(0, 1fr) auto auto;
     grid-template-areas: "icon body status actions";
     align-items: center;
     column-gap: 12px;
@@ -1967,16 +1974,16 @@
     grid-area: icon;
     display: grid;
     place-items: center;
-    width: 30px;
-    height: 30px;
+    width: 36px;
+    height: 36px;
     border-radius: var(--radius-sm);
-    background: var(--color-surface-white);
-    color: var(--color-brand-navy);
+    background: var(--color-brand-navy);
+    color: var(--color-surface-white);
 }
 
 .rp-cert__icon svg {
-    width: 15px;
-    height: 15px;
+    width: 18px;
+    height: 18px;
 }
 
 .rp-cert__body {
@@ -2032,7 +2039,7 @@
 
 @container rpGroup (max-width: 640px) {
     .rp-cert {
-        grid-template-columns: 30px minmax(0, 1fr) auto;
+        grid-template-columns: 36px minmax(0, 1fr) auto;
         grid-template-areas: "icon body actions" ". status status";
     }
 }
@@ -2076,14 +2083,47 @@
     color: var(--color-text-secondary);
 }
 
-@container rpCard (max-width: 560px) {
+/* One date for every ≈ line: they all use the same daily rates */
+.rp-svcfx {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 12px 0 0;
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--color-text-secondary);
+}
+
+.rp-svcfx svg {
+    flex: 0 0 auto;
+    width: 13px;
+    height: 13px;
+}
+
+/* Without room for one line, Collapse all keeps its icon beside the search and the filter drops below */
+@container rpCard (max-width: 660px) {
     .rp-svcbar .rp-search {
-        flex: 1 1 100%;
+        flex: 1 1 200px;
         max-width: none;
     }
 
-    .rp-pairs {
+    .rp-svcbar .rp-segmented {
+        order: 1;
         margin-left: 0;
+    }
+
+    .rp-svcbar__toggle {
+        width: 36px;
+        padding: 0;
+    }
+
+    .rp-svcbar__togglelabel {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
     }
 }
 
@@ -3253,7 +3293,7 @@
 
 .rp-srow__pending {
     font-size: 13px;
-    color: var(--color-status-warning);
+    color: var(--color-status-notification);
 }
 
 /* The ID card: who the resource is on a tile of its own, so the work counts under it read apart */
@@ -3655,6 +3695,9 @@
     .rp-card,
     .rp-svc,
     .rp-cert,
+    .rp-svcgroup__body,
+    .rp-svcgroup__toggle svg,
+    .rp-svcgroup.is-collapsed .rp-svcgroup__head,
     .rp-modal,
     .rp-modal__panel,
     .rp-paycard {
