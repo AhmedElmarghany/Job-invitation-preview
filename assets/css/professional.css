@@ -1996,7 +1996,7 @@
 .rp-cert__icon {
     grid-area: icon;
     width: 36px;
-    height: 36px;
+    height: 40px;
 }
 
 .rp-cert__body {
