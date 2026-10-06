@@ -1837,12 +1837,10 @@
     color: var(--color-text-secondary);
 }
 
-/* Date at the line's start, ≈ amount at its end under the NZD one: the open space between keeps them apart */
 .rp-svc__conv {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 14px;
+    justify-content: flex-end;
     margin: 2px 0 0;
     font-size: 12px;
     color: var(--color-text-secondary);
@@ -1850,18 +1848,24 @@
     font-variant-numeric: tabular-nums;
 }
 
-/* The old table's clock, a size smaller than the amount; the full stamp waits in the tip */
+/* The old table's clock; the full stamp waits in the tip */
 .rp-svc__fx {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    font-size: 11.5px;
     cursor: help;
 }
 
 .rp-svc__fx svg {
     width: 11px;
     height: 11px;
+}
+
+/* A hairline with air on both sides keeps the date and the ≈ amount apart on one short line */
+.rp-svc__amount {
+    margin-left: 12px;
+    padding: 2px 0 2px 12px;
+    border-left: 1px solid #d4d4d8;
 }
 
 /* A gutter between the right-aligned rate and the left-aligned pill, so they never read as one */
@@ -1929,7 +1933,6 @@
 
     .rp-svc__conv {
         justify-content: flex-start;
-        gap: 16px;
         margin: 0;
     }
 
