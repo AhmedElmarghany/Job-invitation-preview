@@ -1762,7 +1762,7 @@
 
 .rp-svc {
     display: grid;
-    grid-template-columns: 34px minmax(0, 1fr) minmax(120px, 160px) 168px auto;
+    grid-template-columns: 34px minmax(0, 1fr) minmax(120px, 190px) 168px auto;
     grid-template-areas: "icon name rate status actions";
     align-items: center;
     column-gap: 14px;
@@ -1838,6 +1838,10 @@
 }
 
 .rp-svc__conv {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
     margin: 1px 0 0;
     font-size: 12px;
     color: var(--color-text-secondary);
@@ -1845,16 +1849,12 @@
     font-variant-numeric: tabular-nums;
 }
 
-/* Smaller than the ≈ line it dates, with the old table's clock, so it reads as that conversion's stamp */
+/* The old table's clock beside the amount it dates; the full stamp waits in the tip */
 .rp-svc__fx {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    justify-content: flex-end;
-    gap: 4px;
-    margin: 1px 0 0;
-    font-size: 11.5px;
-    color: var(--color-text-secondary);
-    white-space: nowrap;
+    gap: 3px;
+    cursor: help;
 }
 
 .rp-svc__fx svg {
@@ -1925,8 +1925,8 @@
         text-align: left;
     }
 
-    .rp-svc__conv,
-    .rp-svc__fx {
+    .rp-svc__conv {
+        justify-content: flex-start;
         margin: 0;
     }
 
