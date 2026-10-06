@@ -861,13 +861,13 @@
 
 /* Honey amber reads as "waiting"; a brighter dot keeps it legible at filter size */
 .status-pending {
-    --pill-bg: #fef3c7;
-    --pill-color: #92400e;
+    --pill-bg: #f0ece6;
+    --pill-color: #5f5246;
 }
 
 .status-pending .status-dot,
 .status-dot.status-pending {
-    background-color: #f59e0b;
+    background-color: #a08c78;
 }
 
 .rp-soon {
