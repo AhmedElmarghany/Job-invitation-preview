@@ -545,10 +545,17 @@
         return p.entered && p.entered !== BASE ? p.entered : "USD";
     }
 
-    function fxWhen() {
-        return fmtDate(RP.FX_UPDATED) + ", " + fmtTime(RP.FX_UPDATED);
+    /* Today and yesterday read faster than a date; older stamps keep the time, as the old table's did */
+    function fmtRateTime(date) {
+        var now = new Date();
+        var yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+        if (date.toDateString() === now.toDateString()) return "today, " + fmtTime(date);
+        if (date.toDateString() === yesterday.toDateString()) return "yesterday, " + fmtTime(date);
+        if (date.getFullYear() === now.getFullYear()) return date.toLocaleDateString(LOCALE, { day: "numeric", month: "short" }) + ", " + fmtTime(date);
+        return fmtDate(date);
     }
 
+    /* Each rate's own exchange-rate stamp sits under its ≈ line, so it reads as that conversion's date */
     function priceRow(p, q) {
         var def = serviceDef(p.service);
         var st = PRICE_STATUS[p.status];
@@ -559,8 +566,9 @@
             '<div class="rp-svc__name"><p class="rp-svc__title">' + hl(def.name, q) +
             (p.mode ? '<span class="rp-svc__mode">' + hl(p.mode, q) + " → " + hl(p.type, q) + "</span>" : "") + "</p></div>" +
             '<div class="rp-svc__rate"><p class="rp-svc__price">' + BASE + " " + money(p.price) + ' <span class="rp-svc__unit">/ ' + def.unit + "</span></p>" +
-            '<p class="rp-svc__conv" data-tip="1 NZD = ' + RP.FX[code] + " " + code + ", exchange rate of " + fxWhen() + '">≈ ' + code + " " +
-            money(inCurrency(p.price, code)) + "</p></div>" +
+            '<p class="rp-svc__conv">≈ ' + code + " " + money(inCurrency(p.price, code)) + "</p>" +
+            '<p class="rp-svc__fx is-tip-end" data-tip="Exchange rate updated ' + fmtDate(p.rateUpdated) + ", " + fmtTime(p.rateUpdated) + '">' +
+            icon("clock") + "as of " + fmtRateTime(p.rateUpdated) + "</p></div>" +
             '<div class="rp-svc__status">' + pill(st, st.tip) + "</div>" +
             '<div class="rp-svc__actions">' +
             '<button type="button" class="rp-iconbtn rp-iconbtn--ghost" data-act="edit-price" data-id="' + p.id + '" aria-label="Edit the ' +
@@ -580,7 +588,7 @@
 
         return (
             '<li class="rp-cert" id="cert-' + c.id + '">' +
-            '<span class="rp-cert__icon" aria-hidden="true">' + icon("certificate-colour") + "</span>" +
+            icon("certificate-colour", "rp-cert__icon") +
             '<div class="rp-cert__body"><button type="button" class="rp-cert__name" data-act="cert-details" data-id="' + c.id + '">' + hl(c.name, q) + "</button>" +
             '<p class="rp-cert__meta"><span>' + esc(def ? def.name : c.service) + "</span>" + dot() + "<span>ID " + esc(c.certId) + "</span>" + dot() +
             "<span>" + expiry + "</span>" +
@@ -720,8 +728,7 @@
             ) +
             '<div class="rp-card__body">' +
             (has
-                ? servicesBar() + '<div class="rp-svcgroups" data-svc-groups>' + groupsMarkup() + "</div>" +
-                  '<p class="rp-svcfx">' + icon("clock") + "<span>≈ amounts are converted at the exchange rates updated " + fxWhen() + ".</span></p>"
+                ? servicesBar() + '<div class="rp-svcgroups" data-svc-groups>' + groupsMarkup() + "</div>"
                 : empty(
                       "banknote",
                       "No services yet",
@@ -1668,7 +1675,7 @@
             [
                 "Currency",
                 "Rates are kept in NZD, the currency jobs are priced in. Type a rate in another currency and it is converted; the ≈ line shows it in that currency, or in USD. " +
-                    "Exchange rates are updated daily, last on " + fxWhen() + "."
+                    "The time under it is when that rate's exchange rate was last updated."
             ],
             [
                 "Up to " + PRO.pairLimit + " language pairs",
@@ -1966,7 +1973,8 @@
                     service: x.service,
                     price: parseFloat(x.amount) / RP.FX[x.currency],
                     entered: x.currency,
-                    status: "pending"
+                    status: "pending",
+                    rateUpdated: new Date()
                 };
                 if (x.source) {
                     row.source = x.source;
@@ -2028,6 +2036,7 @@
         dialogDone(form, function () {
             p.price = amount / RP.FX[code];
             p.entered = code;
+            p.rateUpdated = new Date();
             refresh("services");
             flash("price-" + p.id);
             RP.toast(serviceDef(p.service).name + " rate updated.", "success");

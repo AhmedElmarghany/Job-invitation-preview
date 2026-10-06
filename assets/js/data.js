@@ -2278,14 +2278,6 @@
     /* 1 NZD in each company currency, for the rate a resource types in another one */
     RP.FX = { NZD: 1, USD: RP.USD_RATE, AUD: 0.9105, EUR: 0.5562, GBP: 0.4721 };
 
-    /* The rates refresh daily at 9:00; the old prices table printed this time under every rate */
-    RP.FX_UPDATED = (function () {
-        var d = new Date(NOW);
-        d.setHours(9, 0, 0, 0);
-        if (d.getTime() > NOW) d.setDate(d.getDate() - 1);
-        return d;
-    })();
-
     /* What the certificate form offers once a country is picked */
     RP.CERT_NAMES = {
         AU: ["NAATI Certified Translator", "NAATI Certified Interpreter", "NAATI Recognised Practising Translator"],
@@ -2309,20 +2301,21 @@
 
         specialities: ["Legal", "Immigration", "Medical", "Pharmaceutical", "Technical", "Marketing", "Education"],
 
-        /* Rates are kept in NZD, the company currency; `entered` is the currency they were typed in */
+        /* Rates are kept in NZD, the company currency; `entered` is the currency they were typed in.
+           `rateUpdated` is when that rate was last converted: the old table showed it under each rate */
         prices: [
-            { id: 701, service: "Translation", source: "English", target: "Arabic", price: 0.055, entered: "NZD", status: "active" },
-            { id: 702, service: "Proofreading", source: "English", target: "Arabic", price: 0.022, entered: "NZD", status: "active" },
-            { id: 703, service: "Certified", source: "English", target: "Arabic", price: 45, entered: "NZD", status: "active" },
-            { id: 704, service: "PostEditing", source: "English", target: "Arabic", price: 0.0495, entered: "USD", status: "active" },
-            { id: 705, service: "Transcreation", source: "English", target: "Arabic", price: 0.085, entered: "NZD", status: "pending" },
-            { id: 706, service: "Subtitling", source: "English", target: "Arabic", price: 4.5, entered: "NZD", status: "active" },
-            { id: 711, service: "Translation", source: "Arabic", target: "English", price: 0.06, entered: "NZD", status: "active" },
-            { id: 712, service: "Interpreting", source: "Arabic", target: "English", mode: "Onsite", type: "Consecutive", price: 70, entered: "NZD", status: "active" },
-            { id: 713, service: "Interpreting", source: "Arabic", target: "English", mode: "Video remote", type: "Simultaneous", price: 85, entered: "NZD", status: "pending" },
-            { id: 721, service: "DTP", language: "Arabic", price: 6, entered: "NZD", status: "active" },
-            { id: 722, service: "Transcription", language: "Arabic", price: 3.2, entered: "NZD", status: "active" },
-            { id: 731, service: "Formatting", price: 28, entered: "NZD", status: "active" }
+            { id: 701, service: "Translation", source: "English", target: "Arabic", price: 0.055, entered: "NZD", status: "active", rateUpdated: new Date(NOW - 1.5 * HOUR) },
+            { id: 702, service: "Proofreading", source: "English", target: "Arabic", price: 0.022, entered: "NZD", status: "active", rateUpdated: new Date(NOW - 5 * HOUR) },
+            { id: 703, service: "Certified", source: "English", target: "Arabic", price: 45, entered: "NZD", status: "active", rateUpdated: new Date(NOW - 27 * HOUR) },
+            { id: 704, service: "PostEditing", source: "English", target: "Arabic", price: 0.0495, entered: "USD", status: "active", rateUpdated: new Date(NOW - 0.7 * HOUR) },
+            { id: 705, service: "Transcreation", source: "English", target: "Arabic", price: 0.085, entered: "NZD", status: "pending", rateUpdated: new Date(NOW - 2 * DAY - 3 * HOUR) },
+            { id: 706, service: "Subtitling", source: "English", target: "Arabic", price: 4.5, entered: "NZD", status: "active", rateUpdated: new Date(NOW - 3 * DAY - 6 * HOUR) },
+            { id: 711, service: "Translation", source: "Arabic", target: "English", price: 0.06, entered: "NZD", status: "active", rateUpdated: new Date(NOW - 3 * HOUR) },
+            { id: 712, service: "Interpreting", source: "Arabic", target: "English", mode: "Onsite", type: "Consecutive", price: 70, entered: "NZD", status: "active", rateUpdated: new Date(NOW - 6 * DAY - 2 * HOUR) },
+            { id: 713, service: "Interpreting", source: "Arabic", target: "English", mode: "Video remote", type: "Simultaneous", price: 85, entered: "NZD", status: "pending", rateUpdated: new Date(NOW - 5 * DAY) },
+            { id: 721, service: "DTP", language: "Arabic", price: 6, entered: "NZD", status: "active", rateUpdated: new Date(NOW - 9 * DAY - 4 * HOUR) },
+            { id: 722, service: "Transcription", language: "Arabic", price: 3.2, entered: "NZD", status: "active", rateUpdated: new Date(NOW - 9 * DAY - 7 * HOUR) },
+            { id: 731, service: "Formatting", price: 28, entered: "NZD", status: "active", rateUpdated: new Date(NOW - 14 * DAY - HOUR) }
         ],
 
         /* Billing Details: while sameAsPrimary is on, the address is User Account's */

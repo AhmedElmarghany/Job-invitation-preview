@@ -338,12 +338,12 @@ the block of the row it flags.
   pair, it starts on that pair and the first service the pair has no rate for. A duplicate rate and a
   seventh pair are refused before saving, the latter with a link to message the vendor manager.
 - A rate shows NZD first, then ≈ the currency it was typed in (or USD), as the old two lines did.
-  The date the old table printed under each rate is when the exchange rates were last updated, not
-  when the rate was changed, so it is said once, under the blocks: *≈ amounts are converted at the
-  exchange rates updated …* (`RP.FX_UPDATED`); hovering a ≈ line shows the rate it used.
-- New rates are *Pending approval* — on this page `.status-pending` is a calm blue (waiting on our
-  team), so it stays apart from the amber that asks the resource to act; *Active* is the Verified
-  green.
+  The clock date the old table printed under each rate is that rate's own exchange-rate update, not
+  when the service was edited, so it moved out from under the service name to the rate cell, under
+  the ≈ line: *as of today, 9:12 am* (`rateUpdated` on each price; the full stamp on hover). Saving
+  a rate stamps it again.
+- New rates are *Pending approval* — on this page `.status-pending` is honey amber with a brighter
+  dot, the colour read everywhere as "waiting"; *Active* is the Verified green.
 - A verified certificate expiring within 60 days gets **Renew**, which adds the renewed one; the
   old one then reads *Renewal sent* and stops asking. A rejected one shows its reason and
   **Replace the file**. Verified certificates are locked, as before.
