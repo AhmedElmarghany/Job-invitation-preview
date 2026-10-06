@@ -20,7 +20,8 @@
         { key: "dashboard", label: "Dashboard", icon: "dashboard", href: "dashboard.html" },
         { key: "invitations", label: "Invitations", icon: "invitations", href: "invitations.html", badge: true },
         { key: "jobs", label: "Jobs", icon: "jobs", href: "jobs.html" },
-        { key: "earnings", label: "Earnings", icon: "earnings", href: "earnings.html" }
+        { key: "earnings", label: "Earnings", icon: "earnings", href: "earnings.html" },
+        { key: "productivity", label: "Productivity", icon: "productivity", href: "productivity.html" }
     ];
 
     var FOOTER_NAV = [

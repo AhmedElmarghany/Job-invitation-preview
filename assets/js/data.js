@@ -2238,6 +2238,387 @@
         ]
     };
 
+    /* ── Productivity: the work delivered each month, as get_freelance_resource_productivity groups it ── */
+    /* Jobs and words add up to the dashboard's periods; a month earns what its bill's jobs come to (Sept is B-2209).
+       This month is not billed yet, so it is the dashboard's Delivered and Approved stages */
+    RP.PRODUCTIVITY = (function () {
+        var rand = seeded(4111);
+        var P = RP.DASHBOARD.periods;
+        var done = RP.JOBS.filter(function (job) {
+            return job.tab === "completed";
+        });
+        var first = BILLS_SINCE;
+        var last = new Date(THIS_MONTH.getFullYear(), THIS_MONTH.getMonth(), 1);
+        var count = (last.getFullYear() - first.getFullYear()) * 12 + last.getMonth() - first.getMonth() + 1;
+        var cur = count - 1;
+        var yearStart = cur - last.getMonth();
+        var i, k;
+
+        var bills = {};
+        RP.BILLS.forEach(function (bill) {
+            bills[bill.from.getFullYear() * 12 + bill.from.getMonth()] = bill;
+        });
+
+        var months = [];
+        for (i = 0; i < count; i++) {
+            var from = new Date(first.getFullYear(), first.getMonth() + i, 1);
+            months.push({ from: from, to: new Date(from.getFullYear(), from.getMonth() + 1, 0), bill: bills[from.getFullYear() * 12 + from.getMonth()] || null });
+        }
+
+        function range(a, b) {
+            var out = [];
+            for (var n = Math.max(0, a); n <= Math.min(cur, b); n++) out.push(n);
+            return out;
+        }
+
+        /* Whole units in proportion to `weight`, the remainder to the largest fractions, so a part never drifts from its sum */
+        function spread(sum, idx, weight) {
+            var w = idx.map(weight);
+            var all = total(w) || 1;
+            var exact = w.map(function (v) {
+                return (sum * v) / all;
+            });
+            var out = exact.map(Math.floor);
+            exact
+                .map(function (v, n) {
+                    return { n: n, rem: v - Math.floor(v) };
+                })
+                .sort(function (a, b) {
+                    return b.rem - a.rem;
+                })
+                .slice(0, Math.max(0, sum - total(out)))
+                .forEach(function (r) {
+                    out[r.n] += 1;
+                });
+            var res = {};
+            idx.forEach(function (n, at) {
+                res[n] = out[at];
+            });
+            return res;
+        }
+
+        function pick(list) {
+            return list[Math.floor(rand() * list.length)];
+        }
+
+        var unbilled = done.filter(function (job) {
+            return job.status === "DL" || job.status === "AP";
+        });
+        var earnings = months.map(function (m, n) {
+            if (n === cur) return cents(total(unbilled.map(function (job) {
+                return job.amount;
+            })));
+            return m.bill ? cents(m.bill.amount - m.bill.bonus + m.bill.deduction) : 0;
+        });
+
+        /* Jobs: the dashboard's This month, last month, Last 3 months, the 3 before, This year and this time last year */
+        var jobs = {};
+        var noise = {};
+        months.forEach(function (m, n) {
+            noise[n] = 0.92 + rand() * 0.16;
+        });
+        function billWeight(n) {
+            return (months[n].bill ? months[n].bill.jobs.length : 1) * noise[n];
+        }
+        function place(idx, sum) {
+            var free = idx.filter(function (n) {
+                return !(n in jobs);
+            });
+            if (!free.length) return;
+            var got = spread(Math.max(0, sum), free, billWeight);
+            free.forEach(function (n) {
+                jobs[n] = got[n];
+            });
+        }
+        var lastYear = range(yearStart - 12, cur - 12);
+        place([cur], done.length);
+        place([cur - 1], P.month.prev.completed);
+        place([cur - 2], P.quarter.completed.jobs - done.length - P.month.prev.completed);
+        place(range(cur - 5, cur - 3), P.quarter.prev.completed);
+        place(range(yearStart, cur - 6), P.year.completed.jobs - P.quarter.completed.jobs - P.quarter.prev.completed);
+        place(lastYear, P.year.prev.completed);
+
+        /* The months between last year's stretch and this year run at last year's pace; the years before take the rest */
+        var paceLastYear = P.year.prev.completed / (total(lastYear.map(billWeight)) || 1);
+        var between = range(cur - 11, yearStart - 1);
+        place(between, Math.round(total(between.map(billWeight)) * paceLastYear));
+        var placed = total(Object.keys(jobs).map(function (n) {
+            return jobs[n];
+        }));
+        place(range(0, cur), P.all.completed.jobs - placed);
+
+        /* Words: This month, Last 3 months, This year and All time; a month with dearer jobs carries more of them */
+        var words = {};
+        var wordNoise = {};
+        months.forEach(function (m, n) {
+            wordNoise[n] = 0.9 + rand() * 0.2;
+        });
+        function wordSpread(idx, sum) {
+            var j = total(idx.map(function (n) {
+                return jobs[n];
+            })) || 1;
+            var e = total(idx.map(function (n) {
+                return earnings[n];
+            })) || 1;
+            var got = spread(Math.max(0, sum), idx, function (n) {
+                return (0.5 * jobs[n] / j + 0.5 * earnings[n] / e) * wordNoise[n];
+            });
+            idx.forEach(function (n) {
+                words[n] = got[n];
+            });
+        }
+        var rowWords = total(done.filter(function (job) {
+            return job.count.unit === "Words";
+        }).map(function (job) {
+            return job.count.value;
+        }));
+        words[cur] = rowWords;
+        wordSpread(range(cur - 2, cur - 1), P.quarter.completed.words - rowWords);
+        wordSpread(range(yearStart, cur - 3), P.year.completed.words - P.quarter.completed.words);
+        wordSpread(range(0, yearStart - 1), P.all.completed.words - P.year.completed.words);
+
+        /* NZD a unit, as the professional profile prices them; they only set each service's share of the month */
+        var WORD_SERVICES = [
+            { service: "Translation", share: 0.5, odds: 1, words: 2600, rate: 0.055 },
+            { service: "Certified", share: 0.22, odds: 0.85, words: 1900, rate: 0.075 },
+            { service: "Proofreading", share: 0.12, odds: 0.7, words: 2100, rate: 0.022 },
+            { service: "DTP", share: 0.1, odds: 0.5, words: 600, rate: 0.09 },
+            { service: "Transcreation", share: 0.06, odds: 0.4, words: 1500, rate: 0.085 }
+        ];
+        var HOUR_RATE = 70;
+        var MINUTE_RATE = 4.5;
+        var DOCUMENT_RATE = 30;
+
+        function line(service) {
+            return { service: service, jobs: 0, words: 0, hours: 0, minutes: 0, documents: 0, pages: 0, earnings: 0 };
+        }
+
+        function worth(row) {
+            var rate = WORD_SERVICES.filter(function (s) {
+                return s.service === row.service;
+            })[0];
+            return (row.words * (rate ? rate.rate : 0.05)) + row.hours * HOUR_RATE + row.minutes * MINUTE_RATE + row.documents * DOCUMENT_RATE + row.pages * 6;
+        }
+
+        /* Earnings to the cent, in proportion to what each service's volume is worth */
+        function price(rows, amount) {
+            var idx = rows.map(function (row, n) {
+                return n;
+            });
+            var got = spread(Math.round(amount * 100), idx, function (n) {
+                return worth(rows[n]) || 1;
+            });
+            rows.forEach(function (row, n) {
+                row.earnings = got[n] / 100;
+            });
+        }
+
+        function generated(n) {
+            var left = jobs[n];
+            var rows = [];
+            var docs = 0;
+
+            if (n >= 3 && rand() < 0.55) {
+                var interp = line("Interpreting");
+                interp.hours = pick([1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 6, 7.5]);
+                interp.jobs = Math.max(1, Math.round(interp.hours / 2.5));
+                if (left - interp.jobs >= 2) {
+                    rows.push(interp);
+                    left -= interp.jobs;
+                }
+            }
+            if (n >= 6 && rand() < 0.3 && left >= 3) {
+                var sub = line("Subtitling");
+                sub.minutes = 30 + Math.floor(rand() * 121);
+                sub.jobs = 1;
+                rows.push(sub);
+                left -= 1;
+            }
+            if (rand() < 0.35) docs = 1 + Math.floor(rand() * 7);
+
+            var present = WORD_SERVICES.filter(function (s, at) {
+                return at === 0 || rand() < s.odds;
+            }).slice(0, Math.max(1, left));
+            var shares = present.map(function (s) {
+                return s.share * (0.75 + rand() * 0.5);
+            });
+            var wordRows = present.map(function (s) {
+                return line(s.service);
+            });
+            var idx = present.map(function (s, at) {
+                return at;
+            });
+
+            /* Each service that is there holds at least one job */
+            var spare = spread(left - present.length, idx, function (at) {
+                return shares[at];
+            });
+            wordRows.forEach(function (row, at) {
+                row.jobs = 1 + spare[at];
+            });
+            var split = spread(words[n], idx, function (at) {
+                return wordRows[at].jobs * present[at].words * (0.8 + rand() * 0.4);
+            });
+            wordRows.forEach(function (row, at) {
+                row.words = split[at];
+            });
+
+            if (docs) {
+                var certified = wordRows.filter(function (row) {
+                    return row.service === "Certified";
+                })[0];
+                if (!certified) {
+                    certified = line("Certified");
+                    wordRows.push(certified);
+                    var donor = wordRows[0];
+                    if (donor.jobs > 1) {
+                        donor.jobs -= 1;
+                        certified.jobs = 1;
+                    } else {
+                        wordRows.pop();
+                        certified = null;
+                    }
+                }
+                if (certified) certified.documents = docs;
+            }
+
+            rows = wordRows.concat(rows);
+            price(rows, earnings[n]);
+            return rows;
+        }
+
+        /* This month is the real job rows: their services and units as listed, priced to the month's total */
+        function fromRows() {
+            var byService = {};
+            var order = [];
+            done.forEach(function (job) {
+                if (!byService[job.service]) {
+                    byService[job.service] = line(job.service);
+                    order.push(job.service);
+                }
+                var row = byService[job.service];
+                var unit = { Words: "words", Hours: "hours", Minutes: "minutes", Documents: "documents", "Physical Pages": "pages" }[job.count.unit];
+                row.jobs += 1;
+                row[unit] += job.count.value;
+                row.worth = (row.worth || 0) + job.amount;
+            });
+            var rows = order.map(function (service) {
+                return byService[service];
+            });
+            var got = spread(Math.round(earnings[cur] * 100), rows.map(function (row, n) {
+                return n;
+            }), function (n) {
+                return rows[n].worth;
+            });
+            rows.forEach(function (row, n) {
+                row.earnings = got[n] / 100;
+                delete row.worth;
+            });
+            return rows;
+        }
+
+        return months.map(function (m, n) {
+            var services = (n === cur ? fromRows() : generated(n))
+                .map(function (row) {
+                    /* Per-minute work counts as hours, as hours_ann does */
+                    row.hours = cents(row.hours + row.minutes / 60);
+                    return row;
+                })
+                .sort(function (a, b) {
+                    return b.earnings - a.earnings;
+                });
+            var sum = function (key) {
+                return total(services.map(function (row) {
+                    return row[key];
+                }));
+            };
+            return {
+                key: m.from.getFullYear() + "-" + String(m.from.getMonth() + 1).padStart(2, "0"),
+                from: m.from,
+                to: m.to,
+                current: n === cur,
+                jobs: jobs[n],
+                words: words[n],
+                hours: cents(sum("hours")),
+                documents: sum("documents"),
+                earnings: earnings[n],
+                services: services
+            };
+        });
+    })();
+
+    /* ── Productivity as a full-timer sees it: productivity.html?as=fulltimer ── */
+    /* Past the base the resource earns their own price a word on top of the salary (fulltimer_productivity).
+       Weights are CompanyFullTimerServiceWeightConfig's defaults; base and salary are this preview's own */
+    RP.FULLTIMER = (function () {
+        var rand = seeded(5000);
+        var config = {
+            since: new Date(2024, 0, 1),
+            baseWords: 50000,
+            baseSalary: 1000,
+            /* USD a counted word past the base: English → Arabic at NZD 0.055, in USD */
+            excessRate: 0.0333,
+            currency: "AED",
+            perUsd: 3.6725,
+            weights: { translation: 100, revision: 50, legalization: 25, hours: 100, other: 100 },
+            wordsPerPage: 250,
+            wordsPerHour: 500
+        };
+        var last = new Date(THIS_MONTH.getFullYear(), THIS_MONTH.getMonth(), 1);
+        var count = (last.getFullYear() - config.since.getFullYear()) * 12 + last.getMonth() - config.since.getMonth() + 1;
+        var w = config.weights;
+        var months = [];
+
+        for (var n = 0; n < count; n++) {
+            var from = new Date(config.since.getFullYear(), config.since.getMonth() + n, 1);
+            var current = n === count - 1;
+            /* A slow climb with the odd short month; this month is a week in */
+            var pace = current ? 0.23 : 0.9 + n * 0.0065 + (rand() - 0.5) * 0.28;
+            var target = config.baseWords * pace;
+
+            var revision = Math.round((target * (0.07 + rand() * 0.06)) / (w.revision / 100) / 10) * 10;
+            var pages = rand() < 0.75 ? Math.round(6 + rand() * 40) : 0;
+            var hours = rand() < 0.6 ? Math.round((1 + rand() * 9) * 4) / 4 : 0;
+            var other = rand() < 0.5 ? Math.round((300 + rand() * 1500) / 10) * 10 : 0;
+            var counted = {
+                revision: Math.round((revision * w.revision) / 100),
+                legalization: Math.round((pages * config.wordsPerPage * w.legalization) / 100),
+                hours: Math.round((hours * config.wordsPerHour * w.hours) / 100),
+                other: Math.round((other * w.other) / 100)
+            };
+            var translation = Math.max(0, Math.round((target - counted.revision - counted.legalization - counted.hours - counted.other) / 10) * 10);
+            counted.translation = Math.round((translation * w.translation) / 100);
+
+            var net = counted.translation + counted.revision + counted.legalization + counted.hours + counted.other;
+            var excess = Math.max(0, net - config.baseWords);
+            var excessPay = cents(excess * config.excessRate);
+            var pay = cents(config.baseSalary + excessPay);
+            var jobs =
+                Math.max(1, Math.round(translation / 2300) + Math.round(revision / 3800) + (pages ? Math.max(1, Math.round(pages / 9)) : 0) + (hours ? Math.max(1, Math.round(hours / 3)) : 0) + (other ? 1 : 0));
+
+            months.push({
+                key: from.getFullYear() + "-" + String(from.getMonth() + 1).padStart(2, "0"),
+                from: from,
+                to: new Date(from.getFullYear(), from.getMonth() + 1, 0),
+                current: current,
+                jobs: jobs,
+                translation: translation,
+                revision: revision,
+                pages: pages,
+                hours: hours,
+                other: other,
+                counted: counted,
+                net: net,
+                excess: excess,
+                excessPay: excessPay,
+                pay: pay,
+                payLocal: cents(pay * config.perUsd)
+            });
+        }
+
+        return { config: config, months: months };
+    })();
+
     /* ── Professional profile: what translation/singleResource.html shows a resource about their own work ── */
 
     /* Settings > Industries. The model has no category, so these groups are the preview's own */

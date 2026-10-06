@@ -1,0 +1,2443 @@
+/* ============================================================
+   PAGE: Productivity
+   The delivered work, a row a month or a year, its trend above
+   it and its totals after it. The period picker, table chrome,
+   open row, tiles and tip are earnings.css and dashboard.css,
+   rebuilt here under the same names so the page renders from its
+   own file. New: the trend chart, the export menu, the services
+   in an open period and its summary.
+   ============================================================ */
+
+/* min-width: 0 all the way down, or the table never gets its own scrollbar */
+#rp-productivity {
+    container: rpProd / inline-size;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+
+    /* The navy ramp the dashboard validated: steps 2 and 5, and a pale step for a period still running */
+    --bar: #6983a0;
+    --bar-hot: var(--color-brand-navy);
+    --bar-partial: #b9c6d4;
+    --chart-grid: #efeff1;
+    --chart-base: #dcdcdf;
+    --chart-avg: rgba(41, 23, 4, 0.5);
+    --chart-base-line: rgba(41, 23, 4, 0.62);
+
+    --good-ink: #067647;
+    --good-bg: #ecfdf3;
+    --bad-ink: #b91c1c;
+    --bad-bg: #fef2f2;
+}
+
+#rp-productivity .wrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+    background: var(--color-surface-white);
+}
+
+/* Visually hidden, still read aloud */
+.rp-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ── Toolbar: Monthly / Yearly, then the period, columns and export at the end ── */
+.rp-prod-toolbar {
+    flex-wrap: wrap;
+}
+
+.rp-view-switch {
+    flex: 0 0 auto;
+}
+
+.rp-view-switch[hidden] {
+    display: none;
+}
+
+.rp-view-switch .rp-segment {
+    padding: 0 14px;
+}
+
+.rp-view-switch .rp-segment:focus-visible,
+.rp-metric-switch .rp-segment:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-gold);
+}
+
+.rp-prod-tools {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    margin-left: auto;
+}
+
+/* A full-timer's base, read the way the profile menu reads its balance: plain text, nothing to press */
+.rp-base {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 0 2px;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+}
+
+.rp-base[hidden] {
+    display: none;
+}
+
+.rp-base strong {
+    font-weight: 600;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Phone: the grouping takes a row whole, then period, columns and export share the next */
+@container rpProd (max-width: 560px) {
+    .rp-view-switch {
+        flex: 1 1 100%;
+    }
+
+    .rp-view-switch .rp-segment {
+        flex: 1 1 0;
+        justify-content: center;
+    }
+
+    .rp-prod-tools {
+        flex: 1 1 100%;
+        margin-left: 0;
+    }
+
+    .rp-prod-tools .rp-period-filter {
+        flex: 1 1 auto;
+    }
+
+    .rp-period-filter .rp-period-btn {
+        width: 100%;
+    }
+
+    .rp-period-btn__label {
+        display: none;
+    }
+}
+
+/* ── Period — earnings.css's picker ─────────────────────── */
+.rp-period-filter {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+}
+
+.rp-period-filter[hidden] {
+    display: none;
+}
+
+.rp-period-btn {
+    gap: 7px;
+    min-width: 0;
+}
+
+.rp-period-btn svg {
+    flex: 0 0 auto;
+    width: 17px;
+    height: 17px;
+}
+
+.rp-period-btn__label {
+    color: var(--color-text-secondary);
+}
+
+.rp-period-btn__value {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.rp-period-btn .rp-period-btn__caret {
+    width: 15px;
+    height: 15px;
+    margin-left: auto;
+    color: var(--color-text-secondary);
+    transition: transform var(--transition-fast);
+}
+
+.rp-period-filter.is-open .rp-period-btn {
+    border-color: var(--color-border-hover);
+    background: var(--color-surface-subtle);
+}
+
+.rp-period-filter.is-open .rp-period-btn__caret {
+    transform: rotate(180deg);
+}
+
+/* A chosen period reads in navy and gets its own clear button, like a filter chip */
+.rp-period-filter.is-set .rp-period-btn {
+    padding-right: 36px;
+    border-color: rgba(11, 38, 62, 0.32);
+    color: var(--color-brand-navy);
+}
+
+.rp-period-filter.is-set .rp-period-btn__value {
+    color: var(--color-brand-navy);
+}
+
+.rp-period-clear {
+    position: absolute;
+    right: 7px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--color-status-danger-bg);
+    color: var(--color-status-danger);
+    cursor: pointer;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.rp-period-clear svg {
+    width: 12px;
+    height: 12px;
+}
+
+.rp-period-clear:hover {
+    background: var(--color-status-danger);
+    color: var(--color-surface-white);
+}
+
+/* Opens leftwards: the period sits at the end of the row */
+.rp-period-pop {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 60;
+    width: 296px;
+    max-width: calc(100vw - 24px);
+    padding: 6px 6px 8px;
+    background: var(--color-surface-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    animation: rp-pop-in 0.16s ease;
+}
+
+.rp-period-pop[hidden] {
+    display: none;
+}
+
+@keyframes rp-pop-in {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.rp-period-pop__list {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.rp-period-opt {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    height: 34px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: var(--radius-xs);
+    background: transparent;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--color-text-primary);
+    text-align: left;
+    cursor: pointer;
+}
+
+.rp-period-opt svg {
+    width: 15px;
+    height: 15px;
+    color: var(--color-brand-navy);
+    opacity: 0;
+}
+
+.rp-period-opt:hover {
+    background: var(--color-surface-inset);
+}
+
+.rp-period-opt.is-active {
+    background: var(--color-surface-subtle);
+    font-weight: 500;
+    color: var(--color-brand-navy);
+}
+
+.rp-period-opt.is-active svg {
+    opacity: 1;
+}
+
+.rp-period-pop__title {
+    margin: 8px 4px 8px;
+    padding: 10px 6px 0;
+    border-top: 1px solid var(--color-border);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+}
+
+.rp-period-years {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 0 10px;
+}
+
+.rp-period-year {
+    height: 28px;
+    padding: 0 11px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    background: var(--color-surface-white);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.rp-period-year:hover {
+    border-color: var(--color-border-hover);
+    background: var(--color-surface-inset);
+}
+
+.rp-period-year.is-active {
+    border-color: var(--color-brand-navy);
+    background: var(--color-brand-navy);
+    color: var(--color-surface-white);
+}
+
+.rp-period-range {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    padding: 0 10px;
+}
+
+.rp-period-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.rp-period-field__label {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+}
+
+/* pagination.css's page-size select, one size up */
+.rp-period-select {
+    width: 100%;
+    height: 34px;
+    padding: 0 28px 0 10px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xs);
+    background: var(--color-surface-white)
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2371717a' viewBox='0 0 256 256'%3E%3Cpath d='M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z'/%3E%3C/svg%3E")
+        no-repeat right 9px center;
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.rp-period-select:hover {
+    border-color: var(--color-border-hover);
+    background-color: var(--color-surface-subtle);
+}
+
+.rp-period-select:focus-visible {
+    border-color: var(--color-brand-gold);
+    box-shadow: var(--focus-ring-gold);
+}
+
+.rp-period-range.is-active .rp-period-select {
+    border-color: rgba(11, 38, 62, 0.32);
+}
+
+.rp-period-apply {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(100% - 20px);
+    height: 34px;
+    margin: 10px 10px 2px;
+    border: 0;
+    border-radius: var(--radius-xs);
+    background: var(--color-brand-navy);
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--color-surface-white);
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.rp-period-apply:hover {
+    background: var(--color-brand-navy-hover);
+}
+
+.rp-period-apply:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-navy);
+}
+
+/* ── Export: a menu that says what goes out, then the format ── */
+.rp-export {
+    position: relative;
+    display: inline-flex;
+}
+
+.rp-export-btn svg {
+    flex: 0 0 auto;
+    width: 17px;
+    height: 17px;
+}
+
+.rp-export-btn .rp-export-btn__caret {
+    width: 15px;
+    height: 15px;
+    color: var(--color-text-secondary);
+    transition: transform var(--transition-fast);
+}
+
+.rp-export.is-open .rp-export-btn {
+    border-color: var(--color-border-hover);
+    background: var(--color-surface-subtle);
+    color: var(--color-text-primary);
+}
+
+.rp-export.is-open .rp-export-btn__caret {
+    transform: rotate(180deg);
+}
+
+.rp-export-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 60;
+    width: 264px;
+    max-width: calc(100vw - 24px);
+    padding: 6px;
+    background: var(--color-surface-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    animation: rp-pop-in 0.16s ease;
+}
+
+.rp-export-menu[hidden] {
+    display: none;
+}
+
+.rp-export-menu__head {
+    margin-bottom: 6px;
+    padding: 8px 10px 10px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.rp-export-menu__title {
+    margin: 0;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.rp-export-menu__scope {
+    margin: 2px 0 0;
+    font-size: 12.5px;
+    color: var(--color-text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-export-menu__list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.rp-export-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    height: 44px;
+    padding: 0 12px 0 6px;
+    border: 0;
+    border-radius: var(--radius-xs);
+    background: transparent;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--color-text-primary);
+    text-align: left;
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.rp-export-item:hover,
+.rp-export-item:focus-visible {
+    outline: none;
+    background: var(--color-surface-inset);
+}
+
+.rp-export-item__icon {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-subtle);
+    color: var(--color-brand-navy);
+}
+
+.rp-export-item__icon svg {
+    width: 17px;
+    height: 17px;
+}
+
+.rp-export-item__label {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* The arrow shows on the row you are about to choose */
+.rp-export-item .rp-export-item__go {
+    width: 15px;
+    height: 15px;
+    color: var(--color-brand-navy);
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+}
+
+.rp-export-item:hover .rp-export-item__go,
+.rp-export-item:focus-visible .rp-export-item__go {
+    opacity: 1;
+}
+
+/* ── Columns: a popover of checkboxes, the Period and Export popovers' twin ── */
+.rp-cols {
+    position: relative;
+    display: inline-flex;
+}
+
+.rp-cols-btn svg {
+    flex: 0 0 auto;
+    width: 17px;
+    height: 17px;
+}
+
+.rp-cols-btn .rp-cols-btn__caret {
+    width: 15px;
+    height: 15px;
+    color: var(--color-text-secondary);
+    transition: transform var(--transition-fast);
+}
+
+.rp-cols.is-open .rp-cols-btn {
+    border-color: var(--color-border-hover);
+    background: var(--color-surface-subtle);
+    color: var(--color-text-primary);
+}
+
+.rp-cols.is-open .rp-cols-btn__caret {
+    transform: rotate(180deg);
+}
+
+/* Some columns hidden: the button reads in navy, as a chosen period does */
+.rp-cols.is-set .rp-cols-btn {
+    border-color: rgba(11, 38, 62, 0.32);
+    color: var(--color-brand-navy);
+}
+
+.rp-cols-btn__count {
+    display: inline-flex;
+    align-items: center;
+    height: 18px;
+    padding: 0 6px;
+    border-radius: var(--radius-full);
+    background: var(--color-brand-navy);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--color-surface-white);
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-cols-btn__count[hidden] {
+    display: none;
+}
+
+.rp-cols-pop {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 60;
+    width: 252px;
+    max-width: calc(100vw - 24px);
+    padding: 6px;
+    background: var(--color-surface-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    animation: rp-pop-in 0.16s ease;
+}
+
+.rp-cols-pop[hidden] {
+    display: none;
+}
+
+.rp-cols-pop__head,
+.rp-cols-pop__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.rp-cols-pop__head {
+    margin-bottom: 4px;
+    padding: 4px 4px 8px 10px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.rp-cols-pop__foot {
+    margin-top: 4px;
+    padding: 8px 4px 2px 10px;
+    border-top: 1px solid var(--color-border);
+}
+
+.rp-cols-pop__title {
+    margin: 0;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.rp-cols-pop__count {
+    font-size: 12.5px;
+    color: var(--color-text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-cols-pop__count strong {
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+/* dashboard.css's text button: navy words, a wash on hover, nothing to press once it has nothing to do */
+.rp-cols-pop__action {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 28px;
+    padding: 0 9px;
+    border: 0;
+    border-radius: var(--radius-xs);
+    background: transparent;
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--color-brand-navy);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.rp-cols-pop__action svg {
+    width: 13px;
+    height: 13px;
+}
+
+.rp-cols-pop__action:hover:not(:disabled) {
+    background: var(--color-surface-subtle);
+}
+
+.rp-cols-pop__action:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-gold);
+}
+
+.rp-cols-pop__action:disabled {
+    color: #b4b4bb;
+    cursor: default;
+}
+
+.rp-cols-pop__list {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    /* A full-timer's eleven columns fit whole on a laptop; only a short window makes the list scroll */
+    max-height: min(520px, calc(100vh - 250px));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.rp-cols-pop__group {
+    margin: 8px 10px 4px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+}
+
+.rp-cols-pop__group:first-child {
+    margin-top: 4px;
+}
+
+/* The whole row is the target; the box is the native checkbox, restyled */
+.rp-check {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 34px;
+    padding: 0 10px;
+    border-radius: var(--radius-xs);
+    font-size: 14px;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    user-select: none;
+    transition: background var(--transition-fast);
+}
+
+.rp-check:hover {
+    background: var(--color-surface-inset);
+}
+
+.rp-check input {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    border: 1.5px solid #c4c4cc;
+    border-radius: 4px;
+    background: var(--color-surface-white);
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.rp-check input::after {
+    content: "";
+    width: 8px;
+    height: 4px;
+    margin-top: -2px;
+    border-left: 2px solid var(--color-surface-white);
+    border-bottom: 2px solid var(--color-surface-white);
+    transform: rotate(-45deg);
+    opacity: 0;
+}
+
+.rp-check input:checked {
+    border-color: var(--color-brand-navy);
+    background: var(--color-brand-navy);
+}
+
+.rp-check input:checked::after {
+    opacity: 1;
+}
+
+.rp-check:hover input:not(:checked):not(:disabled) {
+    border-color: var(--color-text-secondary);
+}
+
+.rp-check input:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-gold);
+}
+
+.rp-check__label {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* The pinned first column: ticked, greyed and locked, so it reads as there to stay */
+.rp-check.is-locked {
+    color: var(--color-text-secondary);
+    cursor: default;
+}
+
+.rp-check.is-locked:hover {
+    background: transparent;
+}
+
+.rp-check.is-locked input {
+    border-color: #a7b3c0;
+    background: #a7b3c0;
+    cursor: default;
+}
+
+.rp-check .rp-check__lock {
+    width: 14px;
+    height: 14px;
+    color: var(--color-text-secondary);
+}
+
+/* ── Card — dashboard.css's ──────────────────────────────── */
+.rp-card {
+    container: rpCard / inline-size;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-surface-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+}
+
+.rp-card[hidden] {
+    display: none;
+}
+
+.rp-card__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    min-height: 26px;
+    padding: 14px 18px 0;
+}
+
+.rp-card__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.07em;
+    color: var(--color-brand-navy);
+}
+
+.rp-card__title svg {
+    width: 18px;
+    height: 18px;
+}
+
+.rp-card__body {
+    flex: 1 1 auto;
+    padding: 10px 18px 12px;
+}
+
+/* ── Trend ───────────────────────────────────────────────── */
+.rp-trend {
+    margin: 14px 10px 10px;
+}
+
+.rp-metric-switch .rp-segment {
+    height: 26px;
+    padding: 0 10px;
+    font-size: 12.5px;
+}
+
+/* The keys for the dashed average and a period still running; the title names the bars */
+.rp-chart-key {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 18px;
+    min-height: 18px;
+    margin: 0 0 14px;
+    font-size: 12.5px;
+    color: var(--color-text-secondary);
+}
+
+.rp-chart-key__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    white-space: nowrap;
+}
+
+.rp-chart-key strong {
+    font-weight: 600;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-chart-key__avg {
+    width: 18px;
+    height: 0;
+    border-top: 1.5px dashed var(--chart-avg);
+}
+
+.rp-chart-key__swatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    background: var(--bar-partial);
+}
+
+/* A full-timer's base is a rule, not a statistic: solid, where the average is dashed */
+.rp-chart-key__base {
+    width: 18px;
+    height: 0;
+    border-top: 2px solid var(--chart-base-line);
+}
+
+/* y-axis on the left, the plot beside it, the period labels under it */
+.rp-chart {
+    --plot-h: 196px;
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    grid-template-rows: var(--plot-h) auto;
+}
+
+.rp-chart__y {
+    grid-column: 1;
+    grid-row: 1;
+    position: relative;
+}
+
+.rp-chart__tick {
+    position: absolute;
+    right: 10px;
+    transform: translateY(50%);
+    font-size: 11.5px;
+    line-height: 1;
+    color: var(--color-text-secondary);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.rp-chart__plot {
+    grid-column: 2;
+    grid-row: 1;
+    position: relative;
+}
+
+/* Hairline, solid and one step off the surface; the baseline a step darker */
+.rp-chart__grid {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 0;
+    border-top: 1px solid var(--chart-grid);
+}
+
+.rp-chart__grid:first-child {
+    border-top-color: var(--chart-base);
+}
+
+/* A reference, not a grid line, so it is dashed and sits over the bars */
+.rp-chart__avg,
+.rp-chart__base {
+    position: absolute;
+    z-index: 2;
+    left: 0;
+    right: 0;
+    height: 0;
+    border-top: 1.5px dashed var(--chart-avg);
+    pointer-events: none;
+}
+
+.rp-chart__base {
+    border-top: 2px solid var(--chart-base-line);
+}
+
+.rp-chart__bars {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: stretch;
+}
+
+/* The whole column is the hit target; the bar inside it is what you see */
+.rp-bar {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 0;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.rp-bar:focus-visible {
+    outline: none;
+}
+
+/* At most 24px wide, rounded at the data end and square on the baseline */
+.rp-bar__fill {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: min(24px, 64%);
+    min-width: 2px;
+    height: var(--h);
+    border-radius: 4px 4px 0 0;
+    background: var(--bar);
+    transform: translateX(-50%);
+    transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1), background var(--transition-fast);
+}
+
+.rp-chart.is-dense .rp-bar__fill {
+    border-radius: 2px 2px 0 0;
+}
+
+.rp-bar.is-partial .rp-bar__fill {
+    background: var(--bar-partial);
+}
+
+.rp-bar:hover .rp-bar__fill,
+.rp-bar.is-hot .rp-bar__fill,
+.rp-bar:focus-visible .rp-bar__fill {
+    background: var(--bar-hot);
+}
+
+.rp-bar:focus-visible .rp-bar__fill {
+    box-shadow: 0 0 0 2px var(--color-surface-white), 0 0 0 4px rgba(149, 128, 73, 0.55);
+}
+
+.rp-chart.is-growing .rp-bar__fill,
+.rp-bar.is-instant .rp-bar__fill {
+    transition: none;
+}
+
+.rp-chart.is-growing .rp-bar__fill {
+    height: 0;
+}
+
+/* The best complete period carries its value on its cap; the rest live in the tip and the table */
+.rp-chart__peak {
+    position: absolute;
+    z-index: 3;
+    transform: translate(-50%, -6px);
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    pointer-events: none;
+    transition: opacity var(--transition-fast);
+}
+
+.rp-chart__peak.is-start {
+    transform: translate(-12px, -6px);
+}
+
+.rp-chart__peak.is-end {
+    transform: translate(calc(-100% + 12px), -6px);
+}
+
+.rp-chart.is-growing .rp-chart__peak {
+    opacity: 0;
+}
+
+.rp-chart__x {
+    grid-column: 2;
+    grid-row: 2;
+    display: flex;
+    height: 36px;
+}
+
+.rp-chart__x-slot {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.rp-chart__x-label {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11.5px;
+    line-height: 1.25;
+    color: var(--color-text-secondary);
+    text-align: center;
+    white-space: nowrap;
+}
+
+.rp-chart__x-year {
+    display: block;
+    color: var(--color-text-secondary);
+    opacity: 0.8;
+}
+
+/* Many months keep only the years, each starting at its January */
+.rp-chart.is-busy .rp-chart__x-label,
+.rp-chart.is-dense .rp-chart__x-label {
+    left: 0;
+    transform: none;
+    padding-left: 5px;
+    border-left: 1px solid var(--chart-base);
+}
+
+.rp-chart.is-busy .rp-chart__x-label:empty,
+.rp-chart.is-dense .rp-chart__x-label:empty {
+    display: none;
+}
+
+@container rpCard (max-width: 640px) {
+    .rp-card__head {
+        padding: 12px 14px 0;
+    }
+
+    .rp-card__body {
+        padding: 10px 14px 10px;
+    }
+
+    /* The measures scroll sideways rather than wrap onto a second line */
+    .rp-metric-switch {
+        flex: 1 1 100%;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .rp-metric-switch::-webkit-scrollbar {
+        display: none;
+    }
+
+    .rp-metric-switch .rp-segment {
+        flex: 1 0 auto;
+        justify-content: center;
+    }
+
+    /* More measures past the edge: that edge fades out */
+    .rp-metric-switch.is-more-end {
+        mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent);
+    }
+
+    .rp-metric-switch.is-more-start {
+        mask-image: linear-gradient(to left, #000 calc(100% - 36px), transparent);
+    }
+
+    .rp-metric-switch.is-more-start.is-more-end {
+        mask-image: linear-gradient(to right, transparent, #000 36px, #000 calc(100% - 36px), transparent);
+    }
+
+    .rp-chart {
+        --plot-h: 150px;
+        grid-template-columns: 38px minmax(0, 1fr);
+    }
+
+    .rp-chart__tick {
+        right: 8px;
+        font-size: 11px;
+    }
+}
+
+/* ── Info tip trigger and the tip — dashboard.css's ──────── */
+.rp-info {
+    flex: 0 0 auto;
+    display: inline-grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-full);
+    background: transparent;
+    color: var(--color-text-secondary);
+    cursor: help;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.rp-info svg {
+    width: 15px;
+    height: 15px;
+}
+
+.rp-info:hover,
+.rp-info[aria-expanded="true"] {
+    background: var(--color-surface-white);
+    color: var(--color-brand-navy);
+}
+
+.rp-info:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-gold);
+}
+
+.rp-tip {
+    position: fixed;
+    z-index: 3000;
+    top: 0;
+    left: 0;
+    max-width: 280px;
+    padding: 9px 12px;
+    border-radius: var(--radius-sm);
+    background: var(--color-brand-navy);
+    box-shadow: var(--shadow-md);
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--color-surface-white);
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.rp-tip.is-shown {
+    opacity: 1;
+    transform: none;
+}
+
+/* On a bar the value leads and the period follows */
+.rp-tip__value {
+    display: block;
+    font-size: 13.5px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-tip__label {
+    display: block;
+    color: rgba(255, 255, 255, 0.78);
+}
+
+/* ── Chips — dashboard.css's ─────────────────────────────── */
+/* Where a figure is measured, here a period still running */
+.rp-scope {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 8px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-subtle);
+    font-size: 11.5px;
+    font-weight: 500;
+    letter-spacing: 0;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+}
+
+/* Signed change vs the period before; up is good for every figure here */
+.rp-delta {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 1px 7px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-subtle);
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1.5;
+    letter-spacing: 0;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-delta svg {
+    width: 12px;
+    height: 12px;
+}
+
+.rp-delta--good {
+    background: var(--good-bg);
+    color: var(--good-ink);
+}
+
+.rp-delta--bad {
+    background: var(--bad-bg);
+    color: var(--bad-ink);
+}
+
+/* ── Table: jobs.css and earnings.css's chrome ─────────────── */
+
+/* table.css leaves 4rem under the table; here the totals take that place */
+#rp-productivity #new-customized-table {
+    margin-bottom: 0;
+}
+
+/* #fff odd, #F8F8F8 even — counted over .rp-row only, since every period is a row plus its panel */
+#new-customized-table tbody tr > td,
+#new-customized-table tbody tr:nth-child(even) > td {
+    background-color: var(--color-surface-white) !important;
+}
+
+#new-customized-table tbody tr:nth-child(even of .rp-row) > td {
+    background-color: var(--color-surface-inset) !important;
+}
+
+#new-customized-table tbody tr.rp-row:hover > td,
+#new-customized-table tbody tr.rp-row.is-hot > td {
+    background-color: var(--color-surface-subtle) !important;
+}
+
+#new-customized-table tbody tr.rp-row.is-expanded > td {
+    background-color: var(--color-surface-subtle) !important;
+    border-bottom-color: transparent;
+    border-bottom-width: 0;
+}
+
+/* The navy bar the open panel carries, so row and panel read as one */
+#new-customized-table tbody tr.rp-row.is-expanded > td:first-child {
+    box-shadow: inset 3px 0 0 var(--color-brand-navy);
+}
+
+#new-customized-table tbody tr.rp-row {
+    cursor: pointer;
+}
+
+tr.rp-subrow:hover {
+    background-color: var(--color-surface-inset) !important;
+}
+
+/* The period stays pinned while the figures scroll */
+#new-customized-table .sticky-col {
+    position: sticky;
+    z-index: 5;
+}
+
+#new-customized-table .col-period.sticky-col {
+    left: 0;
+}
+
+#new-customized-table thead th.sticky-col {
+    z-index: 11;
+}
+
+/* Only money is right-aligned; its header and cells share one gutter so the label ends where the amounts end */
+#new-customized-table thead th.is-right,
+#new-customized-table tbody td.right-aligned-td {
+    padding-right: 18px !important;
+}
+
+#new-customized-table thead th.is-right .th-inner {
+    justify-content: flex-end;
+}
+
+/* ── Cells ───────────────────────────────────────────────── */
+.rp-id-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.rp-period-name {
+    font-weight: 500;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-period-note {
+    font-size: 12.5px;
+    color: var(--color-text-secondary);
+}
+
+.rp-num,
+#new-customized-table td.col-earnings {
+    font-variant-numeric: tabular-nums;
+}
+
+/* A full-timer's net words: the figure their pay turns on */
+.rp-num--key {
+    font-weight: 500;
+}
+
+/* Nothing that period, said quietly rather than as a row of zeros */
+.rp-nil {
+    color: #c4c4c9;
+}
+
+.rp-amount {
+    cursor: default;
+}
+
+.rp-expand-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-xs);
+    background: var(--color-surface-inset);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+#new-customized-table tbody tr:nth-child(even of .rp-row) .rp-expand-btn {
+    background-color: var(--color-surface-white);
+}
+
+.rp-expand-btn svg {
+    width: 16px;
+    height: 16px;
+    transition: transform var(--transition-fast);
+}
+
+.rp-expand-btn:hover {
+    background: var(--color-surface-white);
+    color: var(--color-text-primary);
+}
+
+.rp-row.is-expanded .rp-expand-btn svg {
+    transform: rotate(90deg);
+}
+
+.rp-row.is-expanded .rp-expand-btn {
+    background: var(--color-brand-navy) !important;
+    color: var(--color-surface-white) !important;
+}
+
+.rp-dot {
+    display: inline-block;
+    flex: 0 0 auto;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.5;
+}
+
+/* A period opened from its bar is marked once, then settles into the open-row colour */
+@keyframes rp-flash {
+    0%,
+    35% {
+        box-shadow: inset 0 0 0 999px rgba(149, 128, 73, 0.2);
+    }
+
+    100% {
+        box-shadow: inset 0 0 0 999px rgba(149, 128, 73, 0);
+    }
+}
+
+@keyframes rp-flash-first {
+    0%,
+    35% {
+        box-shadow: inset 3px 0 0 var(--color-brand-navy), inset 0 0 0 999px rgba(149, 128, 73, 0.2);
+    }
+
+    100% {
+        box-shadow: inset 3px 0 0 var(--color-brand-navy), inset 0 0 0 999px rgba(149, 128, 73, 0);
+    }
+}
+
+#new-customized-table tbody tr.rp-row.is-flash > td {
+    animation: rp-flash 2.2s ease;
+}
+
+#new-customized-table tbody tr.rp-row.is-flash > td:first-child {
+    animation-name: rp-flash-first;
+}
+
+/* ── Sorting icon — templates/partials/_sorting_icon.html, as jobs.css ── */
+.rp-sort {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 5px;
+    color: #c2c0b6;
+    vertical-align: middle;
+}
+
+.rp-sort .sorting-icon {
+    width: 14px;
+    height: 14px;
+}
+
+.sorting-icon .down-triangle-icon,
+.sorting-icon .up-triangle-icon {
+    display: none;
+}
+
+th.is-asc .sorting-icon .order-icon,
+th.is-desc .sorting-icon .order-icon {
+    display: none;
+}
+
+th.is-asc .sorting-icon .up-triangle-icon,
+th.is-desc .sorting-icon .down-triangle-icon {
+    display: inline;
+}
+
+th.is-sorted .rp-sort {
+    color: var(--color-brand-navy);
+}
+
+th.is-sorted .label {
+    color: var(--color-text-primary);
+    font-weight: 600;
+}
+
+#new-customized-table thead th.order_by {
+    cursor: pointer;
+}
+
+#new-customized-table thead th.order_by:hover .label {
+    color: var(--color-text-primary);
+}
+
+#new-customized-table thead th .th-inner {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+
+#new-customized-table thead th .label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* An info button in a header keeps out of the sort's way */
+#new-customized-table thead th .rp-info {
+    width: 20px;
+    height: 20px;
+    margin-left: 2px;
+}
+
+#new-customized-table thead th .rp-info svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* ── Empty state: jobs.css's ───────────────────────────────── */
+#new-customized-table tbody td.rp-empty-cell {
+    padding: 0 !important;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    border-bottom: 0;
+}
+
+/* Pinned to the visible width, or it centres itself in the full column run */
+#new-customized-table tbody td.rp-empty-cell .rp-empty {
+    position: sticky;
+    left: 0;
+    width: var(--rp-detail-w, 100%);
+}
+
+.rp-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 56px 24px;
+    text-align: center;
+}
+
+.rp-empty__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    margin-bottom: 4px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-subtle);
+    color: var(--color-brand-gold);
+}
+
+.rp-empty__icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.rp-empty__title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.rp-empty__note {
+    max-width: 400px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+}
+
+.rp-empty__action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 30px;
+    margin-top: 6px;
+    padding: 0 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xs);
+    background: var(--color-surface-white);
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    cursor: pointer;
+}
+
+.rp-empty__action svg {
+    width: 13px;
+    height: 13px;
+}
+
+.rp-empty__action:hover {
+    background: var(--color-surface-subtle);
+}
+
+/* ── The open row: invitations.css's panel, holding one period ─── */
+#new-customized-table tbody tr.rp-subrow > td {
+    padding: 0 !important;
+    background: var(--color-surface-subtle) !important;
+    border-bottom: 1px solid var(--color-border);
+    /* table.css clips and nowraps every cell; the panel must not be */
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    vertical-align: top;
+    cursor: default;
+}
+
+tr.rp-subrow.is-hidden {
+    display: none;
+}
+
+/* Pinned to the visible width (--rp-detail-w, written by JS), so a phone never scrolls to find it */
+.rp-detail {
+    position: sticky;
+    left: 0;
+    width: var(--rp-detail-w, 100%);
+    padding: 14px 16px 18px;
+    box-shadow: inset 3px 0 0 var(--color-brand-navy);
+    animation: rp-detail-in 0.2s ease;
+}
+
+@media (max-width: 767px) {
+    .rp-detail {
+        padding: 10px;
+    }
+}
+
+@keyframes rp-detail-in {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.rp-panel {
+    container: rpPanel / inline-size;
+    background: var(--color-surface-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.rp-panel__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 12px;
+    padding: 12px 18px;
+    background: var(--color-surface-inset);
+    border-bottom: 1px solid var(--color-border);
+    box-shadow: inset 3px 0 0 var(--color-brand-navy);
+}
+
+.rp-panel__mark {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-md);
+    background: var(--color-surface-white);
+    color: var(--color-brand-navy);
+}
+
+.rp-panel__mark svg {
+    width: 17px;
+    height: 17px;
+}
+
+.rp-panel__titles {
+    flex: 1 1 160px;
+    min-width: 0;
+}
+
+.rp-panel__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.3;
+    color: var(--color-text-primary);
+    white-space: nowrap;
+}
+
+.rp-panel__sub {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 2px 0 0;
+    font-size: 13.5px;
+    line-height: 1.3;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rp-panel__actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+@container rpPanel (max-width: 520px) {
+    .rp-panel__head {
+        padding: 12px 14px;
+    }
+
+    .rp-panel__titles {
+        flex-basis: calc(100% - 46px);
+    }
+
+    .rp-panel__actions {
+        flex: 1 1 auto;
+    }
+
+    .rp-panel__actions .rp-btn {
+        flex: 1 1 0;
+    }
+}
+
+/* Services on the left, the summary on the right, once the panel has room for both */
+.rp-panel__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+}
+
+@container rpPanel (min-width: 820px) {
+    .rp-panel__body {
+        grid-template-columns: minmax(0, 1fr) 300px;
+    }
+}
+
+.rp-panel__main {
+    container: rpMain / inline-size;
+    min-width: 0;
+    padding: 14px 18px 16px;
+}
+
+.rp-panel__side {
+    min-width: 0;
+    border-top: 1px solid var(--color-border);
+}
+
+@container rpPanel (min-width: 820px) {
+    .rp-panel__side {
+        border-top: 0;
+        border-left: 1px solid var(--color-border);
+    }
+}
+
+@container rpPanel (max-width: 520px) {
+    .rp-panel__main {
+        padding: 12px 14px 14px;
+    }
+}
+
+.rp-section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 10px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--color-brand-navy);
+}
+
+.rp-section-count {
+    padding: 0 7px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-subtle);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0;
+    color: var(--color-text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-section-note {
+    margin-left: auto;
+    font-size: 12.5px;
+    font-weight: 400;
+    letter-spacing: 0;
+    color: var(--color-text-secondary);
+}
+
+.rp-section-title .rp-scope {
+    margin-left: auto;
+}
+
+/* ── Services in the period ──────────────────────────────── */
+.rp-svc__table {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+
+.rp-svc__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) 48px minmax(0, 1.5fr) 96px 120px;
+    align-items: center;
+    gap: 14px;
+    min-height: 40px;
+    padding: 0 12px;
+    border-top: 1px solid var(--color-border);
+    font-size: 13.5px;
+    color: var(--color-text-primary);
+}
+
+.rp-svc__row--head {
+    min-height: 32px;
+    border-top: 0;
+    background: var(--color-surface-inset);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+}
+
+.rp-svc__name {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.rp-svc__row:not(.rp-svc__row--head) .rp-svc__name {
+    font-weight: 500;
+}
+
+.rp-svc__icon {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-subtle);
+    color: var(--color-brand-navy);
+}
+
+.rp-svc__icon svg {
+    width: 14px;
+    height: 14px;
+}
+
+.rp-svc__jobs {
+    font-variant-numeric: tabular-nums;
+}
+
+/* Money alone is right-aligned, as in the table above it */
+.rp-svc__amount {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-svc__row:not(.rp-svc__row--head) .rp-svc__amount {
+    font-weight: 500;
+}
+
+.rp-svc__volume {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--color-text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-svc__share {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rp-svc__row--head .rp-svc__share {
+    display: block;
+}
+
+/* The share of the period's earnings, in the chart's own bar colour */
+.rp-share {
+    flex: 1 1 auto;
+    height: 6px;
+    overflow: hidden;
+    border-radius: var(--radius-full);
+    background: #e9edf2;
+}
+
+.rp-share > span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--bar);
+}
+
+.rp-share__pct {
+    flex: 0 0 34px;
+    font-size: 12.5px;
+    text-align: right;
+    color: var(--color-text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+@container rpMain (max-width: 600px) {
+    .rp-svc__row {
+        grid-template-columns: minmax(0, 1fr) 40px minmax(0, 1.2fr) 88px;
+        gap: 10px;
+    }
+
+    .rp-svc__share {
+        display: none !important;
+    }
+}
+
+.rp-svc__row--head .rp-svc__amount {
+    white-space: nowrap;
+}
+
+@container rpMain (max-width: 420px) {
+    .rp-svc__row {
+        grid-template-columns: minmax(0, 1fr) 36px 104px;
+        padding: 0 10px;
+    }
+
+    .rp-svc__volume {
+        display: none;
+    }
+}
+
+/* ── A full-timer's net words: each kind of work, its weight, what it counted ── */
+.rp-net__row {
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr) 64px 96px;
+}
+
+.rp-net__name {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    line-height: 1.25;
+}
+
+.rp-net__note {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--color-text-secondary);
+}
+
+.rp-net__weight {
+    color: var(--color-text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-net__counted {
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-net__row:not(.rp-svc__row--head) .rp-net__counted {
+    font-weight: 500;
+}
+
+/* Work the month had none of stays listed, so the sum reads the same every month */
+.rp-net__row.is-none .rp-svc__name {
+    color: var(--color-text-secondary);
+}
+
+.rp-net__row.is-none .rp-svc__icon {
+    background: var(--color-surface-inset);
+    color: var(--color-text-secondary);
+}
+
+.rp-net__row--total {
+    min-height: 40px;
+    background: var(--color-surface-inset);
+    font-weight: 600;
+}
+
+.rp-net__row--total .rp-net__counted {
+    font-family: var(--font-heading);
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--color-brand-navy);
+}
+
+@container rpMain (max-width: 600px) {
+    .rp-net__row {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 52px 84px;
+    }
+}
+
+@container rpMain (max-width: 420px) {
+    .rp-net__row {
+        grid-template-columns: minmax(0, 1fr) 48px 84px;
+    }
+}
+
+/* ── A full-timer's net words against the base ───────────── */
+.rp-basebar__top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rp-basebar__label {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+}
+
+.rp-basebar__value {
+    margin-left: auto;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-basebar__value small {
+    font-size: 12.5px;
+    font-weight: 400;
+    color: var(--color-text-secondary);
+}
+
+.rp-basebar__track {
+    position: relative;
+    height: 8px;
+    margin-top: 8px;
+    overflow: hidden;
+    border-radius: var(--radius-full);
+    background: #e9edf2;
+}
+
+.rp-basebar__fill {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--bar);
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Past the base the bar is full and turns navy, the colour the chart gives the period you point at */
+.rp-basebar__track.is-over .rp-basebar__fill {
+    background: var(--bar-hot);
+}
+
+.rp-basebar__note {
+    margin: 6px 0 0;
+    font-size: 12.5px;
+    color: var(--color-text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── Summary ─────────────────────────────────────────────── */
+.rp-periodsum {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px 18px 16px;
+}
+
+.rp-periodsum .rp-section-title {
+    margin: 0;
+}
+
+.rp-facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 16px;
+    margin: 0;
+}
+
+.rp-fact {
+    min-width: 0;
+}
+
+.rp-fact dt {
+    margin: 0 0 2px;
+    font-size: 13px;
+    line-height: 1.3;
+    color: var(--color-text-secondary);
+}
+
+.rp-fact dd {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-sum {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    padding-top: 12px;
+    border-top: 1px solid var(--color-border);
+}
+
+.rp-sum__row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 13.5px;
+}
+
+.rp-sum__row dt {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    color: var(--color-text-secondary);
+}
+
+.rp-sum__row dd {
+    margin: 0;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.rp-sum__row--total {
+    align-items: center;
+}
+
+.rp-sum__row--total dt {
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.rp-sum__row--total dd {
+    font-family: var(--font-heading);
+    font-size: 17px;
+    color: var(--color-brand-navy);
+}
+
+.rp-sum__unit {
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-weight: 400;
+    color: var(--color-text-secondary);
+}
+
+.rp-sum__usd {
+    margin: -6px 0 0;
+    font-size: 12.5px;
+    text-align: right;
+    color: var(--color-text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── Totals: dashboard.css's tiles, a white tray around a grey well, under the rows ─── */
+/* Centred and no wider than three tiles need, rather than stretched across the page */
+.rp-totals {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 300px));
+    justify-content: center;
+    gap: 16px;
+    padding: 20px 24px;
+}
+
+/* An empty list has nothing to add up, and its empty state already says so */
+#rp-productivity:has(.rp-empty-cell) .rp-totals {
+    display: none;
+}
+
+.rp-stat {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 12px;
+    background: var(--color-surface-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    transition: box-shadow var(--transition-fast);
+}
+
+.rp-stat:hover {
+    box-shadow: var(--shadow-sm);
+}
+
+.rp-stat__well {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 16px 16px 18px;
+    background: var(--color-surface-inset);
+    border-radius: var(--radius-md);
+    box-shadow: inset var(--shadow-sm);
+}
+
+.rp-stat__head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.rp-stat__icon {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: var(--color-surface-white);
+    color: var(--color-brand-navy);
+}
+
+.rp-stat__icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.rp-stat__label {
+    min-width: 0;
+    margin: 0;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.3;
+    color: var(--color-text-primary);
+    overflow-wrap: anywhere;
+}
+
+/* Tabular figures, so the count-up does not jitter the width */
+.rp-stat__value {
+    margin: 6px 0 0;
+    font-family: var(--font-heading);
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+}
+
+/* Number first, the unit after — the order the balance settled on */
+.rp-stat__unit {
+    margin-left: 6px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0;
+    color: var(--color-text-secondary);
+}
+
+.rp-stat__words {
+    margin: 0;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-stat__words strong {
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+@container rpProd (max-width: 980px) {
+    .rp-totals {
+        gap: 12px;
+        padding: 16px;
+    }
+
+    .rp-stat__well {
+        padding: 14px 14px 16px;
+    }
+
+    .rp-stat__head {
+        gap: 8px;
+    }
+
+    .rp-stat__icon {
+        width: 30px;
+        height: 30px;
+    }
+
+    .rp-stat__icon svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .rp-stat__label {
+        font-size: 13.5px;
+    }
+
+    .rp-stat__value {
+        font-size: 23px;
+    }
+}
+
+/* One a row on a phone, the figure beside the label, as the dashboard's tiles go */
+@container rpProd (max-width: 640px) {
+    .rp-totals {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .rp-stat {
+        padding: 8px;
+    }
+
+    /* The figure sits beside the label while both fit, and drops under it when they do not;
+       "2,184,300 words" is too wide to share a phone's row with "Total Word Count" */
+    .rp-stat__well {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 2px 12px;
+        padding: 12px 14px;
+    }
+
+    .rp-stat__head {
+        flex: 0 0 auto;
+    }
+
+    .rp-stat__label {
+        white-space: nowrap;
+    }
+
+    .rp-stat__value {
+        margin: 0 0 0 auto;
+        font-size: 21px;
+        text-align: right;
+    }
+
+    .rp-stat__words {
+        flex: 1 0 100%;
+        text-align: right;
+    }
+
+    .rp-trend {
+        margin: 10px 8px 8px;
+    }
+}
+
+/* ── Buttons — one filled navy control per panel ─────────── */
+.rp-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 12px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-xs);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.rp-btn svg {
+    width: 15px;
+    height: 15px;
+}
+
+.rp-btn--primary {
+    background: var(--color-brand-navy);
+    color: var(--color-surface-white);
+}
+
+.rp-btn--primary:hover {
+    background: var(--color-brand-navy-hover);
+}
+
+.rp-btn--ghost {
+    border-color: var(--color-border);
+    background: var(--color-surface-white);
+    color: var(--color-text-primary);
+}
+
+.rp-btn--ghost:hover {
+    border-color: var(--color-border-hover);
+    background: var(--color-surface-subtle);
+}
+
+.rp-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-navy);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rp-detail,
+    .rp-period-pop,
+    .rp-export-menu,
+    .rp-cols-pop,
+    .rp-tip,
+    .rp-bar__fill,
+    #new-customized-table tbody tr.rp-row.is-flash > td {
+        animation: none;
+        transition: none;
+    }
+}

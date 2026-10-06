@@ -38,11 +38,12 @@ Nothing inside the folder refers to the folder name, so renaming is safe.
 | `job.html` | **Built.** A single job — opens from a Job ID on My Jobs (`job.html?id=J-47990`). |
 | `dashboard.html` | **Built.** Dashboard — the resource's home; the logo and the first sidebar entry open it. |
 | `earnings.html` | **Built.** My Earnings — every bill, paid and pending, with its totals. |
+| `productivity.html` | **Built.** Productivity — the work delivered a month (or a year) at a time, its trend and its totals; `?as=fulltimer` for a full-timer's page. |
 | `professional-profile.html` | **Built.** Professional Profile — services and rates by language pair with their certificates, specialities, billing details, payment methods and emails. |
 | `account.html` | **Built.** User Account — the resource's own profile, opened from their name and photo in the sidebar. |
 
 The sidebar, topbar, availability control, profile menu and logout modal are **final** and shared
-by all six pages, so a new page only needs its own content.
+by every page, so a new page only needs its own content.
 
 ---
 
@@ -57,6 +58,7 @@ resource portal preview/
 ├── account.html                built page — the resource's own profile (User Account)
 ├── dashboard.html              built page — the resource's home, ?period=month|quarter|year|all
 ├── earnings.html               built page — the bills, ?period=…&status=…&q=… or ?bill=B-…
+├── productivity.html           built page — delivered work, ?view=yearly&period=…&metric=…, ?month=2026-09, ?as=fulltimer
 ├── professional-profile.html   built page — services, rates, certificates, payment, ?highlight_cert=…
 └── assets/
     ├── css/
@@ -77,6 +79,7 @@ resource portal preview/
     │   ├── account.css         page-specific: profile head, field grid, records, technology, terms
     │   ├── dashboard.css       page-specific: job tiles, revenue pipeline, meters, due soon, feed
     │   ├── earnings.css        page-specific: totals, period picker, status filter, bill panel
+    │   ├── productivity.css    page-specific: trend chart, columns popover, export menu, period panel (services / net words, pay)
     │   ├── professional.css    page-specific: profile head with facts, pair blocks, certificates, method cards, emails
     │   └── password-modal.css  copied from config/static/css/password-modal.css (shell swapped)
     ├── js/
@@ -91,6 +94,7 @@ resource portal preview/
     │   ├── account.js          the profile: jump tabs, inline edit, dialogs, profile strength
     │   ├── dashboard.js        the home: period switch, count-up, tips, meters that repaint from data-value
     │   ├── earnings.js         the bills: period and status filters, search, totals, the open bill
+    │   ├── productivity.js     delivered work: monthly / yearly, period, trend chart, export, the open period
     │   ├── professional.js     the work profile: pair blocks, rate and certificate dialogs, specialities, payment
     │   └── password-policy.js  copied from config/static/js/password-policy.js
     ├── fonts/                  IBM Plex Sans + Serif (woff2)
@@ -126,6 +130,12 @@ shell (`.modal-dialog`, `.modal-content` and the agile.css bridge) is replaced b
 `earnings.css` does the same once more: the totals are `dashboard.css`'s `.rp-stat` tiles and the
 table chrome, sort icon, empty state and open row are `jobs.css` and `invitations.css`, all under
 their original class names.
+
+`productivity.css` is `earnings.css` again — period picker, table chrome, sort icon, empty state,
+open row, `.rp-stat` tiles and tip — plus `dashboard.css`'s card, `.rp-scope` and `.rp-delta`, all
+under their original names. New: the chart, the columns popover, the export menu and what an open
+period holds. The page does not load `columns-modal.css` / `columns-modal.js`: its Columns is a popover
+of its own.
 
 `professional.css` rebuilds User Account's head, jump tabs, cards, `.pd-*` fields, aside, confirm
 popover and modal from `account.css`, under the same names. Specialities wear Technology's
@@ -534,6 +544,96 @@ joins the buttons under them.
 
 ---
 
+## Productivity
+
+`productivity.html` replaces the dashboard's `trProductivity` tab — `freelancer_productivity_table.html`
+and `fulltimer_productivity_table.html`, their overview cards and their filter. The sidebar entry sits
+under Earnings. Like My Earnings it reads **toolbar → trend → rows → totals**, so the months are the
+first figures on screen and their sum closes the list.
+
+**What went.** The current-month cards (Jobs, Word Count, Hours Count, Document Count; Translation WC,
+Revision WC, Legalization PC, Hours Count and Net WC Count for a full-timer): this month is now the top
+row, marked *So far*, and its open row says the rest. The Quality / Punctuality / Completed Jobs line
+is not repeated either — the Dashboard carries it as Performance and the Completed jobs tile.
+
+**The toolbar** — the old search box held three icons; each is now a control of its own:
+
+| Control | Does | Was |
+| --- | --- | --- |
+| Monthly / Yearly | How the rows are grouped, `base.css`'s segmented control | *Breakdown: Month-Wise / Year-Wise*, inside the filter popup |
+| Period | My Earnings' picker: All time, Last 3 / 6 / 12 months, a year, a custom range of months, with a red ×. Rolling and this month included, so *Last 3 months* is the dashboard's | *Productivity Months*, a flatpickr range; hidden in Yearly as before |
+| Columns | A popover of checkboxes, the Period and Export popovers' twin, applied as you tick: *Select all*, and *Reset* (the default columns at their default widths, undoing a hand resize). Month is ticked, greyed and locked. With columns hidden the button turns navy and counts what is shown, *5/6*; a full-timer's eleven come in three groups — Work, Words counted, Pay | The sliders icon and its checkbox popup; the other pages' Customize Columns modal |
+| Export | A menu that first says what goes out — *Export 12 months · 1 Nov 2025 – 31 Oct 2026* — then PDF report or Excel (CSV). Every page of the view, not only the page on screen as the old form posted | The export icon, PDF only |
+
+**One chart instead of four.** Earnings, Jobs, Words, and Hours or Documents when the view has any,
+one at a time on a segmented switch; changing it moves the same bars rather than redrawing them. Bars
+are at most 24px with a 4px rounded cap, in one step of the dashboard's validated navy ramp; the month
+still running is a paler step, keyed *This month so far*. A dashed line marks the average of the
+complete periods in view, and the best one carries its value on its cap — the only direct label; the
+tip and the table carry the rest. Hovering a bar lights its row and hovering a row lights its bar;
+clicking a bar opens that period in the table, turning the page when it is on another one. Many months
+keep only the year labels, at each January.
+
+**The table** — Month (Year) · Job Count · Word Count · Hours · Documents · Earnings. Only money is
+right-aligned — Earnings here, Excess Pay and both Monthly Pay columns for a full-timer — its header
+ending where the amounts end (one 18px gutter for both); counts stay left-aligned, as in every other
+table, and so do they in an open period. A period with none reads as a quiet dash rather than *0*. Earnings leads with the currency, ≈ USD on hover; Hours
+and Earnings explain themselves in a tip. 12 / 24 / 48 a page — a year to a page by default. Sorting,
+resizing, the pinned first column and the striping are My Earnings'.
+
+**A row opens** to the period — *By service* (jobs, volume in words, hours, documents or pages,
+earnings and its share) beside a *Summary* against the period before (Job Count, Word Count and
+Earnings carry the change; a period still running, or the year after the short first one, carries
+none). *View jobs* opens My Jobs' Completed tab for this month; older months only say where they would
+go, as do the PDF buttons.
+
+**Totals close the list**: Total Job Count (in *n* months), Total Word Count (and the hours and
+documents), Total Earned (≈ USD) — every period the view lets through, on all pages, in My Earnings'
+centred `.rp-stat` row.
+
+**The numbers agree with the other pages.** `RP.PRODUCTIVITY` in `data.js` files a month at a time
+from March 2021:
+
+- Jobs and words add up to the dashboard's periods: this month 30 jobs and 55,040 words (the completed
+  rows on My Jobs), Last 3 months 84 and 158,420, This year 241 and 452,880, All time 1,164 and
+  2,184,300; last month is 27, the 3 months before 77 and Jan – Oct 2025 218, as the dashboard's
+  changes imply.
+- A month's earnings are its bill's jobs: September is B-2209 (1,608.66, the pending balance), August
+  B-2201 (3,410.97, the payment in Recent activity). This month is not billed yet, so it is the
+  dashboard's Delivered and Approved stages, 2,086.05.
+- All-time Total Earned is 108,427.16 NZD: My Earnings' 106,421.11, less the 80.00 that bonuses and
+  deductions add on the bills, plus the 2,086.05 not billed yet.
+- Hours count per-minute work as hours, as `hours_ann` does: this month's 15.68 is 13.5 interpreting
+  hours and 131 minutes of subtitling.
+
+### A full-timer's page — `productivity.html?as=fulltimer`
+
+Months only, as before: a full-timer is paid a month at a time. In the switch's place the toolbar
+reads their base — *Base 50,000 words · 1,000.00 USD a month* — as plain text.
+
+| Part | Shows |
+| --- | --- |
+| Columns | Month · Job Count · Translation WC · Revision WC · Legalization PC · Hours · Net WC · Excess Words · Excess Pay · Monthly Pay · Monthly Pay (AED). The tips on Hours, Net WC, Excess Words, Excess Pay and Monthly Pay are the old popovers, with the company's weights written in |
+| Chart | Net words against a solid **base** line, Pay against the base salary, Jobs against their average |
+| Open month | *How your net words were counted* — each kind of work, what was done, its weight and what it counted for, down to Net words — beside *Pay*: net words against the base on a bar, *38,495 to go before excess pay* while the month runs, then base salary, excess pay, monthly pay and ≈ AED |
+| Totals | Total Job Count, Total Net WC (and how many went past the base), Total Pay (and its excess pay) |
+
+`RP.FULLTIMER` holds it: `CompanyFullTimerServiceWeightConfig`'s default weights (translation 100%,
+revision 50%, legalization 25%, hours 100%; other work 100%), 250 words a page, 500 an hour; the base,
+the salary and the excess rate (USD 0.0333 a word, English → Arabic's NZD 0.055) are this preview's
+own; AED because the billing address is in Dubai. Each variant keeps its own column choice.
+
+**In the URL**: `?view=yearly`, `?period=last-12` / `2025` / `2025-01_2025-06`, `?metric=words`;
+`?month=2026-09` or `?year=2025` opens that period in its place in the list.
+
+**Narrower screens:** the freelancer's six columns fit from about 1,140px with the sidebar open (950px
+with it collapsed); below that the table scrolls with Month pinned, and a full-timer's eleven do on
+most laptops. On a phone the switch takes a row and period, columns and export share the next, the
+chart drops to 150px, and the tiles go one a row — a figure moves under its label when the two do not
+fit side by side.
+
+---
+
 ## Adding the next page
 
 1. Copy a page's shell (e.g. `account.html`) and set `data-page` / `data-title` on `#rp-layout`.
@@ -638,8 +738,9 @@ line at the bottom — label and value on one row, like the Total on an Earnings
 | Key | Does |
 | --- | --- |
 | `/` | Jump to the search field; on Professional Profile, the services search |
-| `Esc` | Leave the search field, close any modal, the availability dropdown or the mobile drawer; on User Account and Professional Profile, close the Delete popover first; on My Earnings, close the period picker first |
+| `Esc` | Leave the search field, close any modal, the availability dropdown or the mobile drawer; on User Account and Professional Profile, close the Delete popover first; on My Earnings, close the period picker first; on Productivity, the Columns popover, the Export menu or the period picker |
 | `Enter` | Submit a bid, when the bid field has focus; send a chat message on the job page (`Shift+Enter` for a new line); in Add services' rate, add the service to the list |
-| `↑` / `↓` | Move between statuses in the availability dropdown |
+| `↑` / `↓` | Move between statuses in the availability dropdown; on Productivity, `↓` on Columns or Export opens it, and the arrows move between the Export formats |
+| `←` / `→`, `Home` / `End` | On Productivity's chart, move between the periods; `Enter` opens the one in focus in the table |
 | `Enter` in Technology's search | Pick the first match, or add what was typed as your own tool |
 | `Enter` in Specialities' search | Pick the first match that still has room |

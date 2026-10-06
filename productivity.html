@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Productivity · Resource Portal</title>
+  <meta name="description" content="Redesign preview of the AGATO resource portal — Productivity.">
+  <link rel="icon" href="assets/img/logo.png">
+
+  <link rel="stylesheet" href="assets/css/variables.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/sidebar.css">
+  <link rel="stylesheet" href="assets/css/topbar.css">
+  <link rel="stylesheet" href="assets/css/toolbar.css">
+  <link rel="stylesheet" href="assets/css/table.css">
+  <link rel="stylesheet" href="assets/css/pagination.css">
+  <link rel="stylesheet" href="assets/css/logout-modal.css">
+  <link rel="stylesheet" href="assets/css/productivity.css">
+</head>
+<body>
+
+  <!-- Sidebar + topbar + modals are injected here by assets/js/layout.js -->
+  <div id="rp-layout" data-page="productivity" data-title="Productivity"></div>
+
+  <main class="rp-page">
+
+    <section id="rp-productivity">
+
+      <!-- Toolbar: how the rows are grouped, then the period, columns and export at the end -->
+      <div class="dashboard_toolbar-row rp-prod-toolbar">
+        <div class="rp-segmented rp-view-switch" id="rpView" role="group" aria-label="Group the rows by"></div>
+        <!-- A full-timer's base, in the switch's place (productivity.html?as=fulltimer) -->
+        <p class="rp-base" id="rpBase" hidden></p>
+
+        <div class="rp-prod-tools">
+          <div class="rp-period-filter" id="rpPeriod"></div>
+
+          <!-- Columns: a popover of checkboxes, this page's own rather than the shared modal -->
+          <div class="rp-cols" id="rpCols"></div>
+
+          <div class="rp-export" id="rpExport"></div>
+        </div>
+      </div>
+
+      <div class="wrapper">
+        <!-- The periods in view, oldest to newest -->
+        <section class="rp-card rp-trend" id="rpTrend" aria-labelledby="rpTrendTitle"></section>
+
+        <!-- Table -->
+        <div class="table-wrap" id="scrollContainer">
+          <table id="new-customized-table" class="table" data-table="rp-productivity">
+            <colgroup></colgroup>
+            <thead><tr></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <!-- Totals of every period the view lets through, on all pages -->
+        <div class="rp-totals" id="rpTotals"></div>
+
+        <div class="cu-pagination-bar" id="rpPagination"></div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- One tip for the info buttons, the bars and the amounts -->
+  <div class="rp-tip" id="rpTip" role="tooltip" hidden></div>
+
+  <script src="assets/js/icons.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script src="assets/js/productivity.js"></script>
+</body>
+</html>
