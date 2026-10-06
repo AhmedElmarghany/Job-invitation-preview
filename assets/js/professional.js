@@ -545,7 +545,7 @@
         return p.entered && p.entered !== BASE ? p.entered : "USD";
     }
 
-    /* The stamp shares the ≈ line it dates, so a rate takes two lines, not three */
+    /* The stamp shares the ≈ line it dates, so a rate takes two lines; the ≈ amount stays under the NZD one */
     function priceRow(p, q) {
         var def = serviceDef(p.service);
         var st = PRICE_STATUS[p.status];
@@ -556,9 +556,9 @@
             '<div class="rp-svc__name"><p class="rp-svc__title">' + hl(def.name, q) +
             (p.mode ? '<span class="rp-svc__mode">' + hl(p.mode, q) + " → " + hl(p.type, q) + "</span>" : "") + "</p></div>" +
             '<div class="rp-svc__rate"><p class="rp-svc__price">' + BASE + " " + money(p.price) + ' <span class="rp-svc__unit">/ ' + def.unit + "</span></p>" +
-            '<p class="rp-svc__conv">≈ ' + code + " " + money(inCurrency(p.price, code)) + dot() +
-            '<span class="rp-svc__fx is-tip-end" data-tip="Exchange rate updated ' + fmtDate(p.rateUpdated) + ", " + fmtTime(p.rateUpdated) + '">' +
-            icon("clock") + fmtWhen(p.rateUpdated) + "</span></p></div>" +
+            '<p class="rp-svc__conv"><span class="rp-svc__fx" data-tip="Exchange rate updated ' + fmtDate(p.rateUpdated) + ", " + fmtTime(p.rateUpdated) + '">' +
+            icon("clock") + fmtWhen(p.rateUpdated) + "</span>" +
+            '<span class="rp-svc__amount">≈ ' + code + " " + money(inCurrency(p.price, code)) + "</span></p></div>" +
             '<div class="rp-svc__status">' + pill(st, st.tip) + "</div>" +
             '<div class="rp-svc__actions">' +
             '<button type="button" class="rp-iconbtn rp-iconbtn--ghost" data-act="edit-price" data-id="' + p.id + '" aria-label="Edit the ' +
@@ -1665,7 +1665,7 @@
             [
                 "Currency",
                 "Rates are kept in NZD, the currency jobs are priced in. Type a rate in another currency and it is converted; the ≈ line shows it in that currency, or in USD. " +
-                    "The time beside it is when that rate's exchange rate was last updated."
+                    "The time at the start of that line is when that rate's exchange rate was last updated."
             ],
             [
                 "Up to " + PRO.pairLimit + " language pairs",

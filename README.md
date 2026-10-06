@@ -340,8 +340,9 @@ the block of the row it flags.
 - A rate shows NZD first, then ≈ the currency it was typed in (or USD), as the old two lines did.
   The clock date the old table printed under each rate is that rate's own exchange-rate update, not
   when the service was edited, so it moved out from under the service name into the rate cell, on
-  the ≈ line itself — *≈ USD 0.0333 · 🕘 9:12 am* — so a rate takes two lines, not three
-  (`rateUpdated` on each price; the full stamp on hover). Saving a rate stamps it again.
+  the ≈ line itself — *🕘 9:12 am* at its start, *≈ USD 0.0333* at its end under the NZD amount,
+  open space between — so a rate takes two lines, not three (`rateUpdated` on each price; the full
+  stamp on hover). Saving a rate stamps it again.
 - New rates are *Pending approval* — on this page `.status-pending` is honey amber with a brighter
   dot, the colour read everywhere as "waiting"; *Active* is the Verified green.
 - A verified certificate expiring within 60 days gets **Renew**, which adds the renewed one; the
