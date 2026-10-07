@@ -561,13 +561,40 @@
             paymentAlert(row) +
             offerActions(row) +
             '<dl class="rp-offer__lines">' +
-            '<div class="rp-offer__line"><dt>Suggested range</dt><dd>' +
-            row.currencyCode +
-            " " +
-            money(row.bid.suggestedMin) +
-            " – " +
-            money(row.bid.suggestedMax) +
+            '<div class="rp-offer__line"><dt>Suggested range</dt><dd data-bid-range>' +
+            suggestedRange(row, row.currencyCode) +
             "</dd></div></dl></div>"
+        );
+    }
+
+    /* The original bid form's two choices: the job's currency, or USD */
+    function bidCurrencies(row) {
+        return row.currencyCode === "USD" ? ["USD"] : [row.currencyCode, "USD"];
+    }
+
+    function inCurrency(amount, from, to) {
+        return from === to ? amount : (amount / RP.FX[from]) * RP.FX[to];
+    }
+
+    function suggestedRange(row, code) {
+        return (
+            code +
+            " " +
+            money(inCurrency(row.bid.suggestedMin, row.currencyCode, code)) +
+            " – " +
+            money(inCurrency(row.bid.suggestedMax, row.currencyCode, code))
+        );
+    }
+
+    function currencySelect(row) {
+        return (
+            '<select class="rp-bid__currency" name="currency" aria-label="Currency of your bid" data-bid-currency>' +
+            bidCurrencies(row)
+                .map(function (code) {
+                    return '<option value="' + code + '">' + code + "</option>";
+                })
+                .join("") +
+            "</select>"
         );
     }
 
@@ -623,12 +650,10 @@
             return (
                 '<form class="rp-bid" data-bid-form>' +
                 '<span class="rp-bid__field">' +
-                '<span class="rp-bid__prefix">' +
-                row.currencyCode +
-                "</span>" +
                 '<input type="number" step="0.01" min="0" name="amount" placeholder="' +
                 money(row.bid.suggestedMin) +
                 '" aria-label="Your price" required>' +
+                currencySelect(row) +
                 "</span>" +
                 '<button class="rp-cta rp-cta--primary" type="submit">' +
                 icon("bid") +
@@ -1025,11 +1050,15 @@
         dropRow(row);
     }
 
-    function submitBid(row, amount) {
+    /* As the original, a bid typed in USD is kept in the job's currency; the toast repeats what was typed */
+    function submitBid(row, amount, currency) {
+        var cents = function (n) {
+            return Math.round(n * 100) / 100;
+        };
         row.status = "bid_sent";
-        row.amount = amount;
-        row.usd = Math.round(amount * 0.6073 * 100) / 100;
-        RP.toast("Bid of " + row.currencyCode + " " + money(amount) + " submitted for " + row.id + ".", "success");
+        row.amount = cents(inCurrency(amount, currency, row.currencyCode));
+        row.usd = cents(inCurrency(amount, currency, "USD"));
+        RP.toast("Bid of " + currency + " " + money(amount) + " submitted for " + row.id + ".", "success");
         refreshAfterAction(row);
     }
 
@@ -1184,7 +1213,19 @@
                 return;
             }
 
-            submitBid(findRow(id), amount);
+            submitBid(findRow(id), amount, form.querySelector("[data-bid-currency]").value);
+        });
+
+        /* A bid typed in USD is weighed against a range in USD, so the reference follows the currency */
+        els.tbody.addEventListener("change", function (e) {
+            var select = e.target.closest("[data-bid-currency]");
+            if (!select) return;
+
+            var form = select.closest("[data-bid-form]");
+            var row = findRow(form.closest("tr").dataset.detail);
+            var range = form.closest(".rp-offer").querySelector("[data-bid-range]");
+            form.querySelector('input[name="amount"]').placeholder = money(inCurrency(row.bid.suggestedMin, row.currencyCode, select.value));
+            if (range) range.textContent = suggestedRange(row, select.value);
         });
 
         /* Pagination */

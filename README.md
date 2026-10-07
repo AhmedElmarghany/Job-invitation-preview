@@ -79,8 +79,8 @@ resource portal preview/
     │   ├── account.css         page-specific: profile head, field grid, records, technology, terms
     │   ├── dashboard.css       page-specific: job tiles, revenue pipeline, meters, due soon, feed
     │   ├── earnings.css        page-specific: totals, period picker, status filter, bill panel
-    │   ├── productivity.css    page-specific: trend chart, columns popover, export menu, period panel (services / net words, pay)
-    │   ├── professional.css    page-specific: profile head with facts, pair blocks, certificates, method cards, emails
+    │   ├── productivity.css    page-specific: totals strip, trend chart, columns popover, export menu, period panel (services / net words, pay)
+    │   ├── professional.css    page-specific: profile head with facts, pair blocks, certificates, method cards, emails and their pager
     │   └── password-modal.css  copied from config/static/css/password-modal.css (shell swapped)
     ├── js/
     │   ├── icons.js            inline Lucide set — RP.icon('name')
@@ -132,10 +132,10 @@ table chrome, sort icon, empty state and open row are `jobs.css` and `invitation
 their original class names.
 
 `productivity.css` is `earnings.css` again — period picker, table chrome, sort icon, empty state,
-open row, `.rp-stat` tiles and tip — plus `dashboard.css`'s card, `.rp-scope` and `.rp-delta`, all
-under their original names. New: the chart, the columns popover, the export menu and what an open
-period holds. The page does not load `columns-modal.css` / `columns-modal.js`: its Columns is a popover
-of its own.
+open row and tip — plus `dashboard.css`'s card, `.rp-scope` and `.rp-delta`, all under their original
+names. New: the totals strip, the chart, the columns popover, the export menu and what an open period
+holds. The page does not load `columns-modal.css` / `columns-modal.js`: its Columns is a popover of
+its own.
 
 `professional.css` rebuilds User Account's head, jump tabs, cards, `.pd-*` fields, aside, confirm
 popover and modal from `account.css`, under the same names. Specialities wear Technology's
@@ -325,7 +325,7 @@ aside stays sticky only while it fits the window — measured, since the card gr
 | Specialities | **Own section and tab.** Up to ten, in six groups like Technology on User Account; Edit swaps in the toggles | The Specialties picker inside Resource Details |
 | Billing details | The address as label over value, or *Same as your primary address* linking to User Account; Edit opens the form; Tax read-only | `resource/billing_details.html` |
 | Payment method | A card per method: the default framed in navy, Verified or Pending verification, Make default; a method not added yet is a dashed row | `resource/preferred_payment_method.html`, `method_Forms/` |
-| Emails | The mail sent to the resource, unread in bold with a dot, read in a dialog | `customer/emails.html` |
+| Emails | The mail sent to the resource, eight a page, found by search, topic and All / Unread; unread in bold with a dot, read in a dialog | `customer/emails.html` |
 | Aside | Needs your attention: rejected or expiring certificates, an unverified default method. At a glance: the ID card (resource ID with copy, category, company preferred, native language, preferred currency, joining date), then pairs used of 6, services, certificates, specialities, vendor manager | — |
 
 **Pairs instead of a table with an expanding row.** A certificate belongs to a language pair (and one
@@ -335,6 +335,17 @@ anything. Inside a block the rows keep a table's columns — service, rate, stat
 still compare at a glance. Search sits above them on the left, the status filter and *Collapse all*
 on the right. The six-pair limit is no longer a meter there: *How services and prices work* says it,
 with how many pairs are priced, and At a glance counts them.
+
+**Emails, a page at a time.** Five years of mail is about two hundred emails, and *Show more* would
+take forty presses and a card longer than the rest of the page. So the card stays one size: a page
+of eight, newest first, with the tables' pager under it (*1–8 of 200*, first, last and the pages
+either side, in `pagination.css`'s classes). Above the list, as on Services & prices, search on the
+left — subject, sender and text — and on the right the topic (Invitations, Payments, Rates,
+Certificates, Account) and **All / Unread**, the unread count on its segment. Searching or filtering
+goes back to page 1; only the list and pager repaint, so the search keeps its caret. Reading an
+unread email updates both counts. The preview's 200 are generated in `data.js`: each bill on My
+Earnings brings a *ready* and a *paid* email (bill, amount and Wise or PayPal as listed there),
+sixty older invitations fall between, and the eight written-out emails lead.
 
 **Collapse.** Blocks open by default. The chevron at a block's right folds it (the whole head does,
 for a mouse); *Collapse all* folds every block and turns into *Expand all*, so a resource can close
@@ -548,8 +559,8 @@ joins the buttons under them.
 
 `productivity.html` replaces the dashboard's `trProductivity` tab — `freelancer_productivity_table.html`
 and `fulltimer_productivity_table.html`, their overview cards and their filter. The sidebar entry sits
-under Earnings. Like My Earnings it reads **toolbar → trend → rows → totals**, so the months are the
-first figures on screen and their sum closes the list.
+under Earnings. It reads **toolbar → totals → trend → rows**: what the view adds up to leads, in one
+full-width strip, then how it moved, then the months themselves.
 
 **What went.** The current-month cards (Jobs, Word Count, Hours Count, Document Count; Translation WC,
 Revision WC, Legalization PC, Hours Count and Net WC Count for a full-timer): this month is now the top
@@ -587,9 +598,13 @@ Earnings carry the change; a period still running, or the year after the short f
 none). *View jobs* opens My Jobs' Completed tab for this month; older months only say where they would
 go, as do the PDF buttons.
 
-**Totals close the list**: Total Job Count (in *n* months), Total Word Count (and the hours and
-documents), Total Earned (≈ USD) — every period the view lets through, on all pages, in My Earnings'
-centred `.rp-stat` row.
+**Totals lead the page**, in one full-width strip (`.rp-sumbar`) with a hairline between figures:
+Total Job Count (in *n* months), Total Word Count, Total Hours, Total Documents and Total Earned
+(≈ USD) — the table's own columns, totalled, in their order. None in view reads as the table's quiet
+dash. They add up every period the view lets through, on all pages. The lines are the strip's border
+colour showing through 1px gaps, so they hold however the cells wrap: five a row, three and two below
+~900px of page width (Total Earned taking the room of two), two a row on a phone. A full-timer's strip
+has three: Total Job Count, Total Net WC and Total Pay.
 
 **The numbers agree with the other pages.** `RP.PRODUCTIVITY` in `data.js` files a month at a time
 from March 2021:
@@ -629,8 +644,7 @@ own; AED because the billing address is in Dubai. Each variant keeps its own col
 **Narrower screens:** the freelancer's six columns fit from about 1,140px with the sidebar open (950px
 with it collapsed); below that the table scrolls with Month pinned, and a full-timer's eleven do on
 most laptops. On a phone the switch takes a row and period, columns and export share the next, the
-chart drops to 150px, and the tiles go one a row — a figure moves under its label when the two do not
-fit side by side.
+totals strip goes two a row with Total Earned across the bottom, and the chart drops to 150px.
 
 ---
 
@@ -732,6 +746,13 @@ opening or collapsing the sidebar moves that line by 184px, which a viewport que
 On a bid request the bid leads the decision side: *Your bid* with the countdown, the price field
 and **Submit bid**, then *Not interested*. The suggested range is only a reference, so it is one quiet
 line at the bottom — label and value on one row, like the Total on an Earnings bill.
+
+The price field is a grey well: the price in the serif on the left, its currency on the right as a
+quiet **NZD ⌄** select — the original `job_bid_form.html`'s choice of the job's currency or USD.
+Switching it converts the suggested range and the placeholder, so the bid and its reference read in
+one currency. A bid typed in USD is kept in NZD, as the original converts it before saving: the
+toast repeats what was typed (*Bid of USD 280.00*), and the Bid Sent card reads
+`NZD 462.12 ≈ USD 280.00`. Rates are `RP.FX`, the same the Professional Profile converts with.
 
 ## Keyboard
 

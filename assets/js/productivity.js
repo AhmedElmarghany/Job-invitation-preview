@@ -1,9 +1,9 @@
 /* ============================================================
    PRODUCTIVITY — productivity.html
    The work the resource delivered, a row a month or a year: jobs,
-   words, hours, documents and what they earned. One chart reads
-   the same rows left to right, a row opens to its services, and
-   the totals close the list, as on My Earnings.
+   words, hours, documents and what they earned. Their totals lead
+   in one strip, one chart reads the same rows left to right, and a
+   row opens to its services.
    Everything is in memory; nothing is sent anywhere.
    ============================================================ */
 (function (global) {
@@ -62,14 +62,23 @@
         { key: "last-12", label: "Last 12 months", months: 12 }
     ];
 
+    /* The summary strip: the table's own figures, totalled, in its column order */
     var TOTALS = [
         {
             key: "jobs", label: "Total Job Count", icon: "briefcase-business",
-            tip: "Jobs delivered in the periods listed above, on all pages. It follows the period."
+            tip: "Jobs delivered in the periods listed below, on all pages. It follows the period."
         },
         {
             key: "words", label: "Total Word Count", icon: "whole-word",
             tip: "Words in those jobs. Hours and documents are counted in their own units."
+        },
+        {
+            key: "hours", label: "Total Hours", icon: "clock",
+            tip: "Interpreting and hourly work, with per-minute work such as subtitling counted in hours."
+        },
+        {
+            key: "documents", label: "Total Documents", icon: "files",
+            tip: "Work counted by the document rather than by the word, such as certified translations."
         },
         {
             key: "earned", label: "Total Earned", icon: "wallet",
@@ -103,7 +112,7 @@
     var FT_TOTALS = [
         {
             key: "jobs", label: "Total Job Count", icon: "briefcase-business",
-            tip: "Jobs delivered in the months listed above, on all pages. It follows the period."
+            tip: "Jobs delivered in the months listed below, on all pages. It follows the period."
         },
         {
             key: "net", label: "Total Net WC", icon: "whole-word",
@@ -1831,68 +1840,68 @@
 
     /* ── Totals ──────────────────────────────────────────── */
 
-    /* The dashboard's tile, value then unit; only the Earnings column leads with the currency */
-    function tileMarkup(def, t) {
+    /* One cell of the strip, value then unit; only the Earnings column leads with the currency.
+       Nothing in view reads as the table's quiet dash, not "0.00 hours" */
+    function cellMarkup(def, t) {
         var unit = function (text) {
-            return '<span class="rp-stat__unit">' + text + "</span>";
+            return '<span class="rp-sumbar__unit">' + text + "</span>";
         };
-        var value, words;
+        var nil = '<span class="rp-nil" aria-label="None">—</span>';
+        var value, sub = "";
 
         if (def.key === "jobs") {
             var span = viewDef().unit;
             value = counter(t.jobs, "jobs") + unit(plural(t.jobs, "job", "jobs"));
-            words = "in <strong>" + counter(t.count, "count") + "</strong> " + plural(t.count, span[0], span[1]);
+            sub = "in <strong>" + counter(t.count, "count") + "</strong> " + plural(t.count, span[0], span[1]);
         } else if (def.key === "words") {
-            var extra = [];
-            if (t.hours) extra.push("<strong>" + hours(t.hours, true) + "</strong> " + plural(t.hours, "hour", "hours"));
-            if (t.documents) extra.push("<strong>" + number(t.documents) + "</strong> " + plural(t.documents, "document", "documents"));
             value = counter(t.words, "words") + unit("words");
-            words = extra.length ? "and " + extra.join(", ") : "No hours or documents";
+        } else if (def.key === "hours") {
+            value = t.hours ? counter(t.hours, "hours", 2) + unit(plural(t.hours, "hour", "hours")) : nil;
+        } else if (def.key === "documents") {
+            value = t.documents ? counter(t.documents, "documents") + unit(plural(t.documents, "document", "documents")) : nil;
         } else if (def.key === "net") {
             value = counter(t.net, "net") + unit("words");
-            words = t.excess ? "<strong>" + counter(t.excess, "excess") + "</strong> past the base" : "None past the base";
+            sub = t.excess ? "<strong>" + counter(t.excess, "excess") + "</strong> past the base" : "None past the base";
         } else if (def.key === "pay") {
             value = counter(t.pay, "pay", 2) + unit("USD");
-            words = t.excessPay
+            sub = t.excessPay
                 ? "with <strong>" + counter(t.excessPay, "excess-pay", 2) + "</strong> USD excess pay"
                 : "Base salary only";
         } else {
             value = counter(t.earnings, "earned", 2) + unit(escapeHtml(RP.USER.currency));
-            words = "≈ " + counter(cents(t.earnings * RP.USD_RATE), "earned-usd", 2) + " USD";
+            sub = "≈ " + counter(cents(t.earnings * RP.USD_RATE), "earned-usd", 2) + " USD";
         }
 
         return (
-            '<section class="rp-stat rp-stat--' +
-            def.key +
-            '" id="total-' +
+            '<section class="rp-sumbar__cell" id="total-' +
             def.key +
             '" aria-labelledby="total-' +
             def.key +
             '-label">' +
-            '<div class="rp-stat__well"><div class="rp-stat__head">' +
-            '<span class="rp-stat__icon" aria-hidden="true">' +
+            '<div class="rp-sumbar__head">' +
             icon(def.icon) +
-            "</span>" +
-            '<h2 class="rp-stat__label" id="total-' +
+            '<h2 class="rp-sumbar__label" id="total-' +
             def.key +
             '-label">' +
             def.label +
             "</h2>" +
             info(def.tip, "About " + def.label.toLowerCase()) +
             "</div>" +
-            '<p class="rp-stat__value">' +
+            '<p class="rp-sumbar__value">' +
             value +
             "</p>" +
-            '<p class="rp-stat__words">' +
-            words +
-            "</p></div></section>"
+            (sub ? '<p class="rp-sumbar__sub">' + sub + "</p>" : "") +
+            "</section>"
         );
     }
 
+    /* The cell count drives the strip's columns: five for a freelancer, three for a full-timer */
     function renderTotals(list) {
         var t = totalsOf(list);
+        els.totals.dataset.cells = MODEL.totals.length;
+        els.totals.style.setProperty("--cells", MODEL.totals.length);
         els.totals.innerHTML = MODEL.totals.map(function (def) {
-            return tileMarkup(def, t);
+            return cellMarkup(def, t);
         }).join("");
         countUp(els.totals);
     }

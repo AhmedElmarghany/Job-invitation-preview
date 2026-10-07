@@ -1026,11 +1026,30 @@ button.rp-file:focus-visible .rp-file__dl {
     box-shadow: var(--focus-ring-gold);
 }
 
-.rp-bid__prefix {
+/* The bid's currency, at the field's end: the original form's NZD / USD select, quiet until pressed */
+.rp-bid__currency {
     flex: 0 0 auto;
-    font-size: 12px;
-    font-weight: 600;
+    height: 32px;
+    padding: 0 26px 0 8px;
+    border: 0;
+    border-radius: var(--radius-xs);
+    background: transparent
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2371717a' viewBox='0 0 256 256'%3E%3Cpath d='M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z'/%3E%3C/svg%3E")
+        no-repeat right 8px center;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
     color: var(--color-text-secondary);
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.rp-bid__currency:hover {
+    background-color: var(--color-surface-subtle);
+    color: var(--color-text-primary);
 }
 
 .rp-bid__field input {
@@ -1092,20 +1111,11 @@ button.rp-file:focus-visible .rp-file__dl {
     padding-top: 0;
 }
 
-/* The one field that matters here, so it is white, bordered and set in the panel's figure face */
+/* The one field that matters here: a roomy grey well, the price in the panel's figure face, its currency at the end */
 .rp-offer--bid .rp-bid__field {
     height: 46px;
-    padding: 0 14px;
-    border: 1px solid var(--color-border);
-    background: var(--color-surface-white);
-}
-
-.rp-offer--bid .rp-bid__field:focus-within {
-    border-color: var(--color-brand-gold);
-}
-
-.rp-offer--bid .rp-bid__prefix {
-    font-size: 12.5px;
+    padding: 0 6px 0 16px;
+    border-radius: var(--radius-md);
 }
 
 .rp-offer--bid .rp-bid__field input {

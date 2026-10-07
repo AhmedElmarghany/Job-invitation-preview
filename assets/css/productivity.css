@@ -1,11 +1,11 @@
 /* ============================================================
    PAGE: Productivity
-   The delivered work, a row a month or a year, its trend above
-   it and its totals after it. The period picker, table chrome,
-   open row, tiles and tip are earnings.css and dashboard.css,
-   rebuilt here under the same names so the page renders from its
-   own file. New: the trend chart, the export menu, the services
-   in an open period and its summary.
+   The delivered work, a row a month or a year, with its totals
+   and trend above it. The period picker, table chrome, open row
+   and tip are earnings.css and dashboard.css, rebuilt here under
+   the same names so the page renders from its own file. New: the
+   totals strip, the trend chart, the export menu, the services in
+   an open period and its summary.
    ============================================================ */
 
 /* min-width: 0 all the way down, or the table never gets its own scrollbar */
@@ -2193,95 +2193,79 @@ tr.rp-subrow.is-hidden {
     font-variant-numeric: tabular-nums;
 }
 
-/* ── Totals: dashboard.css's tiles, a white tray around a grey well, under the rows ─── */
-/* Centred and no wider than three tiles need, rather than stretched across the page */
-.rp-totals {
+/* ── Totals: one full-width strip above the trend, a hairline between figures ─── */
+/* The 1px gaps show the strip's border colour, so the lines hold however the cells wrap */
+.rp-sumbar {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 300px));
-    justify-content: center;
-    gap: 16px;
-    padding: 20px 24px;
+    grid-template-columns: repeat(var(--cells, 3), minmax(0, 1fr));
+    gap: 1px;
+    margin: 14px 10px 0;
+    background: var(--color-border);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
 }
 
 /* An empty list has nothing to add up, and its empty state already says so */
-#rp-productivity:has(.rp-empty-cell) .rp-totals {
+#rp-productivity:has(.rp-empty-cell) .rp-sumbar {
     display: none;
 }
 
-.rp-stat {
-    display: flex;
-    flex-direction: column;
+.rp-sumbar__cell {
     min-width: 0;
-    padding: 12px;
-    background: var(--color-surface-white);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    transition: box-shadow var(--transition-fast);
-}
-
-.rp-stat:hover {
-    box-shadow: var(--shadow-sm);
-}
-
-.rp-stat__well {
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
     padding: 16px 16px 18px;
-    background: var(--color-surface-inset);
-    border-radius: var(--radius-md);
-    box-shadow: inset var(--shadow-sm);
+    background: var(--color-surface-white);
 }
 
-.rp-stat__head {
+.rp-sumbar__head {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 7px;
     min-width: 0;
-}
-
-.rp-stat__icon {
-    flex: 0 0 auto;
-    display: grid;
-    place-items: center;
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
-    background: var(--color-surface-white);
     color: var(--color-brand-navy);
 }
 
-.rp-stat__icon svg {
-    width: 18px;
-    height: 18px;
+.rp-sumbar__head > svg {
+    flex: 0 0 auto;
+    width: 16px;
+    height: 16px;
 }
 
-.rp-stat__label {
+.rp-sumbar__label {
     min-width: 0;
     margin: 0;
-    font-size: 14px;
-    font-weight: 400;
+    font-size: 13px;
+    font-weight: 500;
     line-height: 1.3;
-    color: var(--color-text-primary);
-    overflow-wrap: anywhere;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* The cells are white, so the tip button needs a grey to show it is pressable */
+.rp-sumbar .rp-info:hover,
+.rp-sumbar .rp-info[aria-expanded="true"] {
+    background: var(--color-surface-subtle);
 }
 
 /* Tabular figures, so the count-up does not jitter the width */
-.rp-stat__value {
-    margin: 6px 0 0;
+.rp-sumbar__value {
+    margin: 10px 0 0;
     font-family: var(--font-heading);
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 500;
     line-height: 1.1;
     letter-spacing: -0.01em;
     color: var(--color-text-primary);
     font-variant-numeric: tabular-nums;
-    overflow-wrap: anywhere;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Number first, the unit after — the order the balance settled on */
-.rp-stat__unit {
+.rp-sumbar__unit {
     margin-left: 6px;
     font-family: var(--font-body);
     font-size: 13px;
@@ -2290,90 +2274,63 @@ tr.rp-subrow.is-hidden {
     color: var(--color-text-secondary);
 }
 
-.rp-stat__words {
-    margin: 0;
-    font-size: 13px;
+.rp-sumbar__sub {
+    margin: 4px 0 0;
+    font-size: 12.5px;
     color: var(--color-text-secondary);
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.rp-stat__words strong {
+.rp-sumbar__sub strong {
     font-weight: 500;
     color: var(--color-text-primary);
 }
 
-@container rpProd (max-width: 980px) {
-    .rp-totals {
-        gap: 12px;
-        padding: 16px;
-    }
-
-    .rp-stat__well {
-        padding: 14px 14px 16px;
-    }
-
-    .rp-stat__head {
-        gap: 8px;
-    }
-
-    .rp-stat__icon {
-        width: 30px;
-        height: 30px;
-    }
-
-    .rp-stat__icon svg {
-        width: 16px;
-        height: 16px;
-    }
-
-    .rp-stat__label {
-        font-size: 13.5px;
-    }
-
-    .rp-stat__value {
-        font-size: 23px;
+/* Five figures a row need ~215px each; under that the figures step down a size */
+@container rpProd (max-width: 1100px) {
+    .rp-sumbar__value {
+        font-size: 22px;
     }
 }
 
-/* One a row on a phone, the figure beside the label, as the dashboard's tiles go */
+/* Then three a row, the last of five taking the space of two */
+@container rpProd (max-width: 900px) {
+    .rp-sumbar[data-cells="5"] {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .rp-sumbar[data-cells="5"] > :last-child {
+        grid-column: span 2;
+    }
+}
+
+/* Phone: two a row, an odd one out across the whole row; the label keeps the room its icon took */
 @container rpProd (max-width: 640px) {
-    .rp-totals {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 10px;
-        padding: 12px;
+    .rp-sumbar,
+    .rp-sumbar[data-cells="5"] {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        margin: 10px 8px 0;
     }
 
-    .rp-stat {
-        padding: 8px;
+    .rp-sumbar > :last-child:nth-child(odd),
+    .rp-sumbar[data-cells="5"] > :last-child {
+        grid-column: 1 / -1;
     }
 
-    /* The figure sits beside the label while both fit, and drops under it when they do not;
-       "2,184,300 words" is too wide to share a phone's row with "Total Word Count" */
-    .rp-stat__well {
-        flex-direction: row;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 2px 12px;
-        padding: 12px 14px;
+    .rp-sumbar__cell {
+        padding: 12px 14px 14px;
     }
 
-    .rp-stat__head {
-        flex: 0 0 auto;
+    .rp-sumbar__head > svg {
+        display: none;
     }
 
-    .rp-stat__label {
-        white-space: nowrap;
-    }
-
-    .rp-stat__value {
-        margin: 0 0 0 auto;
-        font-size: 21px;
-        text-align: right;
-    }
-
-    .rp-stat__words {
-        flex: 1 0 100%;
-        text-align: right;
+    .rp-sumbar__value {
+        margin-top: 8px;
+        font-size: 20px;
     }
 
     .rp-trend {

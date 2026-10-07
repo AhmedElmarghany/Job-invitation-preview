@@ -2735,10 +2735,151 @@
     box-shadow: 0 0 0 2px var(--color-surface-white);
 }
 
-.rp-mails__more {
+/* Search on the left; the topic and All / Unread, which shape the list under them, on the right */
+.rp-mailbar {
     display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px 12px;
+    margin-bottom: 10px;
+}
+
+.rp-mailbar .rp-search {
+    flex: 1 1 220px;
+    max-width: 300px;
+}
+
+/* pagination.css's page-size select, one size up — the same chevron as every select here */
+.rp-mailbar__topic {
+    margin-left: auto;
+    height: 36px;
+    padding: 0 30px 0 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-white)
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2371717a' viewBox='0 0 256 256'%3E%3Cpath d='M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z'/%3E%3C/svg%3E")
+        no-repeat right 11px center;
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.rp-mailbar__topic:hover {
+    background-color: var(--color-surface-subtle);
+}
+
+.rp-mailbar__topic:focus-visible {
+    border-color: var(--color-brand-gold);
+    box-shadow: var(--focus-ring-gold);
+}
+
+@container rpCard (max-width: 560px) {
+    .rp-mailbar .rp-search {
+        flex-basis: 100%;
+        max-width: none;
+    }
+
+    .rp-mailbar__topic {
+        flex: 1 1 auto;
+        margin-left: 0;
+    }
+}
+
+.rp-mails__empty {
+    margin: 0;
+    padding: 28px 12px;
+    font-size: 13px;
+    text-align: center;
+    color: var(--color-text-secondary);
+}
+
+.rp-mails__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    margin-top: 6px;
+    padding-top: 12px;
+    border-top: 1px solid var(--color-border);
+}
+
+/* pagination.css's page info and buttons, under their own names, so the pager ports onto it */
+.cu-page-info {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.cu-page-info strong {
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.cu-page-nav {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.cu-page-nav-btn {
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
-    margin-top: 10px;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xs);
+    background: var(--color-surface-white);
+    font-family: var(--font-body);
+    font-size: 13px;
+    line-height: 1;
+    color: var(--color-text-secondary);
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.cu-page-nav-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+.cu-page-nav-btn:hover:not(:disabled) {
+    border-color: var(--color-border-hover);
+    background: var(--color-surface-subtle);
+    color: var(--color-text-primary);
+}
+
+.cu-page-nav-btn.active {
+    border-color: var(--color-brand-gold);
+    background: var(--color-brand-gold);
+    font-weight: 600;
+    color: var(--color-surface-white);
+}
+
+.cu-page-nav-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.cu-page-nav-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-gold);
+}
+
+.cu-page-ellipsis {
+    padding: 0 4px;
+    font-size: 12px;
+    line-height: 30px;
+    color: var(--color-text-secondary);
 }
 
 .rp-mailview__meta {

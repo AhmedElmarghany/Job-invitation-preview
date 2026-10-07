@@ -2753,6 +2753,64 @@
         ]
     };
 
+    /* Each bill on My Earnings brings an issued and a paid email, invitations fall between: 200 in all */
+    (function () {
+        var rand = seeded(1808);
+        var pms = [PM.sara, PM.daniel, PM.mei, PM.tane];
+        var pairs = [["English", "Arabic"], ["English", "Arabic"], ["Arabic", "English"], ["French", "Arabic"]];
+        var more = [];
+        var id = 100;
+        var day = function (d) {
+            return d.toLocaleDateString("en-NZ", { day: "numeric", month: "short", year: "numeric" });
+        };
+        var nzd = function (n) {
+            return "NZD " + n.toLocaleString("en-NZ", MONEY_FMT);
+        };
+        var some = function (n, one) {
+            return n.toLocaleString("en-NZ") + " " + one + (n === 1 ? "" : "s");
+        };
+
+        RP.BILLS.forEach(function (bill) {
+            more.push({
+                id: id++, cat: "payments", from: "AGATO Accounts", fromEmail: "accounts@agato.example",
+                at: new Date(bill.issued.getFullYear(), bill.issued.getMonth(), bill.issued.getDate(), 9, 4),
+                subject: "Bill " + bill.id + " is ready",
+                body: ["Dear Ahmed,", "Your bill " + bill.id + " for " + day(bill.from) + " – " + day(bill.to) + " is ready: " + some(bill.jobs.length, "job") + ", " + nzd(bill.amount) + ".",
+                    "It is due on " + day(bill.due) + ". You can find it on My Earnings.", "Kind regards,\nAGATO Accounts"]
+            });
+            /* B-2201's payment is the one written out above */
+            if (bill.paidOn && bill.id !== PAID_BILL.id) {
+                more.push({
+                    id: id++, cat: "payments", from: "AGATO Accounts", fromEmail: "accounts@agato.example", at: bill.paidOn,
+                    subject: "Bill " + bill.id + " has been paid",
+                    body: ["Dear Ahmed,", "We have paid bill " + bill.id + ", " + nzd(bill.amount) + ", into your " + bill.method + " account.",
+                        "It can take up to two working days to reach you, depending on your bank.", "Kind regards,\nAGATO Accounts"]
+                });
+            }
+        });
+
+        /* Sixty older invitations, about one a month, back to the first year */
+        for (var k = 0; k < 60; k++) {
+            var work = BILL_WORK[Math.floor(rand() * BILL_WORK.length)];
+            var pair = pairs[Math.floor(rand() * pairs.length)];
+            var pm = pms[k % pms.length];
+            var size =
+                work[1] === "Interpreting" ? some(2 + Math.floor(rand() * 5), "hour")
+                : work[1] === "Subtitling" ? some(10 + Math.floor(rand() * 50), "minute")
+                : work[1] === "Certified" ? some(1 + Math.floor(rand() * 6), "document")
+                : some(500 + Math.round(rand() * 45) * 100, "word");
+            more.push({
+                id: id++, cat: "invitations", from: pm.name, fromEmail: pm.email,
+                at: new Date(NOW - (16 + k * 31 + Math.floor(rand() * 20)) * DAY - Math.floor(rand() * 9) * HOUR),
+                subject: "New job invitation: " + work[0] + " " + (10 + Math.floor(rand() * 290)),
+                body: ["Hi Ahmed,", "You have a new invitation for J-" + (47800 - k * 41 - Math.floor(rand() * 30)) + ": " + work[1] + ", " + pair[0] + " into " + pair[1] + ", " + size + ".",
+                    "Accept or decline it from Job Invitations.", "Thanks,\n" + pm.name.split(" ")[0]]
+            });
+        }
+
+        RP.PRO.emails = RP.PRO.emails.concat(more);
+    })();
+
     /* The sidebar badge counts what still needs a decision. */
     RP.USER.invitationCount = RP.INVITATIONS.filter(function (row) {
         return row.status === "new_invite" || row.status === "new_bid";

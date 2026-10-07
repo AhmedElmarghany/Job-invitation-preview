@@ -18,7 +18,7 @@
     var SOON = 60;
     var MAX_SPECIALITIES = 10;
     var MAX_UPLOAD = 10 * 1024 * 1024;
-    var MAILS_PAGE = 5;
+    var MAILS_PAGE = 8;
     var PLACEHOLDER_PHOTO = RP.USER.photo;
 
     var SERVICE_ICON = {
@@ -54,6 +54,15 @@
 
     var MAIL_ICON = { invitations: "invitations", rates: "banknote", payments: "wallet", certificates: "award", account: "user-round" };
 
+    var MAIL_TOPICS = [
+        ["all", "All topics"],
+        ["invitations", "Invitations"],
+        ["payments", "Payments"],
+        ["rates", "Rates"],
+        ["certificates", "Certificates"],
+        ["account", "Account"]
+    ];
+
     var editing = { specialities: false, billing: false };
     var dirty = { specialities: false, billing: false };
     var specDraft = null;
@@ -61,7 +70,7 @@
     var collapsed = {};
     var staged = [];
     var picked = { photo: null, file: null };
-    var mailsShown = MAILS_PAGE;
+    var mailView = { q: "", show: "all", topic: "all", page: 1 };
     var sections = [];
     var spyQueued = false;
     var lastFocus = null;
@@ -1170,21 +1179,100 @@
         );
     }
 
+    /* A page of eight at a time, found by search and filters, so the card is one size at 8 emails or 200 */
     function emailsCard() {
-        var list = PRO.emails.slice().sort(function (a, b) {
-            return b.at - a.at;
-        });
         var unread = unreadCount();
-        var more = list.length - Math.min(mailsShown, list.length);
         return (
             '<section class="rp-card" id="emails">' +
             cardHead("mail", "Emails", unread ? '<span class="rp-card__aside" data-unread><strong>' + unread + "</strong> unread</span>" : "") +
-            '<div class="rp-card__body"><ul class="rp-mails">' + list.slice(0, mailsShown).map(mailRow).join("") + "</ul>" +
-            (more > 0
-                ? '<div class="rp-mails__more"><button type="button" class="rp-button rp-button--outline rp-button--sm" data-act="mail-more">Show ' +
-                  Math.min(more, MAILS_PAGE) + " more</button></div>"
-                : "") +
-            "</div></section>"
+            '<div class="rp-card__body">' + mailBar() + '<div data-mail-list>' + mailListMarkup() + "</div></div></section>"
+        );
+    }
+
+    /* Search on the left; the topic and All / Unread, which shape the list, on the right — as Services & prices */
+    function mailBar() {
+        return (
+            '<div class="rp-mailbar"><label class="rp-search">' + icon("search") +
+            '<input type="search" placeholder="Search subject, sender or text" aria-label="Search your emails" data-mail-search autocomplete="off" value="' +
+            esc(mailView.q) + '"></label>' +
+            '<select class="rp-mailbar__topic" aria-label="Topic" data-mail-topic>' +
+            MAIL_TOPICS.map(function (t) {
+                return '<option value="' + t[0] + '"' + (t[0] === mailView.topic ? " selected" : "") + ">" + t[1] + "</option>";
+            }).join("") +
+            "</select>" +
+            '<div class="rp-segmented" role="group" aria-label="Show" data-mail-show>' + mailShowMarkup() + "</div></div>"
+        );
+    }
+
+    function mailShowMarkup() {
+        var unread = unreadCount();
+        return [["all", "All"], ["unread", "Unread"]]
+            .map(function (s) {
+                var on = mailView.show === s[0];
+                return (
+                    '<button type="button" class="rp-segment' + (on ? " is-active" : "") + '" data-act="mail-show" data-show="' + s[0] + '" aria-pressed="' + on + '">' +
+                    s[1] + (s[0] === "unread" && unread ? '<span class="rp-segment-count">' + unread + "</span>" : "") + "</button>"
+                );
+            })
+            .join("");
+    }
+
+    function mailMatches() {
+        var q = mailView.q.trim().toLowerCase();
+        return PRO.emails
+            .filter(function (m) {
+                if (mailView.show === "unread" && !m.unread) return false;
+                if (mailView.topic !== "all" && m.cat !== mailView.topic) return false;
+                return !q || (m.subject + " " + m.from + " " + m.body.join(" ")).toLowerCase().indexOf(q) > -1;
+            })
+            .sort(function (a, b) {
+                return b.at - a.at;
+            });
+    }
+
+    function mailEmpty() {
+        var topic = MAIL_TOPICS.filter(function (t) {
+            return t[0] === mailView.topic;
+        })[0][1].toLowerCase();
+        var q = mailView.q.trim();
+        if (q) return "No emails match “" + esc(q) + "”" + (mailView.show !== "all" || mailView.topic !== "all" ? " with these filters." : ".");
+        if (mailView.show === "unread") return "No unread emails" + (mailView.topic !== "all" ? " about " + topic : "") + ".";
+        return "No emails about " + topic + ".";
+    }
+
+    function mailListMarkup() {
+        var list = mailMatches();
+        var pages = Math.max(1, Math.ceil(list.length / MAILS_PAGE));
+        mailView.page = Math.min(mailView.page, pages);
+        var start = (mailView.page - 1) * MAILS_PAGE;
+
+        if (!list.length) return '<p class="rp-mails__empty">' + mailEmpty() + "</p>";
+        return '<ul class="rp-mails">' + list.slice(start, start + MAILS_PAGE).map(mailRow).join("") + "</ul>" + mailPager(list.length, pages, start);
+    }
+
+    /* The tables' pagination at card size: where you are, then the first, the last and the pages either side */
+    function mailPager(total, pages, start) {
+        var cur = mailView.page;
+        var nums = "";
+        for (var p = 1; p <= pages; p++) {
+            if (p !== 1 && p !== pages && Math.abs(p - cur) > 1) {
+                if (p === 2 || p === pages - 1) nums += '<span class="cu-page-ellipsis">…</span>';
+                continue;
+            }
+            nums +=
+                '<button type="button" class="cu-page-nav-btn' + (p === cur ? " active" : "") + '" data-act="mail-page" data-page="' + p + '" aria-label="Page ' + p + '"' +
+                (p === cur ? ' aria-current="page"' : "") + ">" + p + "</button>";
+        }
+        var step = function (to, name, iconName) {
+            return (
+                '<button type="button" class="cu-page-nav-btn" data-act="mail-page" data-page="' + to + '" aria-label="' + name + '"' +
+                (to < 1 || to > pages ? " disabled" : "") + ">" + icon(iconName) + "</button>"
+            );
+        };
+        return (
+            '<div class="rp-mails__foot"><span class="cu-page-info"><strong>' + (start + 1) + "–" + Math.min(start + MAILS_PAGE, total) + "</strong> of <strong>" + total + "</strong></span>" +
+            (pages > 1 ? '<nav class="cu-page-nav" aria-label="Email pages">' + step(cur - 1, "Previous page", "chevron-left") + nums + step(cur + 1, "Next page", "chevron-right") + "</nav>" : "") +
+            "</div>"
         );
     }
 
@@ -2424,6 +2512,8 @@
         var n = unreadCount();
         if (aside && n) aside.innerHTML = "<strong>" + n + "</strong> unread";
         else if (aside) aside.remove();
+        var show = document.querySelector("#emails [data-mail-show]");
+        if (show) show.innerHTML = mailShowMarkup();
     }
 
     function openMail(id) {
@@ -2441,12 +2531,23 @@
         }
     }
 
-    function showMoreMail() {
-        var before = mailsShown;
-        mailsShown += MAILS_PAGE;
-        refresh("emails");
-        var rows = document.querySelectorAll("#emails .rp-mail");
-        if (rows[before]) rows[before].focus({ preventScroll: true });
+    /* Only the list and pager repaint, so the search keeps its focus and caret; a pager button keeps focus by name */
+    function paintMails(focusLabel) {
+        var holder = document.querySelector("#emails [data-mail-list]");
+        if (!holder) return;
+        holder.innerHTML = mailListMarkup();
+        if (!focusLabel) return;
+        var again = holder.querySelector('.cu-page-nav-btn[aria-label="' + focusLabel + '"]:not(:disabled)') || holder.querySelector(".cu-page-nav-btn.active");
+        if (again) again.focus({ preventScroll: true });
+    }
+
+    function setMailShow(show) {
+        mailView.show = show;
+        mailView.page = 1;
+        var group = document.querySelector("#emails [data-mail-show]");
+        group.innerHTML = mailShowMarkup();
+        group.querySelector('[data-show="' + show + '"]').focus();
+        paintMails();
     }
 
     /* ── Photo (User Account's dialog) ───────────────────── */
@@ -2563,7 +2664,11 @@
         if (act === "method-add") return openMethodForm(btn.dataset.code);
         if (act === "method-default") return askDefault(btn.dataset.code);
         if (act === "mail") return openMail(id);
-        if (act === "mail-more") return showMoreMail();
+        if (act === "mail-show") return setMailShow(btn.dataset.show);
+        if (act === "mail-page") {
+            mailView.page = Number(btn.dataset.page);
+            return paintMails(btn.getAttribute("aria-label"));
+        }
         if (act === "goto") return goTo(btn.dataset.target);
         if (act === "availability") return openAvailability();
         if (act === "copy-id") return copyId();
@@ -2619,6 +2724,11 @@
             form.querySelector("[data-naati]").innerHTML = naatiNote(t.value);
             return;
         }
+        if (t.matches("[data-mail-topic]")) {
+            mailView.topic = t.value;
+            mailView.page = 1;
+            return paintMails();
+        }
         if (t.id === "svc_service") return repaintSvc(form, "svc_service");
         if (t.id === "svc_currency") {
             form.querySelector("[data-conv]").innerHTML = convHint(t.value, val(form, "svc_amount"));
@@ -2647,6 +2757,11 @@
         if (t.matches("[data-svc-search]")) {
             view.q = t.value;
             return paintGroups();
+        }
+        if (t.matches("[data-mail-search]")) {
+            mailView.q = t.value;
+            mailView.page = 1;
+            return paintMails();
         }
         if (t.matches("[data-spec-search]")) return filterSpecs(t.value);
         if (t.id === "svc_amount") {
