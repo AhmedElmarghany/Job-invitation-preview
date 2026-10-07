@@ -1831,7 +1831,7 @@
 
     /* ── Totals ──────────────────────────────────────────── */
 
-    /* One cell of the strip, value then unit; only the Earnings column leads with the currency */
+    /* One cell of the band: label and tip, then the figure, value then unit; no mark, the figures carry it */
     function cellMarkup(def, t) {
         var unit = function (text) {
             return '<span class="rp-sumbar__unit">' + text + "</span>";
@@ -1868,7 +1868,6 @@
             def.key +
             '-label">' +
             '<div class="rp-sumbar__head">' +
-            icon(def.icon) +
             '<h2 class="rp-sumbar__label" id="total-' +
             def.key +
             '-label">' +

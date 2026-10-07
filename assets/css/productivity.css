@@ -2193,17 +2193,14 @@ tr.rp-subrow.is-hidden {
     font-variant-numeric: tabular-nums;
 }
 
-/* ── Totals: one full-width strip above the trend, a hairline between figures ─── */
-/* The 1px gaps show the strip's border colour, so the lines hold however the cells wrap */
+/* ── Totals: a quiet grey band across the page, its figures together in the middle, grey room either side ── */
 .rp-sumbar {
     display: grid;
-    grid-template-columns: repeat(var(--cells, 3), minmax(0, 1fr));
-    gap: 1px;
+    grid-template-columns: repeat(var(--cells, 3), minmax(0, 280px));
+    justify-content: center;
     margin: 14px 10px 0;
-    background: var(--color-border);
-    border: 1px solid var(--color-border);
+    background: var(--color-surface-inset);
     border-radius: var(--radius-lg);
-    overflow: hidden;
 }
 
 /* An empty list has nothing to add up, and its empty state already says so */
@@ -2212,23 +2209,27 @@ tr.rp-subrow.is-hidden {
 }
 
 .rp-sumbar__cell {
+    position: relative;
     min-width: 0;
-    padding: 16px 16px 18px;
-    background: var(--color-surface-white);
+    padding: 20px 28px 22px;
+}
+
+/* The hairlines stop short of the band's edges, so the band still reads as one piece */
+.rp-sumbar__cell + .rp-sumbar__cell::before {
+    content: "";
+    position: absolute;
+    top: 20px;
+    bottom: 20px;
+    left: 0;
+    width: 1px;
+    background: #dcdde1;
 }
 
 .rp-sumbar__head {
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 4px;
     min-width: 0;
-    color: var(--color-brand-navy);
-}
-
-.rp-sumbar__head > svg {
-    flex: 0 0 auto;
-    width: 16px;
-    height: 16px;
 }
 
 .rp-sumbar__label {
@@ -2243,17 +2244,11 @@ tr.rp-subrow.is-hidden {
     text-overflow: ellipsis;
 }
 
-/* The cells are white, so the tip button needs a grey to show it is pressable */
-.rp-sumbar .rp-info:hover,
-.rp-sumbar .rp-info[aria-expanded="true"] {
-    background: var(--color-surface-subtle);
-}
-
 /* Tabular figures, so the count-up does not jitter the width */
 .rp-sumbar__value {
-    margin: 10px 0 0;
+    margin: 8px 0 0;
     font-family: var(--font-heading);
-    font-size: 26px;
+    font-size: 30px;
     font-weight: 500;
     line-height: 1.1;
     letter-spacing: -0.01em;
@@ -2268,14 +2263,14 @@ tr.rp-subrow.is-hidden {
 .rp-sumbar__unit {
     margin-left: 6px;
     font-family: var(--font-body);
-    font-size: 13px;
+    font-size: 13.5px;
     font-weight: 400;
     letter-spacing: 0;
     color: var(--color-text-secondary);
 }
 
 .rp-sumbar__sub {
-    margin: 4px 0 0;
+    margin: 6px 0 0;
     font-size: 12.5px;
     color: var(--color-text-secondary);
     font-variant-numeric: tabular-nums;
@@ -2289,38 +2284,69 @@ tr.rp-subrow.is-hidden {
     color: var(--color-text-primary);
 }
 
-/* Three a row down to a phone; a narrow page steps the figures down a size */
+@container rpProd (max-width: 900px) {
+    .rp-sumbar__cell {
+        padding: 18px 20px 20px;
+    }
+
+    .rp-sumbar__value {
+        font-size: 24px;
+    }
+}
+
+/* A narrow page lets the line under a figure wrap rather than cut "93 documents" short */
 @container rpProd (max-width: 760px) {
     .rp-sumbar__value {
         font-size: 22px;
     }
+
+    .rp-sumbar__sub {
+        white-space: normal;
+    }
 }
 
-/* Phone: two a row, the odd one out across the whole row; the label keeps the room its icon took */
+/* Phone: a list, one figure a row — the label on the left, the figure and its line on the right */
 @container rpProd (max-width: 640px) {
     .rp-sumbar {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: minmax(0, 1fr);
         margin: 10px 8px 0;
+        padding: 2px 0;
     }
 
-    .rp-sumbar > :last-child:nth-child(odd) {
-        grid-column: 1 / -1;
-    }
-
+    /* The label keeps its width; the figure's side takes the rest and wraps its line there */
     .rp-sumbar__cell {
-        padding: 12px 14px 14px;
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        grid-template-areas: "head value" "head sub";
+        align-items: center;
+        column-gap: 12px;
+        padding: 12px 16px;
     }
 
-    .rp-sumbar__head > svg {
-        display: none;
+    .rp-sumbar__cell + .rp-sumbar__cell::before {
+        top: 0;
+        right: 16px;
+        bottom: auto;
+        left: 16px;
+        width: auto;
+        height: 1px;
+    }
+
+    .rp-sumbar__head {
+        grid-area: head;
     }
 
     .rp-sumbar__value {
-        margin-top: 8px;
+        grid-area: value;
+        margin: 0;
         font-size: 20px;
+        text-align: right;
     }
 
     .rp-sumbar__sub {
+        grid-area: sub;
+        margin: 2px 0 0;
+        text-align: right;
         white-space: normal;
     }
 
