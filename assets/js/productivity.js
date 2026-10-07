@@ -62,7 +62,6 @@
         { key: "last-12", label: "Last 12 months", months: 12 }
     ];
 
-    /* The summary strip: the table's own figures, totalled, in its column order */
     var TOTALS = [
         {
             key: "jobs", label: "Total Job Count", icon: "briefcase-business",
@@ -71,14 +70,6 @@
         {
             key: "words", label: "Total Word Count", icon: "whole-word",
             tip: "Words in those jobs. Hours and documents are counted in their own units."
-        },
-        {
-            key: "hours", label: "Total Hours", icon: "clock",
-            tip: "Interpreting and hourly work, with per-minute work such as subtitling counted in hours."
-        },
-        {
-            key: "documents", label: "Total Documents", icon: "files",
-            tip: "Work counted by the document rather than by the word, such as certified translations."
         },
         {
             key: "earned", label: "Total Earned", icon: "wallet",
@@ -1840,13 +1831,11 @@
 
     /* ── Totals ──────────────────────────────────────────── */
 
-    /* One cell of the strip, value then unit; only the Earnings column leads with the currency.
-       Nothing in view reads as the table's quiet dash, not "0.00 hours" */
+    /* One cell of the strip, value then unit; only the Earnings column leads with the currency */
     function cellMarkup(def, t) {
         var unit = function (text) {
             return '<span class="rp-sumbar__unit">' + text + "</span>";
         };
-        var nil = '<span class="rp-nil" aria-label="None">—</span>';
         var value, sub = "";
 
         if (def.key === "jobs") {
@@ -1854,11 +1843,11 @@
             value = counter(t.jobs, "jobs") + unit(plural(t.jobs, "job", "jobs"));
             sub = "in <strong>" + counter(t.count, "count") + "</strong> " + plural(t.count, span[0], span[1]);
         } else if (def.key === "words") {
+            var extra = [];
+            if (t.hours) extra.push("<strong>" + hours(t.hours, true) + "</strong> " + plural(t.hours, "hour", "hours"));
+            if (t.documents) extra.push("<strong>" + number(t.documents) + "</strong> " + plural(t.documents, "document", "documents"));
             value = counter(t.words, "words") + unit("words");
-        } else if (def.key === "hours") {
-            value = t.hours ? counter(t.hours, "hours", 2) + unit(plural(t.hours, "hour", "hours")) : nil;
-        } else if (def.key === "documents") {
-            value = t.documents ? counter(t.documents, "documents") + unit(plural(t.documents, "document", "documents")) : nil;
+            sub = extra.length ? "and " + extra.join(", ") : "No hours or documents";
         } else if (def.key === "net") {
             value = counter(t.net, "net") + unit("words");
             sub = t.excess ? "<strong>" + counter(t.excess, "excess") + "</strong> past the base" : "None past the base";
@@ -1895,7 +1884,7 @@
         );
     }
 
-    /* The cell count drives the strip's columns: five for a freelancer, three for a full-timer */
+    /* The cell count drives the strip's columns */
     function renderTotals(list) {
         var t = totalsOf(list);
         els.totals.dataset.cells = MODEL.totals.length;

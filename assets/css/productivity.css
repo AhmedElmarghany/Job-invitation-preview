@@ -2289,34 +2289,21 @@ tr.rp-subrow.is-hidden {
     color: var(--color-text-primary);
 }
 
-/* Five figures a row need ~215px each; under that the figures step down a size */
-@container rpProd (max-width: 1100px) {
+/* Three a row down to a phone; a narrow page steps the figures down a size */
+@container rpProd (max-width: 760px) {
     .rp-sumbar__value {
         font-size: 22px;
     }
 }
 
-/* Then three a row, the last of five taking the space of two */
-@container rpProd (max-width: 900px) {
-    .rp-sumbar[data-cells="5"] {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .rp-sumbar[data-cells="5"] > :last-child {
-        grid-column: span 2;
-    }
-}
-
-/* Phone: two a row, an odd one out across the whole row; the label keeps the room its icon took */
+/* Phone: two a row, the odd one out across the whole row; the label keeps the room its icon took */
 @container rpProd (max-width: 640px) {
-    .rp-sumbar,
-    .rp-sumbar[data-cells="5"] {
+    .rp-sumbar {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         margin: 10px 8px 0;
     }
 
-    .rp-sumbar > :last-child:nth-child(odd),
-    .rp-sumbar[data-cells="5"] > :last-child {
+    .rp-sumbar > :last-child:nth-child(odd) {
         grid-column: 1 / -1;
     }
 
@@ -2331,6 +2318,10 @@ tr.rp-subrow.is-hidden {
     .rp-sumbar__value {
         margin-top: 8px;
         font-size: 20px;
+    }
+
+    .rp-sumbar__sub {
+        white-space: normal;
     }
 
     .rp-trend {
