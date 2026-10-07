@@ -2193,15 +2193,12 @@ tr.rp-subrow.is-hidden {
     font-variant-numeric: tabular-nums;
 }
 
-/* ── Totals: one full-width strip above the trend, a hairline between figures ─── */
-/* The 1px gaps show the strip's border colour, so the lines hold however the cells wrap */
+/* ── Totals: one navy band above the trend — the page's committing colour, gold only on the small marks ── */
 .rp-sumbar {
     display: grid;
     grid-template-columns: repeat(var(--cells, 3), minmax(0, 1fr));
-    gap: 1px;
     margin: 14px 10px 0;
-    background: var(--color-border);
-    border: 1px solid var(--color-border);
+    background: var(--color-brand-navy);
     border-radius: var(--radius-lg);
     overflow: hidden;
 }
@@ -2211,18 +2208,19 @@ tr.rp-subrow.is-hidden {
     display: none;
 }
 
+/* Each cell lines its left and top edges and the band clips the outer ones, so any wrap stays clean */
 .rp-sumbar__cell {
     min-width: 0;
-    padding: 16px 16px 18px;
-    background: var(--color-surface-white);
+    padding: 18px 24px 20px;
+    box-shadow: -1px 0 0 rgba(255, 255, 255, 0.14), 0 -1px 0 rgba(255, 255, 255, 0.14);
 }
 
 .rp-sumbar__head {
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 8px;
     min-width: 0;
-    color: var(--color-brand-navy);
+    color: var(--gold-border);
 }
 
 .rp-sumbar__head > svg {
@@ -2237,27 +2235,32 @@ tr.rp-subrow.is-hidden {
     font-size: 13px;
     font-weight: 500;
     line-height: 1.3;
-    color: var(--color-text-secondary);
+    color: rgba(255, 255, 255, 0.74);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/* The cells are white, so the tip button needs a grey to show it is pressable */
+/* On navy the tip button is a pale mark that lights up */
+.rp-sumbar .rp-info {
+    color: rgba(255, 255, 255, 0.55);
+}
+
 .rp-sumbar .rp-info:hover,
 .rp-sumbar .rp-info[aria-expanded="true"] {
-    background: var(--color-surface-subtle);
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--color-surface-white);
 }
 
 /* Tabular figures, so the count-up does not jitter the width */
 .rp-sumbar__value {
     margin: 10px 0 0;
     font-family: var(--font-heading);
-    font-size: 26px;
+    font-size: 28px;
     font-weight: 500;
     line-height: 1.1;
     letter-spacing: -0.01em;
-    color: var(--color-text-primary);
+    color: var(--color-surface-white);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
     overflow: hidden;
@@ -2271,13 +2274,13 @@ tr.rp-subrow.is-hidden {
     font-size: 13px;
     font-weight: 400;
     letter-spacing: 0;
-    color: var(--color-text-secondary);
+    color: rgba(255, 255, 255, 0.62);
 }
 
 .rp-sumbar__sub {
-    margin: 4px 0 0;
+    margin: 5px 0 0;
     font-size: 12.5px;
-    color: var(--color-text-secondary);
+    color: rgba(255, 255, 255, 0.66);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
     overflow: hidden;
@@ -2286,42 +2289,42 @@ tr.rp-subrow.is-hidden {
 
 .rp-sumbar__sub strong {
     font-weight: 500;
-    color: var(--color-text-primary);
+    color: var(--color-surface-white);
 }
 
-/* Five figures a row need ~215px each; under that the figures step down a size */
-@container rpProd (max-width: 1100px) {
+.rp-sumbar .rp-nil {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+@container rpProd (max-width: 900px) {
+    .rp-sumbar__cell {
+        padding: 16px 18px 18px;
+    }
+
+    .rp-sumbar__value {
+        font-size: 24px;
+    }
+}
+
+@container rpProd (max-width: 760px) {
     .rp-sumbar__value {
         font-size: 22px;
     }
 }
 
-/* Then three a row, the last of five taking the space of two */
-@container rpProd (max-width: 900px) {
-    .rp-sumbar[data-cells="5"] {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .rp-sumbar[data-cells="5"] > :last-child {
-        grid-column: span 2;
-    }
-}
-
-/* Phone: two a row, an odd one out across the whole row; the label keeps the room its icon took */
+/* Phone: two a row, the odd one out across the whole row; the label keeps the room its mark took */
 @container rpProd (max-width: 640px) {
-    .rp-sumbar,
-    .rp-sumbar[data-cells="5"] {
+    .rp-sumbar {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         margin: 10px 8px 0;
     }
 
-    .rp-sumbar > :last-child:nth-child(odd),
-    .rp-sumbar[data-cells="5"] > :last-child {
+    .rp-sumbar > :last-child:nth-child(odd) {
         grid-column: 1 / -1;
     }
 
     .rp-sumbar__cell {
-        padding: 12px 14px 14px;
+        padding: 14px 16px 16px;
     }
 
     .rp-sumbar__head > svg {
@@ -2331,6 +2334,10 @@ tr.rp-subrow.is-hidden {
     .rp-sumbar__value {
         margin-top: 8px;
         font-size: 20px;
+    }
+
+    .rp-sumbar__sub {
+        white-space: normal;
     }
 
     .rp-trend {

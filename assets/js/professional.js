@@ -491,7 +491,8 @@
             { id: "specialities", label: "Specialities", icon: "tags", count: PRO.specialities.length },
             { id: "billing", label: "Billing details", icon: "receipt-new" },
             { id: "payment", label: "Payment method", icon: "wallet", flag: !preferredCurrency() },
-            { id: "emails", label: "Emails", icon: "mail", count: PRO.emails.length }
+            /* What is waiting to be read, not the size of the inbox */
+            { id: "emails", label: "Emails", icon: "mail", count: unreadCount() }
         ];
     }
 
@@ -2514,6 +2515,7 @@
         else if (aside) aside.remove();
         var show = document.querySelector("#emails [data-mail-show]");
         if (show) show.innerHTML = mailShowMarkup();
+        els.tabs.innerHTML = tabsMarkup(currentSection());
     }
 
     function openMail(id) {

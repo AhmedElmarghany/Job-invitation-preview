@@ -342,8 +342,8 @@ of eight, newest first, with the tables' pager under it (*1–8 of 200*, first, 
 either side, in `pagination.css`'s classes). Above the list, as on Services & prices, search on the
 left — subject, sender and text — and on the right the topic (Invitations, Payments, Rates,
 Certificates, Account) and **All / Unread**, the unread count on its segment. Searching or filtering
-goes back to page 1; only the list and pager repaint, so the search keeps its caret. Reading an
-unread email updates both counts. The preview's 200 are generated in `data.js`: each bill on My
+goes back to page 1; only the list and pager repaint, so the search keeps its caret. The Emails tab
+counts what is unread, not the inbox, and reading an email updates it with the other two counts. The preview's 200 are generated in `data.js`: each bill on My
 Earnings brings a *ready* and a *paid* email (bill, amount and Wise or PayPal as listed there),
 sixty older invitations fall between, and the eight written-out emails lead.
 
@@ -598,13 +598,12 @@ Earnings carry the change; a period still running, or the year after the short f
 none). *View jobs* opens My Jobs' Completed tab for this month; older months only say where they would
 go, as do the PDF buttons.
 
-**Totals lead the page**, in one full-width strip (`.rp-sumbar`) with a hairline between figures:
-Total Job Count (in *n* months), Total Word Count, Total Hours, Total Documents and Total Earned
-(≈ USD) — the table's own columns, totalled, in their order. None in view reads as the table's quiet
-dash. They add up every period the view lets through, on all pages. The lines are the strip's border
-colour showing through 1px gaps, so they hold however the cells wrap: five a row, three and two below
-~900px of page width (Total Earned taking the room of two), two a row on a phone. A full-timer's strip
-has three: Total Job Count, Total Net WC and Total Pay.
+**Totals lead the page**, in one navy band (`.rp-sumbar`) — the page's committing colour, with gold only
+on the small marks: Total Job Count (in *n* months), Total Word Count (and the hours and documents) and
+Total Earned (≈ USD), every period the view lets through, on all pages. White serif figures, their units
+and lines in a softer white; each cell lines its left and top edges and the band clips the outer ones,
+so the lines hold however it wraps. Three a row, two on a phone with Total Earned across the bottom. A
+full-timer's band has Total Job Count, Total Net WC and Total Pay.
 
 **The numbers agree with the other pages.** `RP.PRODUCTIVITY` in `data.js` files a month at a time
 from March 2021:
