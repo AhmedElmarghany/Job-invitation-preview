@@ -1868,6 +1868,7 @@
             def.key +
             '-label">' +
             '<div class="rp-sumbar__head">' +
+            icon(def.icon) +
             '<h2 class="rp-sumbar__label" id="total-' +
             def.key +
             '-label">' +
