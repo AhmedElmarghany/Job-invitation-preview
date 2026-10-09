@@ -598,13 +598,12 @@ Earnings carry the change; a period still running, or the year after the short f
 none). *View jobs* opens My Jobs' Completed tab for this month; older months only say where they would
 go, as do the PDF buttons.
 
-**Totals lead the page**, in a quiet grey band (`.rp-sumbar`) across the page's full width — the table
-header's grey, no border and no marks — with the figures together in its middle, 280px each at most,
-and grey room either side: Total Job Count (in *n* months), Total Word Count (and the hours and
-documents) and Total Earned (≈ USD), every period the view lets through, on all pages. The serif figures
-are a size up from the tiles', and hairlines between them stop short of the band's edges, so it still
-reads as one piece. Three a row down to a phone, where the band becomes a list: the label on the left,
-the figure and its line on the right. A full-timer's band has Total Job Count, Total Net WC and Total Pay.
+**Totals lead the page**, in one navy band (`.rp-sumbar`) — the page's committing colour, with gold only
+on the small marks: Total Job Count (in *n* months), Total Word Count (and the hours and documents) and
+Total Earned (≈ USD), every period the view lets through, on all pages. White serif figures, their units
+and lines in a softer white; each cell lines its left and top edges and the band clips the outer ones,
+so the lines hold however it wraps. Three a row, two on a phone with Total Earned across the bottom. A
+full-timer's band has Total Job Count, Total Net WC and Total Pay.
 
 **The numbers agree with the other pages.** `RP.PRODUCTIVITY` in `data.js` files a month at a time
 from March 2021:

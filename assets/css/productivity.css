@@ -2193,11 +2193,10 @@ tr.rp-subrow.is-hidden {
     font-variant-numeric: tabular-nums;
 }
 
-/* ── Totals: a quiet grey band across the page, its figures together in the middle, grey room either side ── */
+/* ── Totals: one navy band above the trend — the page's committing colour, gold only on the small marks ── */
 .rp-sumbar {
     display: grid;
-    grid-template-columns: repeat(var(--cells, 3), minmax(0, 280px));
-    justify-content: center;
+    grid-template-columns: repeat(var(--cells, 3), minmax(0, 1fr));
     margin: 14px 10px 0;
     background: var(--color-surface-inset);
     border-radius: var(--radius-lg);
@@ -2208,28 +2207,30 @@ tr.rp-subrow.is-hidden {
     display: none;
 }
 
+/* Each cell lines its left and top edges and the band clips the outer ones, so any wrap stays clean */
 .rp-sumbar__cell {
     position: relative;
     min-width: 0;
-    padding: 20px 28px 22px;
+    padding: 18px 24px 20px;
+    box-shadow: -1px 0 0 var(--color-border);
 }
 
-/* The hairlines stop short of the band's edges, so the band still reads as one piece */
-.rp-sumbar__cell + .rp-sumbar__cell::before {
-    content: "";
-    position: absolute;
-    top: 20px;
-    bottom: 20px;
-    left: 0;
-    width: 1px;
-    background: #dcdde1;
+.rp-sumbar > :first-child {
+    box-shadow: none;
 }
 
 .rp-sumbar__head {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 8px;
     min-width: 0;
+    color: var(--color-brand-navy);
+}
+
+.rp-sumbar__head > svg {
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
 }
 
 .rp-sumbar__label {
@@ -2244,11 +2245,22 @@ tr.rp-subrow.is-hidden {
     text-overflow: ellipsis;
 }
 
+/* On navy the tip button is a pale mark that lights up */
+.rp-sumbar .rp-info {
+    color: var(--color-text-secondary);
+}
+
+.rp-sumbar .rp-info:hover,
+.rp-sumbar .rp-info[aria-expanded="true"] {
+    background: var(--color-surface-subtle);
+    color: var(--color-text-primary);
+}
+
 /* Tabular figures, so the count-up does not jitter the width */
 .rp-sumbar__value {
     margin: 8px 0 0;
     font-family: var(--font-heading);
-    font-size: 30px;
+    font-size: 28px;
     font-weight: 500;
     line-height: 1.1;
     letter-spacing: -0.01em;
@@ -2270,7 +2282,7 @@ tr.rp-subrow.is-hidden {
 }
 
 .rp-sumbar__sub {
-    margin: 6px 0 0;
+    margin: 5px 0 0;
     font-size: 12.5px;
     color: var(--color-text-secondary);
     font-variant-numeric: tabular-nums;
@@ -2284,9 +2296,13 @@ tr.rp-subrow.is-hidden {
     color: var(--color-text-primary);
 }
 
+.rp-sumbar .rp-nil {
+    color: rgba(255, 255, 255, 0.4);
+}
+
 @container rpProd (max-width: 900px) {
     .rp-sumbar__cell {
-        padding: 18px 20px 20px;
+        padding: 16px 18px 18px;
     }
 
     .rp-sumbar__value {
@@ -2294,7 +2310,6 @@ tr.rp-subrow.is-hidden {
     }
 }
 
-/* A narrow page lets the line under a figure wrap rather than cut "93 documents" short */
 @container rpProd (max-width: 760px) {
     .rp-sumbar__value {
         font-size: 22px;
@@ -2309,6 +2324,7 @@ tr.rp-subrow.is-hidden {
 @container rpProd (max-width: 640px) {
     .rp-sumbar {
         grid-template-columns: minmax(0, 1fr);
+        /* grid-template-columns: repeat(2, minmax(0, 1fr)); */
         margin: 10px 8px 0;
         padding: 2px 0;
     }
@@ -2347,6 +2363,10 @@ tr.rp-subrow.is-hidden {
         grid-area: sub;
         margin: 2px 0 0;
         text-align: right;
+        white-space: normal;
+    }
+
+    .rp-sumbar__sub {
         white-space: normal;
     }
 
