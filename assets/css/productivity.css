@@ -2198,7 +2198,7 @@ tr.rp-subrow.is-hidden {
     display: grid;
     grid-template-columns: repeat(var(--cells, 3), minmax(0, 1fr));
     margin: 14px 10px 0;
-    background: var(--color-brand-navy);
+    background: var(--color-surface-inset);
     border-radius: var(--radius-lg);
     overflow: hidden;
 }
@@ -2212,7 +2212,7 @@ tr.rp-subrow.is-hidden {
 .rp-sumbar__cell {
     min-width: 0;
     padding: 18px 24px 20px;
-    box-shadow: -1px 0 0 rgba(255, 255, 255, 0.14), 0 -1px 0 rgba(255, 255, 255, 0.14);
+    box-shadow: -1px 0 0 var(--color-border), 0 -1px 0 var(--color-border);
 }
 
 .rp-sumbar__head {
@@ -2220,13 +2220,13 @@ tr.rp-subrow.is-hidden {
     align-items: center;
     gap: 8px;
     min-width: 0;
-    color: var(--gold-border);
+    color: var(--color-brand-navy);
 }
 
 .rp-sumbar__head > svg {
     flex: 0 0 auto;
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
 }
 
 .rp-sumbar__label {
@@ -2235,7 +2235,7 @@ tr.rp-subrow.is-hidden {
     font-size: 13px;
     font-weight: 500;
     line-height: 1.3;
-    color: rgba(255, 255, 255, 0.74);
+    color: var(--color-text-secondary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -2243,13 +2243,13 @@ tr.rp-subrow.is-hidden {
 
 /* On navy the tip button is a pale mark that lights up */
 .rp-sumbar .rp-info {
-    color: rgba(255, 255, 255, 0.55);
+    color: var(--color-text-secondary);
 }
 
 .rp-sumbar .rp-info:hover,
 .rp-sumbar .rp-info[aria-expanded="true"] {
-    background: rgba(255, 255, 255, 0.12);
-    color: var(--color-surface-white);
+    background: var(--color-surface-subtle);
+    color: var(--color-text-primary);
 }
 
 /* Tabular figures, so the count-up does not jitter the width */
@@ -2260,7 +2260,7 @@ tr.rp-subrow.is-hidden {
     font-weight: 500;
     line-height: 1.1;
     letter-spacing: -0.01em;
-    color: var(--color-surface-white);
+    color: var(--color-text-primary);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
     overflow: hidden;
@@ -2274,13 +2274,13 @@ tr.rp-subrow.is-hidden {
     font-size: 13px;
     font-weight: 400;
     letter-spacing: 0;
-    color: rgba(255, 255, 255, 0.62);
+    color: var(--color-text-secondary);
 }
 
 .rp-sumbar__sub {
     margin: 5px 0 0;
     font-size: 12.5px;
-    color: rgba(255, 255, 255, 0.66);
+    color: var(--color-text-secondary);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
     overflow: hidden;
@@ -2289,7 +2289,7 @@ tr.rp-subrow.is-hidden {
 
 .rp-sumbar__sub strong {
     font-weight: 500;
-    color: var(--color-surface-white);
+    color: var(--color-text-primary);
 }
 
 .rp-sumbar .rp-nil {
