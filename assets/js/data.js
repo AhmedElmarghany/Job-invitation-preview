@@ -3033,7 +3033,7 @@
     })();
 
     /* Delivered while the preview is open, once a tab, so the bubble's arrival can be seen */
-    RP.MESSAGE_DEMO = { conversation: "c-j-47975", from: "daniel", after: 30, text: "Quick check — are you still on track for the deadline? The client is asking." };
+    RP.MESSAGE_DEMO = { conversation: "c-j-47975", from: "daniel", after: 5, text: "Quick check — are you still on track for the deadline? The client is asking." };
 
     RP.USER.messages = RP.CONVERSATIONS.reduce(function (sum, c) {
         return sum + c.messages.filter(function (m) {

@@ -42,8 +42,8 @@ Nothing inside the folder refers to the folder name, so renaming is safe.
 | `professional-profile.html` | **Built.** Professional Profile — services and rates by language pair with their certificates, specialities, billing details, payment methods and emails. |
 | `account.html` | **Built.** User Account — the resource's own profile, opened from their name and photo in the sidebar. |
 
-The sidebar, topbar, availability control, notifications panel, profile menu and logout modal are
-**final** and shared by every page, so a new page only needs its own content.
+The sidebar, topbar, availability control, notifications panel, messenger, profile menu and logout
+modal are **final** and shared by every page, so a new page only needs its own content.
 
 ---
 
@@ -67,6 +67,7 @@ resource portal preview/
     │   ├── sidebar.css         rp-sidebar
     │   ├── topbar.css          rp-topbar, availability pill + dropdown, profile menu
     │   ├── notifications.css   the bell and its panel: rows, folds, settings, undo, phone sheet
+    │   ├── messenger.css       the chat bubble and its panel: list, conversation, composer, phone screen
     │   ├── toolbar.css         copied from config/static/css/cu_table_toolbar.css
     │   ├── table.css           copied from config/static/tables/table.css
     │   ├── status.css          copied from config/static/css/status.css
@@ -88,6 +89,7 @@ resource portal preview/
     │   ├── data.js             the dummy records and the signed-in resource
     │   ├── layout.js           renders sidebar + topbar + modals into #rp-layout
     │   ├── notifications.js    the bell's panel: list, folds, read / remove, settings, arrivals
+    │   ├── messenger.js        the chat bubble: conversations, sending, reactions, replies, files, voice, arrivals
     │   ├── columns-modal.js    reusable "Customize Columns" modal
     │   ├── navigation-tabs.js  copied from config/static/js/navigation-tabs.js
     │   ├── invitations.js      table render, search, sort, expand, paginate
@@ -737,6 +739,83 @@ waiting; nothing tells the resource it was approved.
 
 ---
 
+## Messages (the chat bubble)
+
+Replaces the messaging dock in `templates/chat/messaging_dock.html` (its Bootstrap *Start a
+conversation* modal included). On every page; built by `assets/js/messenger.js`, which mounts
+`#rpMessenger` at the end of `<body>`.
+
+- **A bubble at the bottom-right, kept clear of the page.** Every page reserves 92px under its
+  content (84px on phones) and toasts rise above the bubble, so at the end of a page the pagination
+  sits 16px above it instead of under it. Its badge counts unread messages, not conversations, and
+  the topbar's Messages button shows the same count and opens the same panel.
+- **One at a time, or both side by side.** The panel (400 x 640, never taller than the room under
+  the topbar) shows the list, then one conversation with a back arrow. *Expand* (the arrows in its
+  head, from 900px wide) puts them side by side at 780px; the choice is remembered. On phones
+  (600px and under) the panel is the whole screen and the bubble hides.
+- **The list:** search (people, jobs and the messages themselves), *All / Unread (n) / Jobs*,
+  *Pinned* above *Recent*; *Archived* is a button in the head beside *New message*, with a grey
+  count, so it is one click away however long the list grows. Each row: who or which job, the last
+  message with its sender, the time (clock today, then the weekday, then the date), the unread
+  count, and marks for pinned, muted and mentioned (`@`). A draft shows as *Draft:* in red.
+  With a mouse, `⋯` replaces the time on hover: Open job, Pin, Mark as read / unread, Mute, Archive.
+- **Three kinds of conversation:** a person (round face, online / away dot), a job's chat (a
+  rounded square with the jobs icon; the head shows the job number only, its name in a tooltip,
+  and a line under it with the service, languages, a deadline chip and *Open job*), and a group
+  (gold-pale square, members in the head, each sender's name above their messages).
+- **The conversation:** day pills, a *New messages* line where the unread part begins, messages
+  grouped by sender within five minutes, your messages navy on the right with their state
+  (sending, sent, delivered in grey, seen in blue), *Edited*, *You deleted this message*, a pale gold wash on a
+  message that mentions you, reply quotes that scroll to the original, files, images (open
+  full screen), voice messages that play, and a `↓` button with a count when new messages arrive
+  while you are reading further up.
+- **On each message** (hover, focus, or a tap on touch screens): react, reply, `⋯` (Copy text,
+  Reply, and on your own: Edit, Delete with a confirmation). One reaction per person, as
+  `chat_messagereaction` allows: picking another replaces yours. At the top of a scrolled
+  conversation the toolbar moves to the bubble's bottom edge, where it is not cut off.
+- **The composer:** grows with the text up to six lines, then scrolls; `Enter` sends,
+  `Shift+Enter` breaks the line; attach (or drop files on the conversation), emoji, and a
+  microphone that turns into *Send* once there is something to send. Recording shows a timer and
+  a live wave, with discard and send. In a group, `@` suggests the members.
+- **Arrivals:** with the panel closed, a card rises above the bubble for seven seconds (who, which
+  job or group, the message; a click opens it), the bubble nudges and the badge pops, and the
+  chime plays at the notification settings' volume. A muted conversation stays quiet: no card, no
+  sound and no badge; its unread count shows in the list, in grey.
+- **The job page is the same conversation.** Its *Chat* card reads and writes the messenger's
+  thread for that job (sending from either shows in both, and the reply lands in both), and
+  *Open in Messages* opens it in the panel.
+
+**State in the preview:** messages, reads, drafts, pins, mutes and archives last for the browser tab
+(`sessionStorage` `rp_messages_v1`); *Expand* lasts for the browser (`localStorage`
+`rp_messenger`). Sending to Sara, Leah, the Medical team, J-47947 or J-47975 plays the other side:
+receipts, typing, then a reply. About 30 seconds after the first page of a tab opens, Daniel writes
+about J-47975 so an arrival can be seen (`RP.MESSAGE_DEMO`). Voice recording shows the bar only; no
+audio is recorded.
+
+**Data:** `RP.PEOPLE` and `RP.CONVERSATIONS` in `data.js`, modelled on user 1146's real chats. The
+job chats are `RP.jobDetail()`'s own chat, so the job page and the panel agree.
+
+**Porting it to Django:**
+
+- Shell as `templates/resource_portal/partials/messenger.html` (replacing the dock include),
+  `resource-portal/css/messenger.css` and `resource-portal/js/messenger.js`. The class names
+  (`rp-messenger__*`, `rp-convo__*`, `rp-thread__*`, `rp-dm__*`, `rp-composer__*`) carry over.
+- The tables are already there: `chat_conversation` (a job's chat is a group with `job_id`),
+  `chat_conversation_participants`, `chat_message` (`type` text / image / video / file / voice /
+  system, `reply_to_message_id`, `is_edited`, `is_deleted`), `chat_messagefile`,
+  `chat_messagereaction` (one per user per message), `chat_readreceipt` and
+  `chat_deliveryreceipt` (the ticks).
+- Pinned and archived live in the browser today (`localStorage`, `chat_pin.js` and
+  `archive_chat.js`), so they do not follow the resource to another device. They become fields per
+  participant on the server, with muted and marked-unread, which do not exist yet. Empty
+  conversations stay out of the list until their first message.
+- Endpoints: the list (search, filter, unread counts), one page of messages, send (with files),
+  edit, delete, react, mark read; the WebSocket push calls what `arrive()` does here.
+- The page reserve under `.rp-page` and the toast offset move into the shell's CSS, so every page
+  keeps its pagination clear of the bubble without a rule of its own.
+
+---
+
 ## Adding the next page
 
 1. Copy a page's shell (e.g. `account.html`) and set `data-page` / `data-title` on `#rp-layout`.
@@ -851,6 +930,10 @@ toast repeats what was typed (*Bid of USD 280.00*), and the Bid Sent card reads
 | `Esc` | Leave the search field, close any modal, the notifications panel (its `⋯` menu first), the availability dropdown or the mobile drawer; on User Account and Professional Profile, close the Delete popover first; on My Earnings, close the period picker first; on Productivity, the Columns popover, the Export menu or the period picker |
 | `Enter` | Submit a bid, when the bid field has focus; send a chat message on the job page (`Shift+Enter` for a new line); in Add services' rate, add the service to the list |
 | `↑` / `↓`, `Home` / `End` in the notifications panel | Move between notifications |
+| `↑` / `↓` in the messenger's list | Move between conversations (`↓` from the search field enters the list) |
+| `Enter` / `Shift+Enter` in the messenger | Send / new line; with the `@` list open, `Enter` or `Tab` picks the member and `↑` / `↓` move |
+| `↑` in an empty message field | Edit the last message you sent |
+| `Esc` in the messenger | Close the image, then the menu, picker, emoji grid or `@` list, then stop a recording, then cancel a reply or edit, then close the panel (focus returns to the bubble). Only when focus is in the messenger, so the page's own popovers close alone |
 | `↑` / `↓` | Move between statuses in the availability dropdown; on Productivity, `↓` on Columns or Export opens it, and the arrows move between the Export formats |
 | `←` / `→`, `Home` / `End` | On Productivity's chart, move between the periods; `Enter` opens the one in focus in the table |
 | `Enter` in Technology's search | Pick the first match, or add what was typed as your own tool |

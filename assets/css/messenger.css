@@ -311,7 +311,6 @@ body.rp-no-scroll:not(.rp-messenger-open) .rp-messenger {
     border-radius: var(--radius-xs);
     background: none;
     color: var(--color-text-secondary);
-    text-decoration: none;
     cursor: pointer;
     transition:
         background var(--transition-fast),
@@ -376,7 +375,6 @@ body.rp-no-scroll:not(.rp-messenger-open) .rp-messenger {
 }
 
 .rp-messenger__search:focus-within {
-    border-color: var(--gold-border);
     background: var(--color-surface-white);
     box-shadow: var(--focus-ring-gold);
 }
@@ -439,6 +437,7 @@ body.rp-no-scroll:not(.rp-messenger-open) .rp-messenger {
 .rp-messenger__scroll {
     flex: 1 1 auto;
     min-height: 0;
+    overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
     padding: 0 6px 10px;
@@ -468,10 +467,26 @@ body.rp-no-scroll:not(.rp-messenger-open) .rp-messenger {
     background: var(--color-surface-inset);
 }
 
-/* The open conversation, beside the list once expanded */
+/* The open conversation, beside the list once expanded: a hairline (a shadow, so nothing shifts) and the navy rule */
 .rp-convo.is-active {
     background: var(--color-surface-subtle);
-    box-shadow: inset 3px 0 0 var(--color-brand-navy);
+    box-shadow: inset 0 0 0 1px var(--color-border);
+}
+
+/* The navy rule: a straight bar of its own, 80% tall and centred, clear of the rounded corners */
+.rp-convo.is-active::before,
+.rp-dm__quote::before,
+.rp-composer__context::before,
+.rp-composer__mentions button.is-active::before {
+    content: "";
+    position: absolute;
+    top: 15%;
+    left: 1px;
+    width: 3px;
+    height: 70%;
+    background: var(--color-brand-navy);
+    pointer-events: none;
+    border-radius: 0 var(--radius-full) var(--radius-full) 0;
 }
 
 .rp-convo__open {
@@ -659,43 +674,29 @@ body.rp-no-scroll:not(.rp-messenger-open) .rp-messenger {
     opacity: 0;
 }
 
-.rp-messenger__archived {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    width: calc(100% - 12px);
-    margin: 10px 6px 4px;
-    padding: 10px 12px;
-    border: 1px solid var(--color-border);
-    border-radius: 10px;
-    background: var(--color-surface-white);
-    font-family: var(--font-body);
-    font-size: 13.5px;
-    font-weight: 500;
-    text-align: left;
-    color: var(--color-text-primary);
-    cursor: pointer;
-    transition: background var(--transition-fast);
+/* Archived, in the head: its count is a grey chip, so it never reads as unread */
+.rp-messenger__archive {
+    position: relative;
 }
 
-.rp-messenger__archived:hover {
-    background: var(--color-surface-inset);
-}
-
-.rp-messenger__archived svg {
-    width: 16px;
+.rp-messenger__archive-count {
+    position: absolute;
+    top: 1px;
+    right: 0;
+    min-width: 16px;
     height: 16px;
-    color: var(--color-text-secondary);
-}
-
-.rp-messenger__archived > span:first-of-type {
-    flex: 1 1 auto;
-}
-
-.rp-messenger__archived-count {
-    font-size: 12px;
+    padding: 0 4px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    background: var(--color-surface-white);
+    font-size: 10.5px;
     font-weight: 600;
+    line-height: 14px;
     color: var(--color-text-secondary);
+}
+
+.rp-messenger__archive-count[hidden] {
+    display: none;
 }
 
 /* ── Nothing to show ──────────────────────────────────────── */
@@ -712,7 +713,28 @@ body.rp-no-scroll:not(.rp-messenger-open) .rp-messenger {
 
 .rp-thread__none {
     flex: 1 1 auto;
+}
+
+/* The conversation's wallpaper, as WhatsApp does. The doodle is only a mask: its colour and
+   strength are the two lines below, and one layer keeps overlapping strokes the same shade */
+.rp-thread,
+.rp-thread__none {
+    position: relative;
+    isolation: isolate;
     background: var(--color-surface-inset);
+}
+
+.rp-thread::before,
+.rp-thread__none::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-color: var(--color-border);
+    opacity: 0.5;
+    -webkit-mask: url("../img/chat-doodle.svg") 0 0 / 1000px auto repeat;
+    mask: url("../img/chat-doodle.svg") 0 0 / 1000px auto repeat;
+    pointer-events: none;
 }
 
 .rp-thread__none[hidden] {
@@ -820,6 +842,13 @@ body.rp-no-scroll:not(.rp-messenger-open) .rp-messenger {
     background: var(--color-surface-gold-pale);
 }
 
+/* On a grey row (the open conversation, the @ option in hand), every face sits on white */
+.rp-convo.is-active .rp-face,
+.rp-composer__mentions button:hover .rp-face,
+.rp-composer__mentions button.is-active .rp-face {
+    background: var(--color-surface-white);
+}
+
 .rp-face__dot {
     display: none;
     position: absolute;
@@ -849,11 +878,14 @@ body.rp-no-scroll:not(.rp-messenger-open) .rp-messenger {
 }
 
 /* ── One conversation ─────────────────────────────────────── */
+/* minmax(0, 1fr): a long status or job line gets an ellipsis instead of widening the thread */
 .rp-thread {
     position: relative;
     display: grid;
     flex: 1 1 auto;
+    grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+    min-width: 0;
     min-height: 0;
 }
 
@@ -869,6 +901,7 @@ body.rp-no-scroll:not(.rp-messenger-open) .rp-messenger {
     min-height: 58px;
     padding: 9px 10px 9px 8px;
     border-bottom: 1px solid var(--color-border);
+    background: var(--color-surface-white);
 }
 
 .rp-messenger__panel.is-expanded .rp-thread__head {
@@ -902,14 +935,14 @@ body.rp-no-scroll:not(.rp-messenger-open) .rp-messenger {
     box-shadow: var(--focus-ring-navy);
 }
 
-/* The job's name, on hover or focus of its number; the sidebar tooltip's look */
+/* The job's name, on hover or focus (a tap on phones) of its number */
 .rp-thread__tip {
     position: absolute;
     top: calc(100% + 4px);
     left: 0;
     z-index: 7;
     width: max-content;
-    max-width: 280px;
+    max-width: min(280px, calc(100vw - 120px));
     padding: 6px 10px;
     border: 1px solid var(--color-brand-navy-hover);
     border-radius: 7px;
@@ -928,7 +961,7 @@ body.rp-no-scroll:not(.rp-messenger-open) .rp-messenger {
         visibility var(--transition-fast);
 }
 
-.rp-thread__who:has(.rp-thread__job:hover, .rp-thread__job:focus-visible) .rp-thread__tip {
+.rp-thread__who:has(.rp-thread__job:hover, .rp-thread__job:focus) .rp-thread__tip {
     opacity: 1;
     visibility: visible;
 }
@@ -1042,10 +1075,10 @@ body.rp-no-scroll:not(.rp-messenger-open) .rp-messenger {
     display: flex;
     flex-direction: column;
     min-height: 0;
+    overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
     padding: 16px 14px 12px;
-    background: var(--color-surface-inset);
 }
 
 .rp-thread__log:focus-visible {
@@ -1130,7 +1163,6 @@ body.rp-no-scroll:not(.rp-messenger-open) .rp-messenger {
     gap: 8px;
     margin: 0;
     padding: 2px 14px 8px;
-    background: var(--color-surface-inset);
     font-size: 12px;
     color: var(--color-text-secondary);
 }
@@ -1346,7 +1378,7 @@ body.rp-no-scroll:not(.rp-messenger-open) .rp-messenger {
 
 .rp-dm.is-deleted .rp-dm__bubble {
     border: 1px dashed var(--color-border);
-    background: transparent;
+    background: var(--color-surface-inset);
     color: var(--color-text-secondary);
 }
 
@@ -1387,12 +1419,11 @@ body.rp-no-scroll:not(.rp-messenger-open) .rp-messenger {
 /* Replying: the message answered, inside the bubble; a click scrolls to it */
 .rp-dm__quote {
     display: block;
+    position: relative;
     width: 100%;
-    max-width: 280px;
     margin: 2px 0 6px;
-    padding: 6px 10px;
-    border: 0;
-    border-left: 3px solid var(--color-brand-navy);
+    padding: 6px 10px 6px 12px;
+    border: 1px solid var(--color-border);
     border-radius: 8px;
     background: var(--color-surface-inset);
     font: inherit;
@@ -1418,8 +1449,12 @@ body.rp-no-scroll:not(.rp-messenger-open) .rp-messenger {
 }
 
 .rp-dm--me .rp-dm__quote {
-    border-left-color: rgba(255, 255, 255, 0.6);
+    border-color: rgba(255, 255, 255, 0.22);
     background: rgba(255, 255, 255, 0.12);
+}
+
+.rp-dm--me .rp-dm__quote::before {
+    background: rgba(255, 255, 255, 0.6);
 }
 
 .rp-dm--me .rp-dm__quote strong {
@@ -1708,7 +1743,7 @@ body.rp-no-scroll:not(.rp-messenger-open) .rp-messenger {
 }
 
 .rp-dm__status--read {
-    color: var(--color-link);
+    color: var(--color-status-notification);
 }
 
 /* Hover (or a tap on touch): react, reply, more. Sits on the bubble's top edge, clear of its text */
@@ -1739,9 +1774,16 @@ body.rp-no-scroll:not(.rp-messenger-open) .rp-messenger {
     left: -8px;
 }
 
+/* At the top of the scrolled log there is no room above the bubble: the tools sit on its bottom edge */
+.rp-dm.is-near-top .rp-dm__tools {
+    top: var(--tools-top);
+    bottom: auto;
+}
+
 .rp-dm:hover .rp-dm__tools,
 .rp-dm:focus-within .rp-dm__tools,
-.rp-dm.is-touched .rp-dm__tools {
+.rp-dm.is-touched .rp-dm__tools,
+.rp-dm__tools:has([aria-expanded="true"]) {
     opacity: 1;
     pointer-events: auto;
     transform: none;
@@ -1801,14 +1843,15 @@ body.rp-no-scroll:not(.rp-messenger-open) .rp-messenger {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 6px 6px 6px 10px;
-    border-left: 3px solid var(--color-brand-navy);
+    position: relative;
+    padding: 6px 6px 6px 12px;
+    border: 1px solid var(--color-border);
     border-radius: 8px;
     background: var(--color-surface-inset);
 }
 
-.rp-composer__context[data-kind="edit"] {
-    border-left-color: var(--color-brand-gold);
+.rp-composer__context[data-kind="edit"]::before {
+    background: var(--color-brand-gold);
 }
 
 .rp-composer__context[hidden],
@@ -1984,18 +2027,30 @@ body.rp-no-scroll:not(.rp-messenger-open) .rp-messenger {
     color: var(--color-status-danger);
 }
 
+/* The field is the pill; the textarea inside scrolls on its own, clear of the emoji button */
 .rp-composer__field {
-    position: relative;
     flex: 1 1 auto;
+    display: flex;
+    align-items: flex-end;
     min-width: 0;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    background: var(--color-surface-inset);
+    transition:
+        background var(--transition-fast),
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast);
+}
+
+.rp-composer__field:focus-within {
+    background: var(--color-surface-white);
+    box-shadow: var(--focus-ring-gold);
 }
 
 .rp-composer__btn--inner {
-    position: absolute;
-    right: 4px;
-    bottom: 4px;
     width: 32px;
     height: 32px;
+    margin: 0 3px 3px 0;
 }
 
 .rp-composer__btn--inner svg {
@@ -2003,35 +2058,26 @@ body.rp-no-scroll:not(.rp-messenger-open) .rp-messenger {
     height: 18px;
 }
 
+/* A whole-pixel line height lets autosize fit the text exactly: no scrollbar before max-height */
 .rp-composer__input {
     display: block;
-    width: 100%;
-    min-height: 40px;
-    max-height: 132px;
-    padding: 10px 40px 10px 12px;
-    border: 1px solid transparent;
-    border-radius: 12px;
-    background: var(--color-surface-inset);
+    flex: 1 1 auto;
+    min-width: 0;
+    max-height: 138px;
+    padding: 9px 4px 9px 12px;
+    border: 0;
+    background: transparent;
     font-family: var(--font-body);
     font-size: 14px;
-    line-height: 1.4;
+    line-height: 20px;
     color: var(--color-text-primary);
     resize: none;
     outline: none;
     overflow-y: auto;
-    transition:
-        background var(--transition-fast),
-        border-color var(--transition-fast),
-        box-shadow var(--transition-fast);
 }
 
 .rp-composer__input::placeholder {
     color: var(--color-text-placeholder);
-}
-
-.rp-composer__input:focus {
-    background: var(--color-surface-white);
-    box-shadow: var(--focus-ring-gold);
 }
 
 .rp-composer__send {
@@ -2186,6 +2232,7 @@ body.rp-no-scroll:not(.rp-messenger-open) .rp-messenger {
 }
 
 .rp-composer__mentions button {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -2555,6 +2602,12 @@ body.rp-no-scroll:not(.rp-messenger-open) .rp-messenger {
     .rp-composer__input,
     .rp-messenger__search input {
         font-size: 16px;
+    }
+
+    .rp-composer__input {
+        padding-top: 8px;
+        padding-bottom: 8px;
+        line-height: 22px;
     }
 
     .rp-composer {

@@ -294,7 +294,7 @@
 
     function convoFace(c, size) {
         if (c.kind === "job") {
-            return '<span class="rp-face rp-face--' + (size || "md") + ' rp-face--job" aria-hidden="true">' + icon("jobs") + "</span>";
+            return '<span class="rp-face rp-face--' + (size || "md") + ' rp-face--job" aria-hidden="true">' + icon("jobs-bag") + "</span>";
         }
         if (c.kind === "group") {
             return '<span class="rp-face rp-face--' + (size || "md") + ' rp-face--group" aria-hidden="true">' + icon("users") + "</span>";
@@ -493,7 +493,7 @@
         if (m.deleted) return "";
         return (
             '<div class="rp-dm__tools" role="toolbar" aria-label="Message actions">' +
-            '<button class="rp-dm__tool" type="button" data-act="pick-reaction" aria-label="Add a reaction" title="React">' +
+            '<button class="rp-dm__tool" type="button" data-act="pick-reaction" aria-label="Add a reaction" title="React" aria-haspopup="dialog" aria-expanded="false">' +
             icon("smile-plus") +
             "</button>" +
             '<button class="rp-dm__tool" type="button" data-act="reply" aria-label="Reply" title="Reply">' +
@@ -680,9 +680,6 @@
         var rest = list.filter(function (c) {
             return !c.pinned;
         });
-        var archived = convos.filter(function (c) {
-            return c.archived;
-        }).length;
         var html = "";
 
         if (!list.length) {
@@ -716,17 +713,6 @@
                     }).join("") +
                     "</ul>";
             }
-        }
-
-        if (archived && ui.filter === "all" && !ui.query) {
-            html +=
-                '<button class="rp-messenger__archived" type="button" data-act="archived">' +
-                icon("archive") +
-                "<span>Archived</span><span class=\"rp-messenger__archived-count\">" +
-                archived +
-                "</span>" +
-                icon("chevron-right") +
-                "</button>";
         }
         return html;
     }
@@ -802,7 +788,7 @@
                             '<li class="rp-convo"><button class="rp-convo__open" type="button" data-start-job="' +
                             j.id +
                             '"><span class="rp-face rp-face--md rp-face--job" aria-hidden="true">' +
-                            icon("jobs") +
+                            icon("jobs-bag") +
                             '</span><span class="rp-convo__main"><span class="rp-convo__line"><span class="rp-convo__name">' +
                             esc(j.id) +
                             '<span class="rp-convo__about">' +
@@ -836,18 +822,19 @@
     function headMarkup(c) {
         var now = new Date();
         var p = c.kind === "group" ? null : person(c.with);
-        var sub;
-        if (ui.typing[c.id]) {
-            sub = '<span class="rp-thread__typing-label">' + esc(first(person(ui.typing[c.id]).name)) + " is typing…</span>";
-        } else if (c.kind === "group") {
-            sub = esc(members(c).length + 1 + " members · " + members(c).map(function (k) {
+        var line = "";
+        if (c.kind === "group") {
+            line = members(c).length + 1 + " members · " + members(c).map(function (k) {
                 return first(person(k).name);
-            }).join(", ") + ", you");
+            }).join(", ") + ", you";
         } else if (c.kind === "job") {
-            sub = esc(p.name + " · " + presence(p, now));
+            line = p.name + " · " + presence(p, now);
         } else {
-            sub = esc(presence(p, now) + " · " + p.role);
+            line = presence(p, now) + " · " + p.role;
         }
+        var sub = ui.typing[c.id]
+            ? '<span class="rp-thread__typing-label">' + esc(first(person(ui.typing[c.id]).name)) + " is typing…</span>"
+            : esc(line);
 
         return (
             '<button class="rp-messenger__iconbtn rp-thread__back" type="button" data-act="back" aria-label="Back to conversations" title="Back">' +
@@ -861,13 +848,12 @@
             (c.kind === "job" ? '<span class="rp-thread__tip" id="rpThreadJobTip" role="tooltip">' + esc(aboutJob(c)) + "</span>" : "") +
             '<p class="rp-thread__status' +
             (p && p.status === "online" && !ui.typing[c.id] ? " is-online" : "") +
+            '" title="' +
+            esc(line) +
             '">' +
             sub +
             "</p></div>" +
             '<div class="rp-thread__tools">' +
-            (c.kind === "job"
-                ? '<a class="rp-messenger__iconbtn" href="job.html?id=' + esc(c.job) + '" aria-label="Open job ' + esc(c.job) + '" title="Open job">' + icon("external-link") + "</a>"
-                : "") +
             '<button class="rp-messenger__iconbtn" type="button" data-act="thread-menu" aria-label="Conversation options" title="Options" aria-haspopup="menu">' +
             icon("ellipsis") +
             "</button>" +
@@ -917,6 +903,10 @@
             '<div class="rp-messenger__tools">' +
             '<button class="rp-messenger__iconbtn" type="button" data-act="new" aria-label="New message" title="New message">' +
             icon("square-pen") +
+            "</button>" +
+            '<button class="rp-messenger__iconbtn rp-messenger__archive" type="button" data-act="archived" aria-label="Archived" title="Archived">' +
+            icon("archive") +
+            '<span class="rp-messenger__archive-count" data-archived-count hidden></span>' +
             "</button>" +
             '<button class="rp-messenger__iconbtn rp-messenger__expand" type="button" data-act="expand" aria-label="Expand" title="Expand">' +
             icon("maximize-2") +
@@ -1075,6 +1065,14 @@
         var topBtn = document.getElementById("rpMessagesBtn");
         if (topBtn) topBtn.setAttribute("aria-label", n ? "Messages, " + n + " unread" : "Messages");
 
+        var archived = convos.filter(function (c) {
+            return c.archived;
+        }).length;
+        var shelf = els.panel.querySelector("[data-archived-count]");
+        shelf.textContent = archived;
+        shelf.hidden = !archived;
+        shelf.parentNode.setAttribute("aria-label", archived ? "Archived, " + archived + (archived === 1 ? " conversation" : " conversations") : "Archived");
+
         var count = els.panel.querySelector("[data-unread-count]");
         var unreadConvos = convos.filter(function (c) {
             return !c.archived && isUnread(c);
@@ -1106,6 +1104,7 @@
         scroll.innerHTML = ui.view === "new" ? newMarkup() : ui.view === "archived" ? archivedMarkup() : listMarkup();
         scroll.scrollTop = top;
         if (focused) focusPath(focused);
+        reanchor();
         renderBadges();
     }
 
@@ -1139,6 +1138,7 @@
         if (keepScroll === "end" || (keepScroll !== "keep" && stick)) scrollToEnd(false);
         else els.log.scrollTop = top;
         if (inside) focusPath(focused, els.log);
+        reanchor();
     }
 
     function renderTyping(c) {
@@ -1285,7 +1285,7 @@
         renderList();
         if (view === "new") els.search.focus({ preventScroll: true });
         else if (view === "archived") els.panel.querySelector('[data-sub-head] [data-act="list"]').focus({ preventScroll: true });
-        else focusPath(from === "archived" ? '[data-list] [data-act="archived"]' : '[data-list-head] [data-act="new"]', els.panel);
+        else focusPath('[data-list-head] [data-act="' + (from === "archived" ? "archived" : "new") + '"]', els.panel);
     }
 
     function startWith(key) {
@@ -1322,10 +1322,11 @@
 
     /* ── Composer ────────────────────────────────────────── */
 
+    /* No border on the textarea, so scrollHeight is its exact height; max-height in the CSS caps it */
     function autosize() {
         var input = els.input;
         input.style.height = "auto";
-        input.style.height = Math.min(input.scrollHeight, 132) + "px";
+        input.style.height = input.scrollHeight + "px";
     }
 
     function hasContent() {
@@ -1656,6 +1657,17 @@
 
     /* ── Message actions ─────────────────────────────────── */
 
+    /* Tools sit on their bubble's top edge; at the top of the scrolled log that is clipped, so they move to its bottom edge */
+    function placeTools(row) {
+        var tools = row.querySelector(".rp-dm__tools");
+        var bubble = row.querySelector(".rp-dm__bubble");
+        if (!tools) return;
+        var room = row.getBoundingClientRect().top - els.log.getBoundingClientRect().top;
+        var low = room < tools.offsetHeight;
+        row.classList.toggle("is-near-top", low);
+        if (low) row.style.setProperty("--tools-top", bubble.offsetTop + bubble.offsetHeight - 8 + "px");
+    }
+
     function closeImage() {
         els.lightbox.hidden = true;
         if (ui.viewing && document.body.contains(ui.viewing)) ui.viewing.focus({ preventScroll: true });
@@ -1839,7 +1851,7 @@
 
     function closePopovers() {
         if (!els.menu) return;
-        if (!els.menu.hidden && ui.menu && ui.menu.button && document.body.contains(ui.menu.button)) ui.menu.button.setAttribute("aria-expanded", "false");
+        if (ui.menu && ui.menu.button) ui.menu.button.setAttribute("aria-expanded", "false");
         els.menu.hidden = true;
         els.picker.hidden = true;
         els.composer.querySelector("[data-emoji-pop]").hidden = true;
@@ -1849,6 +1861,31 @@
             el.classList.remove("is-touched");
         });
         ui.menu = null;
+    }
+
+    /* A menu on a row or a message moves with it while its list scrolls, and closes once it scrolls away */
+    function followAnchor() {
+        var button = ui.menu && ui.menu.button;
+        var pop = !els.menu.hidden ? els.menu : !els.picker.hidden ? els.picker : null;
+        var scroller = button && button.closest("[data-log], [data-list]");
+        if (!pop || !scroller) return;
+        var box = button.getBoundingClientRect();
+        var view = scroller.getBoundingClientRect();
+        if (box.bottom < view.top || box.top > view.bottom) closePopovers();
+        else place(pop, button);
+    }
+
+    /* A re-render swaps the menu's button for a copy: the menu moves onto the copy, or closes */
+    function reanchor() {
+        if (!ui.menu || document.body.contains(ui.menu.button)) return;
+        var twin = ui.menu.from && els.panel.querySelector(ui.menu.from);
+        if (!twin) {
+            closePopovers();
+            return;
+        }
+        ui.menu.button = twin;
+        twin.setAttribute("aria-expanded", "true");
+        followAnchor();
     }
 
     function place(pop, button) {
@@ -1941,7 +1978,14 @@
     function onClick(e) {
         var t = e.target.closest("[data-act], [data-open-convo], [data-filter], [data-start-person], [data-start-job]");
         if (!t || !els.root.contains(t)) {
+            var row = !finePointer() && !e.target.closest("button, a") ? e.target.closest("[data-log] .rp-dm") : null;
+            var touched = !!row && row.classList.contains("is-touched");
             if (!e.target.closest("[data-menu], [data-picker], [data-emoji-pop], [data-mentions]")) closePopovers();
+            /* Touch: a tap on a bubble shows its actions, as a hover does with a mouse */
+            if (row) {
+                placeTools(row);
+                row.classList.toggle("is-touched", !touched);
+            }
             return;
         }
 
@@ -2105,6 +2149,7 @@
                 closePopovers();
                 if (same) break;
                 ui.menu = { button: t, target: { message: m.id }, from: pathOf(t) };
+                t.setAttribute("aria-expanded", "true");
                 place(els.picker, t);
                 els.picker.querySelector("button").focus({ preventScroll: true });
                 break;
@@ -2323,20 +2368,17 @@
             addFiles(e.dataTransfer.files);
         });
 
-        /* Touch: a tap on a bubble shows its actions, as a hover does with a mouse */
-        els.log.addEventListener("click", function (e) {
-            if (finePointer()) return;
-            var row = e.target.closest(".rp-dm");
-            if (!row || e.target.closest("button, a")) return;
-            var on = !row.classList.contains("is-touched");
-            closePopovers();
-            row.classList.toggle("is-touched", on);
-        });
-
         els.log.addEventListener(
             "scroll",
             function () {
-                closePopovers();
+                followAnchor();
+                var hovered = els.log.querySelector(".rp-dm:hover");
+                if (hovered) placeTools(hovered);
+                if (!ui.menu) {
+                    els.log.querySelectorAll(".rp-dm.is-touched").forEach(function (el) {
+                        el.classList.remove("is-touched");
+                    });
+                }
                 if (nearBottom()) {
                     var jump = els.panel.querySelector('[data-act="jump-latest"]');
                     jump.hidden = true;
@@ -2349,7 +2391,20 @@
             { passive: true }
         );
 
+        els.list.addEventListener("scroll", followAnchor, { passive: true });
+
+        ["mouseover", "focusin"].forEach(function (type) {
+            els.log.addEventListener(type, function (e) {
+                var row = e.target.closest(".rp-dm");
+                if (row) placeTools(row);
+            });
+        });
+
+        /* Phones fire resize as their toolbars and keyboard move; only a new width changes the layout */
+        var width = global.innerWidth;
         global.addEventListener("resize", function () {
+            if (global.innerWidth === width) return;
+            width = global.innerWidth;
             closePopovers();
             if (!ui.open) return;
             syncLayout();
