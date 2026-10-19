@@ -1,0 +1,2613 @@
+/* ============================================================
+   BLOCKS: rp-messenger, rp-convo, rp-thread, rp-dm, rp-composer,
+           rp-face, rp-voice-note, rp-peek
+   The chat bubble at the bottom-right and the panel above it
+   (messenger.js). Bubbles, day pills, files and voice notes are
+   the job page's chat (job.css) rebuilt here, so the two read as
+   one. Pages keep room under their content for the bubble.
+   ============================================================ */
+.rp-messenger {
+    --msgr-gap: 24px;
+    --msgr-launcher: 52px;
+    --msgr-online: #10a37f;
+    --msgr-away: #e08a1e;
+    --warn-ink: #b45309;
+    --warn-bg: #fffaeb;
+    --warn-border: #f3dfae;
+    --bad-ink: #b91c1c;
+    --bad-bg: #fef2f2;
+    --bad-border: #f5d0d0;
+
+    position: fixed;
+    right: var(--msgr-gap);
+    bottom: var(--msgr-gap);
+    /* Over the page, under the topbar (900), so its menus open on top */
+    z-index: 890;
+    font-family: var(--font-body);
+    color: var(--color-text-primary);
+}
+
+/* ── Room under every page, so the bubble never sits on its pagination ── */
+body.rp-has-messenger .rp-page {
+    padding-bottom: 92px;
+}
+
+body.rp-has-messenger .rp-toast-stack {
+    bottom: 92px;
+}
+
+/* An open panel owns the corner: toasts line up beside it, not over its composer */
+@media (min-width: 601px) {
+    body.rp-messenger-open .rp-toast-stack {
+        right: min(440px, calc(100vw - 280px));
+    }
+
+    body.rp-messenger-open.rp-messenger-wide .rp-toast-stack {
+        right: min(820px, calc(100vw - 280px));
+    }
+}
+
+/* Another overlay owns the screen (the phone menu, a modal): the bubble steps aside */
+body.rp-no-scroll:not(.rp-messenger-open) .rp-messenger {
+    display: none;
+}
+
+/* ── The bubble ───────────────────────────────────────────── */
+.rp-messenger__launcher {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: var(--msgr-launcher);
+    height: var(--msgr-launcher);
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-full);
+    background: var(--color-brand-navy);
+    box-shadow: 0 10px 24px rgba(12, 37, 63, 0.28), 0 2px 6px rgba(12, 37, 63, 0.18);
+    color: var(--color-surface-white);
+    cursor: pointer;
+    transition:
+        background var(--transition-fast),
+        box-shadow var(--transition-fast),
+        transform var(--transition-fast);
+}
+
+.rp-messenger__launcher:hover {
+    background: var(--color-brand-navy-hover);
+    box-shadow: 0 14px 30px rgba(12, 37, 63, 0.32), 0 3px 8px rgba(12, 37, 63, 0.2);
+    transform: translateY(-2px);
+}
+
+.rp-messenger__launcher:active {
+    transform: scale(0.96);
+}
+
+.rp-messenger__launcher:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-navy), 0 10px 24px rgba(12, 37, 63, 0.28);
+}
+
+.rp-messenger__launcher-icon {
+    grid-area: 1 / 1;
+    display: grid;
+    place-items: center;
+    transition:
+        opacity 0.2s ease,
+        transform 0.25s ease;
+}
+
+.rp-messenger__launcher-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* The chat mark turns into a chevron while the panel is open */
+.rp-messenger__launcher-icon--close {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.6);
+}
+
+.rp-messenger.is-open .rp-messenger__launcher-icon--chat {
+    opacity: 0;
+    transform: rotate(90deg) scale(0.6);
+}
+
+.rp-messenger.is-open .rp-messenger__launcher-icon--close {
+    opacity: 1;
+    transform: none;
+}
+
+.rp-messenger__badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 21px;
+    height: 21px;
+    padding: 0 6px;
+    border: 2px solid var(--color-surface-white);
+    border-radius: var(--radius-full);
+    background: var(--color-status-notification);
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--color-surface-white);
+}
+
+.rp-messenger__badge[hidden],
+.rp-messenger.is-open .rp-messenger__badge {
+    display: none;
+}
+
+/* A message arriving nudges the bubble */
+.rp-messenger__launcher.is-ringing {
+    animation: rp-msgr-nudge 0.8s ease;
+}
+
+.rp-messenger__launcher.is-ringing .rp-messenger__badge {
+    animation: rp-msgr-pop 0.45s ease;
+}
+
+@keyframes rp-msgr-nudge {
+    0%,
+    100% {
+        transform: none;
+    }
+
+    20% {
+        transform: translateY(-5px) rotate(-6deg);
+    }
+
+    45% {
+        transform: translateY(0) rotate(5deg);
+    }
+
+    70% {
+        transform: rotate(-2deg);
+    }
+}
+
+@keyframes rp-msgr-pop {
+    40% {
+        transform: scale(1.3);
+    }
+}
+
+/* ── The panel ────────────────────────────────────────────── */
+.rp-messenger__panel {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 14px);
+    display: flex;
+    width: 400px;
+    /* Short screens: stops 16px under the topbar (90px of bubble below, 16px above) */
+    height: min(640px, calc(100vh - var(--layout-cu_topbar-height) - 106px));
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface-white);
+    box-shadow: var(--shadow-lg);
+    transform-origin: bottom right;
+    animation: rp-msgr-in 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition: width var(--transition-base);
+}
+
+.rp-messenger__panel[hidden] {
+    display: none;
+}
+
+.rp-messenger__panel:focus {
+    outline: none;
+}
+
+.rp-messenger__panel.is-expanded {
+    width: min(780px, calc(100vw - 48px));
+}
+
+@keyframes rp-msgr-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.97);
+    }
+}
+
+.rp-messenger__pane {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+}
+
+.rp-messenger__pane--list {
+    flex: 1 1 auto;
+}
+
+.rp-messenger__pane--thread {
+    display: none;
+    flex: 1 1 auto;
+}
+
+/* One at a time: the conversation slides over the list */
+.rp-messenger__panel.is-thread .rp-messenger__pane--list {
+    display: none;
+}
+
+.rp-messenger__panel.is-thread .rp-messenger__pane--thread {
+    display: flex;
+    animation: rp-msgr-slide 0.22s ease;
+}
+
+@keyframes rp-msgr-slide {
+    from {
+        opacity: 0.4;
+        transform: translateX(24px);
+    }
+}
+
+/* Expanded: the list and the conversation side by side */
+.rp-messenger__panel.is-expanded .rp-messenger__pane--list {
+    flex: 0 0 300px;
+    border-right: 1px solid var(--color-border);
+}
+
+.rp-messenger__panel.is-expanded .rp-messenger__pane--thread {
+    display: flex;
+}
+
+.rp-messenger__panel.is-expanded .rp-thread__back,
+.rp-messenger__panel.is-expanded .rp-thread__close {
+    display: none;
+}
+
+/* ── Header ───────────────────────────────────────────────── */
+.rp-messenger__head {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 58px;
+    padding: 10px 10px 10px 18px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.rp-messenger__head[hidden],
+.rp-messenger__toolbar[hidden],
+.rp-messenger__filter[hidden] {
+    display: none;
+}
+
+.rp-messenger__head--sub {
+    justify-content: flex-start;
+    gap: 4px;
+    padding-left: 8px;
+}
+
+.rp-messenger__title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--color-text-primary);
+}
+
+.rp-messenger__tools,
+.rp-thread__tools {
+    display: flex;
+    flex: 0 0 auto;
+    gap: 2px;
+}
+
+.rp-messenger__iconbtn {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-xs);
+    background: none;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+        background var(--transition-fast),
+        color var(--transition-fast);
+}
+
+.rp-messenger__iconbtn svg {
+    width: 18px;
+    height: 18px;
+}
+
+.rp-messenger__iconbtn:hover {
+    background: var(--color-surface-subtle);
+    color: var(--color-text-primary);
+}
+
+.rp-messenger__iconbtn:focus-visible,
+.rp-messenger__textbtn:focus-visible,
+.rp-convo__open:focus-visible,
+.rp-convo__more:focus-visible,
+.rp-thread__context:focus-visible,
+.rp-dm__tool:focus-visible,
+.rp-dm__reaction:focus-visible,
+.rp-dm__quote:focus-visible,
+.rp-dm__file-get:focus-visible,
+.rp-composer__btn:focus-visible,
+.rp-composer__send:focus-visible,
+.rp-composer__x:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-navy);
+}
+
+/* ── Search and filters ───────────────────────────────────── */
+.rp-messenger__toolbar {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px 14px 10px;
+}
+
+.rp-messenger__search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 38px;
+    padding: 0 6px 0 12px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: var(--color-surface-inset);
+    color: var(--color-text-secondary);
+    cursor: text;
+    transition:
+        background var(--transition-fast),
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast);
+}
+
+.rp-messenger__search > svg {
+    width: 16px;
+    height: 16px;
+}
+
+.rp-messenger__search:focus-within {
+    border-color: var(--gold-border);
+    background: var(--color-surface-white);
+    box-shadow: var(--focus-ring-gold);
+}
+
+.rp-messenger__search input {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 100%;
+    border: 0;
+    background: transparent;
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    color: var(--color-text-primary);
+    outline: none;
+}
+
+.rp-messenger__search input::placeholder {
+    color: var(--color-text-placeholder);
+}
+
+.rp-messenger__search input::-webkit-search-cancel-button {
+    display: none;
+}
+
+.rp-messenger__search-x {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-full);
+    background: none;
+    color: var(--color-status-danger);
+    cursor: pointer;
+}
+
+.rp-messenger__search-x[hidden] {
+    display: none;
+}
+
+.rp-messenger__search-x:hover {
+    background: var(--color-status-danger-bg);
+}
+
+.rp-messenger__search-x svg {
+    width: 14px;
+    height: 14px;
+}
+
+.rp-messenger__filter {
+    align-self: flex-start;
+}
+
+.rp-messenger__filter .rp-segment-count[hidden] {
+    display: none;
+}
+
+/* ── The conversation list ────────────────────────────────── */
+.rp-messenger__scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 0 6px 10px;
+}
+
+.rp-messenger__label {
+    margin: 8px 12px 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+}
+
+.rp-convos {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.rp-convo {
+    position: relative;
+    border-radius: 10px;
+    transition: background var(--transition-fast);
+}
+
+.rp-convo:hover,
+.rp-convo:focus-within {
+    background: var(--color-surface-inset);
+}
+
+/* The open conversation, beside the list once expanded */
+.rp-convo.is-active {
+    background: var(--color-surface-subtle);
+    box-shadow: inset 3px 0 0 var(--color-brand-navy);
+}
+
+.rp-convo__open {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr);
+    align-items: center;
+    column-gap: 12px;
+    width: 100%;
+    padding: 10px 12px;
+    border: 0;
+    border-radius: inherit;
+    background: none;
+    font: inherit;
+    text-align: left;
+    color: inherit;
+    cursor: pointer;
+}
+
+.rp-convo__main {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.rp-convo__line {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    min-width: 0;
+}
+
+.rp-convo__name {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.35;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--color-text-primary);
+}
+
+.rp-convo__about {
+    margin-left: 6px;
+    font-weight: 400;
+    color: var(--color-text-secondary);
+}
+
+.rp-convo__time {
+    flex: 0 0 auto;
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    font-variant-numeric: tabular-nums;
+    transition: opacity var(--transition-fast);
+}
+
+.rp-convo__preview {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    font-size: 13px;
+    line-height: 1.4;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--color-text-secondary);
+}
+
+.rp-convo.is-unread .rp-convo__name {
+    font-weight: 600;
+}
+
+.rp-convo.is-unread .rp-convo__time {
+    font-weight: 600;
+    color: var(--color-brand-navy);
+}
+
+.rp-convo.is-unread .rp-convo__preview {
+    color: var(--color-text-primary);
+}
+
+.rp-convo__typing {
+    font-style: italic;
+    color: var(--color-brand-navy);
+}
+
+.rp-convo__draft {
+    font-weight: 600;
+    color: var(--color-status-danger);
+}
+
+.rp-convo__empty {
+    font-style: italic;
+}
+
+.rp-convo__marks {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    align-self: center;
+}
+
+.rp-convo__mark {
+    display: inline-flex;
+    color: var(--color-text-secondary);
+}
+
+.rp-convo__mark svg {
+    width: 14px;
+    height: 14px;
+}
+
+.rp-convo__count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: var(--radius-full);
+    background: var(--color-brand-navy);
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--color-surface-white);
+}
+
+/* Muted: still counted, quietly */
+.rp-convo.is-muted .rp-convo__count {
+    background: #a1a1aa;
+}
+
+.rp-convo__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-brand-navy);
+}
+
+.rp-convo__at {
+    display: inline-grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--color-surface-subtle);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-brand-navy);
+}
+
+/* ⋯ takes the time's place on hover */
+.rp-convo__more {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xs);
+    background: var(--color-surface-white);
+    color: var(--color-text-secondary);
+    opacity: 0;
+    cursor: pointer;
+    transition: opacity var(--transition-fast);
+}
+
+.rp-convo__more svg {
+    width: 16px;
+    height: 16px;
+}
+
+.rp-convo:hover .rp-convo__more,
+.rp-convo__more:focus-visible,
+.rp-convo__more[aria-expanded="true"] {
+    opacity: 1;
+}
+
+.rp-convo:hover .rp-convo__time {
+    opacity: 0;
+}
+
+.rp-messenger__archived {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: calc(100% - 12px);
+    margin: 10px 6px 4px;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-surface-white);
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    font-weight: 500;
+    text-align: left;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.rp-messenger__archived:hover {
+    background: var(--color-surface-inset);
+}
+
+.rp-messenger__archived svg {
+    width: 16px;
+    height: 16px;
+    color: var(--color-text-secondary);
+}
+
+.rp-messenger__archived > span:first-of-type {
+    flex: 1 1 auto;
+}
+
+.rp-messenger__archived-count {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+}
+
+/* ── Nothing to show ──────────────────────────────────────── */
+.rp-messenger__empty,
+.rp-thread__none {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 48px 24px;
+    text-align: center;
+}
+
+.rp-thread__none {
+    flex: 1 1 auto;
+    background: var(--color-surface-inset);
+}
+
+.rp-thread__none[hidden] {
+    display: none;
+}
+
+.rp-messenger__empty-icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 4px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-subtle);
+    color: var(--color-brand-navy);
+}
+
+.rp-messenger__empty-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.rp-messenger__empty-title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.rp-messenger__textbtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: var(--radius-xs);
+    background: none;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-brand-navy);
+    cursor: pointer;
+}
+
+.rp-messenger__textbtn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.rp-messenger__textbtn:hover {
+    background: var(--color-surface-subtle);
+}
+
+/* ── Avatars ──────────────────────────────────────────────── */
+.rp-face {
+    position: relative;
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-subtle);
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    color: var(--color-brand-navy);
+}
+
+.rp-face--xs {
+    width: 22px;
+    height: 22px;
+    font-size: 9.5px;
+}
+
+.rp-face--sm {
+    width: 28px;
+    height: 28px;
+    font-size: 11px;
+}
+
+.rp-face--md {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+}
+
+.rp-face--lg {
+    width: 56px;
+    height: 56px;
+    font-size: 18px;
+}
+
+/* A job is a rounded square, so it never reads as a person */
+.rp-face--job,
+.rp-face--group {
+    border-radius: 12px;
+}
+
+.rp-face--job svg,
+.rp-face--group svg {
+    width: 50%;
+    height: 50%;
+}
+
+.rp-face--group {
+    background: var(--color-surface-gold-pale);
+}
+
+.rp-face__dot {
+    display: none;
+    position: absolute;
+    right: -1px;
+    bottom: -1px;
+    width: 12px;
+    height: 12px;
+    border: 2px solid var(--color-surface-white);
+    border-radius: 50%;
+    background: var(--msgr-online);
+}
+
+.rp-face--online .rp-face__dot,
+.rp-face--away .rp-face__dot {
+    display: block;
+}
+
+.rp-face--away .rp-face__dot {
+    background: var(--msgr-away);
+}
+
+.rp-face--xs .rp-face__dot,
+.rp-face--sm .rp-face__dot {
+    width: 9px;
+    height: 9px;
+    border-width: 1.5px;
+}
+
+/* ── One conversation ─────────────────────────────────────── */
+.rp-thread {
+    position: relative;
+    display: grid;
+    flex: 1 1 auto;
+    grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+    min-height: 0;
+}
+
+.rp-thread[hidden] {
+    display: none;
+}
+
+.rp-thread__head {
+    grid-row: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 58px;
+    padding: 9px 10px 9px 8px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.rp-messenger__panel.is-expanded .rp-thread__head {
+    padding-left: 16px;
+}
+
+.rp-thread__who {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.rp-thread__name {
+    margin: 0;
+    overflow: hidden;
+    font-size: 14.5px;
+    font-weight: 600;
+    line-height: 1.3;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--color-text-primary);
+}
+
+.rp-thread__job {
+    border-radius: 4px;
+    cursor: default;
+}
+
+.rp-thread__job:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-navy);
+}
+
+/* The job's name, on hover or focus of its number; the sidebar tooltip's look */
+.rp-thread__tip {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 7;
+    width: max-content;
+    max-width: 280px;
+    padding: 6px 10px;
+    border: 1px solid var(--color-brand-navy-hover);
+    border-radius: 7px;
+    background: var(--color-brand-navy);
+    box-shadow: var(--shadow-sm);
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+    line-height: 1.4;
+    color: var(--color-text-inverse);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+        opacity var(--transition-fast),
+        visibility var(--transition-fast);
+}
+
+.rp-thread__who:has(.rp-thread__job:hover, .rp-thread__job:focus-visible) .rp-thread__tip {
+    opacity: 1;
+    visibility: visible;
+}
+
+.rp-thread__status {
+    margin: 2px 0 0;
+    overflow: hidden;
+    font-size: 12px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--color-text-secondary);
+}
+
+.rp-thread__status.is-online::before {
+    content: "";
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin: 0 5px 1px 0;
+    border-radius: 50%;
+    background: var(--msgr-online);
+}
+
+.rp-thread__typing-label {
+    font-style: italic;
+    color: var(--color-brand-navy);
+}
+
+/* A job's chat names the job and its deadline, one click from the job page */
+.rp-thread__context-wrap {
+    grid-row: 2;
+}
+
+.rp-thread__context {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px 8px 16px;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-surface-white);
+    font-size: 12.5px;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: background var(--transition-fast);
+}
+
+.rp-thread__context:hover {
+    background: var(--color-surface-inset);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+}
+
+.rp-thread__context-text {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.rp-thread__context-text strong {
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.rp-thread__chip {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
+    padding: 0 8px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    background: var(--color-surface-white);
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+}
+
+.rp-thread__chip--warn {
+    border-color: var(--warn-border);
+    background: var(--warn-bg);
+    color: var(--warn-ink);
+}
+
+.rp-thread__chip--bad {
+    border-color: var(--bad-border);
+    background: var(--bad-bg);
+    color: var(--bad-ink);
+}
+
+.rp-thread__context-go {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-brand-navy);
+}
+
+.rp-thread__context-go svg {
+    width: 14px;
+    height: 14px;
+}
+
+.rp-thread__log {
+    grid-row: 3;
+    grid-column: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 16px 14px 12px;
+    background: var(--color-surface-inset);
+}
+
+.rp-thread__log:focus-visible {
+    outline: 2px solid var(--color-brand-navy);
+    outline-offset: -2px;
+}
+
+.rp-thread__day {
+    display: flex;
+    justify-content: center;
+    margin: 12px 0 6px;
+}
+
+.rp-thread__day:first-child {
+    margin-top: 0;
+}
+
+.rp-thread__day span,
+.rp-thread__new span {
+    padding: 2px 10px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    background: var(--color-surface-white);
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+}
+
+/* Where the unread messages start, the first time a conversation is opened again */
+.rp-thread__new {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 12px 0 4px;
+}
+
+.rp-thread__new::before,
+.rp-thread__new::after {
+    content: "";
+    flex: 1 1 auto;
+    height: 1px;
+    background: rgba(11, 38, 62, 0.35);
+}
+
+.rp-thread__new span {
+    border-color: rgba(11, 38, 62, 0.35);
+    font-weight: 600;
+    color: var(--color-brand-navy);
+}
+
+.rp-thread__system {
+    align-self: center;
+    max-width: 85%;
+    margin: 8px 0 4px;
+    font-size: 12px;
+    line-height: 1.45;
+    text-align: center;
+    color: var(--color-text-secondary);
+}
+
+.rp-thread__hello {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin: auto;
+    padding: 24px;
+    text-align: center;
+}
+
+.rp-thread__hello-title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.rp-thread__typing {
+    grid-row: 4;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 2px 14px 8px;
+    background: var(--color-surface-inset);
+    font-size: 12px;
+    color: var(--color-text-secondary);
+}
+
+.rp-thread__typing[hidden] {
+    display: none;
+}
+
+.rp-thread__dots {
+    display: inline-flex;
+    gap: 3px;
+    padding: 7px 9px;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    background: var(--color-surface-white);
+}
+
+.rp-thread__dots i {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #a1a1aa;
+    animation: rp-msgr-typing 1.2s ease-in-out infinite;
+}
+
+.rp-thread__dots i:nth-child(2) {
+    animation-delay: 0.15s;
+}
+
+.rp-thread__dots i:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+@keyframes rp-msgr-typing {
+    0%,
+    60%,
+    100% {
+        opacity: 0.45;
+        transform: none;
+    }
+
+    30% {
+        opacity: 1;
+        transform: translateY(-3px);
+    }
+}
+
+/* Over the bottom of the messages, wherever the composer ends */
+.rp-thread__jump {
+    position: relative;
+    z-index: 2;
+    grid-row: 3;
+    grid-column: 1;
+    align-self: end;
+    justify-self: end;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    margin: 0 14px 12px 0;
+    padding: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    background: var(--color-surface-white);
+    box-shadow: var(--shadow-md);
+    color: var(--color-brand-navy);
+    cursor: pointer;
+}
+
+.rp-thread__jump[hidden] {
+    display: none;
+}
+
+.rp-thread__jump svg {
+    width: 18px;
+    height: 18px;
+}
+
+.rp-thread__jump span {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: var(--radius-full);
+    background: var(--color-brand-navy);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 18px;
+    color: var(--color-surface-white);
+}
+
+.rp-thread__jump span[hidden] {
+    display: none;
+}
+
+.rp-thread__drop {
+    z-index: 5;
+    grid-row: 3 / -1;
+    grid-column: 1;
+    display: grid;
+    place-items: center;
+    margin: 8px;
+    border: 2px dashed var(--color-brand-navy);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.94);
+    pointer-events: none;
+}
+
+.rp-thread__drop[hidden] {
+    display: none;
+}
+
+.rp-thread__drop span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-brand-navy);
+}
+
+.rp-thread__drop svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* ── A message ────────────────────────────────────────────── */
+.rp-dm {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    max-width: 86%;
+    margin-top: 3px;
+}
+
+.rp-dm.is-first {
+    margin-top: 12px;
+}
+
+.rp-dm--them {
+    align-self: flex-start;
+}
+
+.rp-dm--me {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.rp-dm .rp-face--sm,
+.rp-dm__spacer {
+    flex: 0 0 28px;
+}
+
+.rp-dm .rp-face--sm {
+    margin-bottom: 19px;
+}
+
+.rp-dm__body {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0;
+}
+
+.rp-dm--me .rp-dm__body {
+    align-items: flex-end;
+}
+
+.rp-dm__author {
+    margin: 0 0 3px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+}
+
+/* The job page's bubbles: theirs white with a hairline, yours navy */
+.rp-dm__bubble {
+    position: relative;
+    max-width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 16px 16px 16px 6px;
+    background: var(--color-surface-white);
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--color-text-primary);
+    overflow-wrap: anywhere;
+}
+
+.rp-dm--them:not(.is-first) .rp-dm__bubble {
+    border-top-left-radius: 6px;
+}
+
+.rp-dm--me .rp-dm__bubble {
+    border-color: var(--color-brand-navy);
+    border-radius: 16px 16px 6px 16px;
+    background: var(--color-brand-navy);
+    color: var(--color-surface-white);
+}
+
+.rp-dm--me:not(.is-first) .rp-dm__bubble {
+    border-top-right-radius: 6px;
+}
+
+/* A message that names you gets a pale gold wash */
+.rp-dm.is-mention .rp-dm__bubble {
+    border-color: var(--gold-border);
+    background: var(--color-surface-gold-pale);
+}
+
+.rp-dm.is-deleted .rp-dm__bubble {
+    border: 1px dashed var(--color-border);
+    background: transparent;
+    color: var(--color-text-secondary);
+}
+
+.rp-dm__deleted {
+    font-size: 13px;
+}
+
+.rp-dm__text {
+    display: block;
+    white-space: pre-wrap;
+}
+
+.rp-dm__text a {
+    color: var(--color-link);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.rp-dm--me .rp-dm__text a {
+    color: var(--color-surface-white);
+}
+
+.rp-dm__mention {
+    font-weight: 600;
+    color: var(--color-brand-navy);
+}
+
+.rp-dm__mention--me {
+    padding: 0 2px;
+    border-radius: 4px;
+    background: rgba(149, 128, 73, 0.2);
+}
+
+.rp-dm--me .rp-dm__mention {
+    color: var(--color-surface-white);
+}
+
+/* Replying: the message answered, inside the bubble; a click scrolls to it */
+.rp-dm__quote {
+    display: block;
+    width: 100%;
+    max-width: 280px;
+    margin: 2px 0 6px;
+    padding: 6px 10px;
+    border: 0;
+    border-left: 3px solid var(--color-brand-navy);
+    border-radius: 8px;
+    background: var(--color-surface-inset);
+    font: inherit;
+    text-align: left;
+    color: inherit;
+    cursor: pointer;
+}
+
+.rp-dm__quote strong {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-brand-navy);
+}
+
+.rp-dm__quote span {
+    display: block;
+    overflow: hidden;
+    font-size: 12.5px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--color-text-secondary);
+}
+
+.rp-dm--me .rp-dm__quote {
+    border-left-color: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.rp-dm--me .rp-dm__quote strong {
+    color: var(--color-surface-white);
+}
+
+.rp-dm--me .rp-dm__quote span {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+/* Files */
+.rp-dm__files {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.rp-dm__bubble > .rp-dm__files:first-child {
+    margin-top: 0;
+}
+
+.rp-dm__file {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 220px;
+    padding: 7px 6px 7px 8px;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-surface-inset);
+}
+
+.rp-dm__file-icon {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--color-surface-white);
+    color: var(--color-brand-navy);
+}
+
+.rp-dm__file-icon svg {
+    width: 17px;
+    height: 17px;
+}
+
+.rp-dm__file-text {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.rp-dm__file-name {
+    overflow: hidden;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.rp-dm__file-size {
+    font-size: 11.5px;
+    color: var(--color-text-secondary);
+}
+
+.rp-dm__file-get {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-xs);
+    background: none;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+}
+
+.rp-dm__file-get svg {
+    width: 16px;
+    height: 16px;
+}
+
+.rp-dm__file-get:hover {
+    background: var(--color-surface-subtle);
+    color: var(--color-brand-navy);
+}
+
+.rp-dm--me .rp-dm__file {
+    border-color: rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.rp-dm--me .rp-dm__file-icon {
+    background: rgba(255, 255, 255, 0.14);
+    color: var(--color-surface-white);
+}
+
+.rp-dm--me .rp-dm__file-size,
+.rp-dm--me .rp-dm__file-get {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.rp-dm--me .rp-dm__file-get:hover {
+    background: rgba(255, 255, 255, 0.14);
+    color: var(--color-surface-white);
+}
+
+.rp-dm__image {
+    display: block;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: zoom-in;
+}
+
+.rp-dm__image img {
+    display: block;
+    max-width: 240px;
+    max-height: 200px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+/* Voice notes: a played layer over the bars fills as it plays */
+.rp-voice-note {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 210px;
+    padding: 2px 0;
+}
+
+.rp-voice-note__play {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--color-brand-navy);
+    color: var(--color-surface-white);
+    cursor: pointer;
+}
+
+.rp-voice-note__play svg {
+    width: 13px;
+    height: 13px;
+}
+
+.rp-voice-note__wave {
+    position: relative;
+    flex: 1 1 auto;
+    height: 26px;
+}
+
+.rp-voice-note__bars {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    color: #c9c4b5;
+}
+
+.rp-voice-note__bars i {
+    flex: 1 1 0;
+    max-width: 3px;
+    border-radius: 2px;
+    background: currentColor;
+}
+
+.rp-voice-note__bars--played {
+    color: var(--color-brand-navy);
+    clip-path: inset(0 100% 0 0);
+}
+
+.rp-voice-note.is-playing .rp-voice-note__bars--played {
+    animation: rp-msgr-played var(--voice-length, 10s) linear forwards;
+}
+
+@keyframes rp-msgr-played {
+    to {
+        clip-path: inset(0 0 0 0);
+    }
+}
+
+.rp-voice-note__time {
+    flex: 0 0 auto;
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-dm--me .rp-voice-note__play {
+    background: var(--color-surface-white);
+    color: var(--color-brand-navy);
+}
+
+.rp-dm--me .rp-voice-note__bars {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.rp-dm--me .rp-voice-note__bars--played {
+    color: var(--color-surface-white);
+}
+
+.rp-dm--me .rp-voice-note__time {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+/* Reactions sit on the bubble's bottom edge */
+.rp-dm__reactions {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: -6px;
+    padding: 0 8px;
+}
+
+.rp-dm__reaction {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    height: 22px;
+    padding: 0 7px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    background: var(--color-surface-white);
+    box-shadow: var(--shadow-sm);
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+    transition: border-color var(--transition-fast);
+}
+
+.rp-dm__reaction span {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+}
+
+.rp-dm__reaction:hover {
+    border-color: rgba(11, 38, 62, 0.35);
+}
+
+.rp-dm__reaction.is-mine {
+    border-color: rgba(11, 38, 62, 0.35);
+    background: #eef2f6;
+}
+
+.rp-dm__reaction.is-mine span {
+    color: var(--color-brand-navy);
+}
+
+.rp-dm__meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin: 4px 6px 0;
+    font-size: 11.5px;
+    color: var(--color-text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-dm__status {
+    display: inline-flex;
+}
+
+.rp-dm__status svg {
+    width: 14px;
+    height: 14px;
+}
+
+.rp-dm__status--sending {
+    opacity: 0.6;
+}
+
+.rp-dm__status--read {
+    color: var(--color-link);
+}
+
+/* Hover (or a tap on touch): react, reply, more. Sits on the bubble's top edge, clear of its text */
+.rp-dm__tools {
+    position: absolute;
+    bottom: calc(100% - 8px);
+    z-index: 3;
+    display: flex;
+    gap: 1px;
+    padding: 2px;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-surface-white);
+    box-shadow: var(--shadow-md);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(4px);
+    transition:
+        opacity var(--transition-fast),
+        transform var(--transition-fast);
+}
+
+.rp-dm--them .rp-dm__tools {
+    right: -8px;
+}
+
+.rp-dm--me .rp-dm__tools {
+    left: -8px;
+}
+
+.rp-dm:hover .rp-dm__tools,
+.rp-dm:focus-within .rp-dm__tools,
+.rp-dm.is-touched .rp-dm__tools {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+}
+
+.rp-dm__tool {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    border-radius: 7px;
+    background: none;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+}
+
+.rp-dm__tool svg {
+    width: 16px;
+    height: 16px;
+}
+
+.rp-dm__tool:hover {
+    background: var(--color-surface-subtle);
+    color: var(--color-text-primary);
+}
+
+.rp-dm.is-flash .rp-dm__bubble {
+    animation: rp-msgr-flash 1.6s ease;
+}
+
+@keyframes rp-msgr-flash {
+    0%,
+    40% {
+        box-shadow: 0 0 0 4px rgba(149, 128, 73, 0.35);
+    }
+
+    100% {
+        box-shadow: 0 0 0 4px rgba(149, 128, 73, 0);
+    }
+}
+
+/* ── Composer ─────────────────────────────────────────────── */
+.rp-composer {
+    position: relative;
+    grid-row: 5;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 12px 12px;
+    border-top: 1px solid var(--color-border);
+    background: var(--color-surface-white);
+}
+
+.rp-composer__context {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 6px 6px 10px;
+    border-left: 3px solid var(--color-brand-navy);
+    border-radius: 8px;
+    background: var(--color-surface-inset);
+}
+
+.rp-composer__context[data-kind="edit"] {
+    border-left-color: var(--color-brand-gold);
+}
+
+.rp-composer__context[hidden],
+.rp-composer__files[hidden],
+.rp-composer__row[hidden],
+.rp-composer__record[hidden],
+.rp-composer__pop[hidden] {
+    display: none;
+}
+
+.rp-composer__context-icon {
+    display: inline-flex;
+    color: var(--color-brand-navy);
+}
+
+.rp-composer__context-icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+.rp-composer__context-text {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.rp-composer__context-text strong {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-brand-navy);
+}
+
+.rp-composer__context-text span {
+    overflow: hidden;
+    font-size: 12.5px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--color-text-secondary);
+}
+
+/* Clear / remove controls are red */
+.rp-composer__x {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-full);
+    background: none;
+    color: var(--color-status-danger);
+    cursor: pointer;
+}
+
+.rp-composer__x svg {
+    width: 14px;
+    height: 14px;
+}
+
+.rp-composer__x:hover {
+    background: var(--color-status-danger-bg);
+}
+
+.rp-composer__files {
+    display: flex;
+    gap: 8px;
+    margin: 0;
+    padding: 0 0 2px;
+    overflow-x: auto;
+    list-style: none;
+}
+
+.rp-composer__file {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 220px;
+    padding: 5px 4px 5px 6px;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-surface-white);
+}
+
+.rp-composer__file img,
+.rp-composer__file-icon {
+    flex: 0 0 auto;
+    width: 32px;
+    height: 32px;
+    border-radius: 7px;
+    object-fit: cover;
+}
+
+.rp-composer__file-icon {
+    display: grid;
+    place-items: center;
+    background: var(--color-surface-subtle);
+    color: var(--color-brand-navy);
+}
+
+.rp-composer__file-icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+.rp-composer__file-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.rp-composer__file-text span {
+    overflow: hidden;
+    font-size: 12.5px;
+    font-weight: 500;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.rp-composer__file-text small {
+    font-size: 11px;
+    color: var(--color-text-secondary);
+}
+
+.rp-composer__row,
+.rp-composer__record {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+.rp-composer__record {
+    align-items: center;
+    min-height: 40px;
+}
+
+.rp-composer__btn {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 40px;
+    padding: 0;
+    border: 0;
+    border-radius: 10px;
+    background: none;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition:
+        background var(--transition-fast),
+        color var(--transition-fast);
+}
+
+.rp-composer__btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.rp-composer__btn:hover,
+.rp-composer__btn[aria-expanded="true"] {
+    background: var(--color-surface-subtle);
+    color: var(--color-brand-navy);
+}
+
+.rp-composer__btn--danger {
+    color: var(--color-status-danger);
+}
+
+.rp-composer__btn--danger:hover {
+    background: var(--color-status-danger-bg);
+    color: var(--color-status-danger);
+}
+
+.rp-composer__field {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.rp-composer__btn--inner {
+    position: absolute;
+    right: 4px;
+    bottom: 4px;
+    width: 32px;
+    height: 32px;
+}
+
+.rp-composer__btn--inner svg {
+    width: 18px;
+    height: 18px;
+}
+
+.rp-composer__input {
+    display: block;
+    width: 100%;
+    min-height: 40px;
+    max-height: 132px;
+    padding: 10px 40px 10px 12px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    background: var(--color-surface-inset);
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--color-text-primary);
+    resize: none;
+    outline: none;
+    overflow-y: auto;
+    transition:
+        background var(--transition-fast),
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast);
+}
+
+.rp-composer__input::placeholder {
+    color: var(--color-text-placeholder);
+}
+
+.rp-composer__input:focus {
+    background: var(--color-surface-white);
+    box-shadow: var(--focus-ring-gold);
+}
+
+.rp-composer__send {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 0;
+    border-radius: 12px;
+    background: var(--color-brand-navy);
+    color: var(--color-surface-white);
+    cursor: pointer;
+    transition:
+        background var(--transition-fast),
+        transform var(--transition-fast);
+}
+
+.rp-composer__send svg {
+    width: 18px;
+    height: 18px;
+}
+
+.rp-composer__send:hover {
+    background: var(--color-brand-navy-hover);
+}
+
+.rp-composer__send:active {
+    transform: scale(0.95);
+}
+
+.rp-composer__send:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+/* Empty: the mic; with something to send: the send button, in the same place */
+.rp-composer:not(.has-content) [data-send] {
+    display: none;
+}
+
+.rp-composer.has-content [data-act="record"] {
+    display: none;
+}
+
+.rp-composer__rec-dot {
+    flex: 0 0 auto;
+    width: 10px;
+    height: 10px;
+    margin-left: 4px;
+    border-radius: 50%;
+    background: var(--color-status-danger);
+    animation: rp-msgr-rec 1s ease-in-out infinite;
+}
+
+@keyframes rp-msgr-rec {
+    50% {
+        opacity: 0.3;
+    }
+}
+
+.rp-composer__rec-time {
+    flex: 0 0 auto;
+    min-width: 36px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-composer__rec-wave {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    height: 28px;
+    overflow: hidden;
+    color: var(--color-brand-navy);
+}
+
+.rp-composer__rec-wave i {
+    flex: 1 1 0;
+    max-width: 3px;
+    border-radius: 2px;
+    background: currentColor;
+    opacity: 0.55;
+    transform-origin: center;
+    animation: rp-msgr-bar 0.9s ease-in-out infinite alternate;
+}
+
+.rp-composer__rec-wave i:nth-child(3n) {
+    animation-delay: 0.2s;
+}
+
+.rp-composer__rec-wave i:nth-child(3n + 1) {
+    animation-delay: 0.45s;
+}
+
+@keyframes rp-msgr-bar {
+    to {
+        transform: scaleY(0.35);
+    }
+}
+
+/* Emoji and @mentions open above the composer */
+.rp-composer__pop {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    z-index: 4;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    background: var(--color-surface-white);
+    box-shadow: var(--shadow-md);
+    animation: rp-dropdown-enter 0.14s ease;
+}
+
+.rp-composer__emoji {
+    right: 56px;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 2px;
+    width: 284px;
+    max-width: calc(100% - 24px);
+    padding: 8px;
+}
+
+.rp-composer__emoji button {
+    display: grid;
+    place-items: center;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.rp-composer__emoji button:hover,
+.rp-composer__emoji button:focus-visible {
+    outline: none;
+    background: var(--color-surface-subtle);
+}
+
+.rp-composer__mentions {
+    left: 52px;
+    min-width: 240px;
+    margin: 0;
+    padding: 4px;
+    list-style: none;
+}
+
+.rp-composer__mentions button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 6px 8px;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    font-family: var(--font-body);
+    font-size: 13px;
+    text-align: left;
+    color: var(--color-text-primary);
+    cursor: pointer;
+}
+
+.rp-composer__mentions button small {
+    margin-left: auto;
+    font-size: 11.5px;
+    color: var(--color-text-secondary);
+}
+
+.rp-composer__mentions button:hover,
+.rp-composer__mentions button.is-active {
+    background: var(--color-surface-subtle);
+}
+
+/* ── Shared popovers: the ⋯ menu and the reaction picker ── */
+.rp-messenger__menu,
+.rp-messenger__picker {
+    position: absolute;
+    z-index: 6;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface-white);
+    box-shadow: var(--shadow-md);
+    animation: rp-dropdown-enter 0.14s ease;
+}
+
+.rp-messenger__menu[hidden],
+.rp-messenger__picker[hidden] {
+    display: none;
+}
+
+.rp-messenger__menu {
+    min-width: 200px;
+    max-width: 260px;
+    padding: 4px;
+    border-radius: 10px;
+}
+
+.rp-messenger__menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 36px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: 7px;
+    background: none;
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    font-weight: 500;
+    text-align: left;
+    color: var(--color-text-primary);
+    cursor: pointer;
+}
+
+.rp-messenger__menu-item svg {
+    width: 16px;
+    height: 16px;
+    color: var(--color-text-secondary);
+}
+
+.rp-messenger__menu-item:hover,
+.rp-messenger__menu-item:focus-visible {
+    outline: none;
+    background: var(--color-surface-subtle);
+}
+
+.rp-messenger__menu-item--danger,
+.rp-messenger__menu-item--danger svg {
+    color: var(--color-status-danger);
+}
+
+.rp-messenger__menu-item--danger:hover,
+.rp-messenger__menu-item--danger:focus-visible {
+    background: var(--color-status-danger-bg);
+}
+
+.rp-messenger__confirm {
+    margin: 8px 8px 10px;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.45;
+}
+
+.rp-messenger__confirm-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    padding: 0 4px 4px;
+}
+
+.rp-messenger__danger {
+    height: 32px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--color-status-danger);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-surface-white);
+    cursor: pointer;
+}
+
+.rp-messenger__danger:hover {
+    background: #b91c1c;
+}
+
+.rp-messenger__danger:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.28);
+}
+
+.rp-messenger__picker {
+    display: flex;
+    gap: 2px;
+    padding: 4px;
+    border-radius: var(--radius-full);
+}
+
+.rp-messenger__picker button {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    font-size: 19px;
+    cursor: pointer;
+    transition: transform var(--transition-fast);
+}
+
+.rp-messenger__picker button:hover,
+.rp-messenger__picker button:focus-visible {
+    outline: none;
+    background: var(--color-surface-subtle);
+    transform: scale(1.18);
+}
+
+/* ── A message arriving while the panel is closed ─────────── */
+.rp-messenger__peek {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 14px);
+    display: flex;
+    align-items: flex-start;
+    width: 320px;
+    max-width: calc(100vw - 32px);
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    background: var(--color-surface-white);
+    box-shadow: var(--shadow-lg);
+}
+
+.rp-messenger__peek[hidden] {
+    display: none;
+}
+
+.rp-messenger__peek.is-in {
+    transform-origin: bottom right;
+    animation: rp-msgr-in 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.rp-peek {
+    flex: 1 1 auto;
+    display: flex;
+    gap: 12px;
+    min-width: 0;
+    padding: 12px 4px 12px 14px;
+    border: 0;
+    border-radius: 14px 0 0 14px;
+    background: none;
+    font: inherit;
+    text-align: left;
+    color: inherit;
+    cursor: pointer;
+}
+
+.rp-peek__text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.rp-peek__who {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    min-width: 0;
+}
+
+.rp-peek__who strong {
+    font-size: 13.5px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.rp-peek__who span {
+    overflow: hidden;
+    font-size: 12px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--color-text-secondary);
+}
+
+.rp-peek__msg {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--color-text-secondary);
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.rp-peek__x {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    margin: 8px 8px 0 0;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+}
+
+.rp-peek__x:hover {
+    background: var(--color-surface-subtle);
+    color: var(--color-text-primary);
+}
+
+.rp-peek__x svg {
+    width: 15px;
+    height: 15px;
+}
+
+/* ── An image, full size ──────────────────────────────────── */
+.rp-messenger__lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 10001;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgba(11, 38, 62, 0.82);
+    cursor: zoom-out;
+}
+
+.rp-messenger__lightbox[hidden] {
+    display: none;
+}
+
+.rp-messenger__lightbox img {
+    max-width: 100%;
+    max-height: 86vh;
+    border-radius: 10px;
+    box-shadow: var(--shadow-lg);
+    cursor: default;
+}
+
+.rp-messenger__lightbox-x {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.14);
+    color: var(--color-surface-white);
+    cursor: pointer;
+}
+
+.rp-messenger__lightbox-x svg {
+    width: 20px;
+    height: 20px;
+}
+
+.rp-messenger__sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ── Smaller screens ──────────────────────────────────────── */
+@media (max-width: 899px) {
+    .rp-messenger__expand {
+        display: none;
+    }
+}
+
+/* Phones: the bubble moves in, and the panel takes the whole screen */
+@media (max-width: 600px) {
+    .rp-messenger {
+        --msgr-gap: 16px;
+    }
+
+    /* Full screen: over the topbar too */
+    .rp-messenger.is-open {
+        z-index: 1150;
+    }
+
+    body.rp-has-messenger .rp-page {
+        padding-bottom: 84px;
+    }
+
+    body.rp-has-messenger .rp-toast-stack {
+        bottom: 84px;
+    }
+
+    .rp-messenger__panel {
+        position: fixed;
+        inset: 0;
+        width: auto;
+        height: 100vh;
+        height: 100dvh;
+        border: 0;
+        border-radius: 0;
+        animation: rp-msgr-sheet 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    @keyframes rp-msgr-sheet {
+        from {
+            opacity: 0.6;
+            transform: translateY(32px);
+        }
+    }
+
+    .rp-messenger.is-open .rp-messenger__launcher,
+    .rp-messenger.is-open .rp-messenger__peek {
+        display: none;
+    }
+
+    .rp-messenger__peek {
+        width: calc(100vw - 32px);
+    }
+
+    /* 16px keeps phones from zooming into the field */
+    .rp-composer__input,
+    .rp-messenger__search input {
+        font-size: 16px;
+    }
+
+    .rp-composer {
+        padding-bottom: max(12px, env(safe-area-inset-bottom));
+    }
+
+    .rp-dm {
+        max-width: 92%;
+    }
+}
+
+/* Fingers: 40px targets, and no hover-only controls */
+@media (hover: none) {
+    .rp-messenger__iconbtn {
+        width: 40px;
+        height: 40px;
+    }
+
+    .rp-convo__more {
+        display: none;
+    }
+
+    .rp-convo:hover .rp-convo__time {
+        opacity: 1;
+    }
+
+    .rp-messenger__menu-item {
+        min-height: 44px;
+    }
+
+    .rp-dm__tool {
+        width: 36px;
+        height: 36px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rp-messenger__panel,
+    .rp-messenger__peek.is-in,
+    .rp-messenger__launcher.is-ringing,
+    .rp-messenger__launcher.is-ringing .rp-messenger__badge,
+    .rp-messenger__panel.is-thread .rp-messenger__pane--thread,
+    .rp-messenger__menu,
+    .rp-messenger__picker,
+    .rp-composer__pop,
+    .rp-thread__dots i,
+    .rp-composer__rec-dot,
+    .rp-composer__rec-wave i,
+    .rp-dm.is-flash .rp-dm__bubble {
+        animation: none;
+    }
+
+    .rp-voice-note.is-playing .rp-voice-note__bars--played {
+        animation-duration: 0.01s;
+    }
+}

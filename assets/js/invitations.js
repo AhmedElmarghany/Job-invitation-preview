@@ -45,6 +45,7 @@
     var els = {};
     var columnsModal = null;
     var pendingWidthSync = false;
+    var flashId = null;
 
     /* ── Formatting ──────────────────────────────────────── */
 
@@ -292,6 +293,7 @@
             '<tr class="rp-row rp-row--' +
             row.status +
             (expanded ? " is-expanded" : "") +
+            (flashId === row.id ? " is-flash" : "") +
             '" data-id="' +
             row.id +
             '">' +
@@ -1283,6 +1285,37 @@
         setInterval(tickCountdowns, 1000);
     }
 
+    /* ── Opened from a link: ?invited_job_id=48198, the old dashboard's own parameter ── */
+
+    function openFromLink(id) {
+        var row = findRow(id);
+        if (!row) return null;
+
+        state.page = Math.floor(visibleRows().indexOf(row) / state.perPage) + 1;
+        state.expanded[row.id] = true;
+        flashId = row.id;
+        return row;
+    }
+
+    /* Only as far as needed, so the toolbar stays in view when the row is near the top */
+    function revealLinked(row) {
+        var tr = els.tbody.querySelector('tr.rp-row[data-id="' + row.id + '"]');
+        if (!tr) return;
+        var still = global.matchMedia && global.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        /* A timeout, not a frame: frames stop in a hidden tab and the scroll must still happen */
+        global.setTimeout(function () {
+            var top = tr.getBoundingClientRect().top;
+            var bottom = tr.nextElementSibling.getBoundingClientRect().bottom;
+            var by = top < 0 ? top - 16 : Math.max(0, Math.min(bottom - global.innerHeight + 16, top - 16));
+            if (by) global.scrollBy({ top: by, behavior: still ? "auto" : "smooth" });
+        }, 60);
+        global.setTimeout(function () {
+            flashId = null;
+            tr.classList.remove("is-flash");
+        }, 2400);
+    }
+
     /* ── Boot ────────────────────────────────────────────── */
 
     function init() {
@@ -1314,8 +1347,12 @@
             onChange: syncStickyOffsets
         });
 
+        var invited = new URLSearchParams(global.location.search).get("invited_job_id");
+        var linked = invited ? openFromLink("J-" + invited.replace(/^J-/i, "")) : null;
+
         wire();
         render();
+        if (linked) revealLinked(linked);
     }
 
     if (document.readyState === "loading") {

@@ -65,6 +65,43 @@
     cursor: pointer;
 }
 
+/* An invitation opened from a notification is marked once, then settles into the open-row colour */
+@keyframes rp-invite-flash {
+    0%,
+    35% {
+        box-shadow: inset 0 0 0 999px rgba(149, 128, 73, 0.2);
+    }
+
+    100% {
+        box-shadow: inset 0 0 0 999px rgba(149, 128, 73, 0);
+    }
+}
+
+@keyframes rp-invite-flash-first {
+    0%,
+    35% {
+        box-shadow: inset 3px 0 0 var(--color-brand-navy), inset 0 0 0 999px rgba(149, 128, 73, 0.2);
+    }
+
+    100% {
+        box-shadow: inset 3px 0 0 var(--color-brand-navy), inset 0 0 0 999px rgba(149, 128, 73, 0);
+    }
+}
+
+#new-customized-table tbody tr.rp-row.is-flash > td {
+    animation: rp-invite-flash 2.2s ease;
+}
+
+#new-customized-table tbody tr.rp-row.is-flash > td:first-child {
+    animation-name: rp-invite-flash-first;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #new-customized-table tbody tr.rp-row.is-flash > td {
+        animation: none;
+    }
+}
+
 tr.rp-subrow:hover {
     background-color: var(--color-surface-inset) !important;
 }

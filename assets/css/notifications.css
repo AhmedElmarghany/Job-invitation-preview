@@ -1,0 +1,1119 @@
+/* ============================================================
+   BLOCKS: rp-bell, rp-notifications, rp-notification, rp-nset
+   The topbar bell and its panel (notifications.js). The panel
+   is the availability and profile menus' sibling: white card,
+   12px radius, a header, then a scrolling list. Rows read like
+   the dashboard's Recent activity: round icon, the time at the
+   end of the first line, the detail under it.
+   ============================================================ */
+.rp-bell,
+.rp-notifications {
+    /* Tones shared with the dashboard feed and the availability pill */
+    --good-ink: #067647;
+    --good-bg: #ecfdf3;
+    --good-border: #c3eadb;
+    --warn-ink: #b45309;
+    --warn-bg: #fffaeb;
+    --warn-border: #f3dfae;
+    --bad-ink: #b91c1c;
+    --bad-bg: #fef2f2;
+    --quiet-ink: #71717a;
+    --quiet-bg: #f4f4f5;
+}
+
+/* ── Bell ─────────────────────────────────────────────────── */
+.rp-bell {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.rp-bell.is-open .rp-bell__btn {
+    background: var(--color-surface-subtle);
+    border-color: var(--color-border-hover);
+    color: var(--color-text-primary);
+}
+
+.rp-bell__btn:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-navy);
+}
+
+/* topbar.css shows the badge as flex, which beats the hidden attribute */
+.rp-topbar__icon-badge[hidden] {
+    display: none;
+}
+
+/* A new notification swings the bell and pops the count */
+.rp-bell.is-ringing .rp-bell__btn > svg {
+    transform-origin: 50% 12%;
+    animation: rp-bell-ring 0.9s ease;
+}
+
+.rp-bell.is-ringing .rp-topbar__icon-badge {
+    animation: rp-badge-pop 0.45s ease;
+}
+
+@keyframes rp-bell-ring {
+    0%,
+    100% {
+        transform: rotate(0);
+    }
+
+    15% {
+        transform: rotate(14deg);
+    }
+
+    30% {
+        transform: rotate(-12deg);
+    }
+
+    45% {
+        transform: rotate(8deg);
+    }
+
+    60% {
+        transform: rotate(-5deg);
+    }
+
+    75% {
+        transform: rotate(2deg);
+    }
+}
+
+@keyframes rp-badge-pop {
+    40% {
+        transform: scale(1.3);
+    }
+}
+
+/* ── Panel ────────────────────────────────────────────────── */
+.rp-notifications {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    z-index: 1100;
+    display: flex;
+    flex-direction: column;
+    width: 400px;
+    max-width: calc(100vw - 24px);
+    max-height: min(620px, calc(100vh - var(--layout-cu_topbar-height) - 32px));
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-white);
+    box-shadow: var(--shadow-lg);
+    font-family: var(--font-body);
+    text-align: left;
+    animation: rp-dropdown-enter 0.18s ease;
+}
+
+.rp-notifications[hidden],
+.rp-notifications__view[hidden] {
+    display: none;
+}
+
+.rp-notifications:focus {
+    outline: none;
+}
+
+.rp-notifications__view {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+}
+
+/* ── Header ───────────────────────────────────────────────── */
+.rp-notifications__head {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px 12px 12px 16px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.rp-notifications__head--sub {
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px 10px 8px;
+}
+
+.rp-notifications__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-width: 0;
+}
+
+.rp-notifications__title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--color-text-primary);
+}
+
+.rp-notifications__filter .rp-segment-count[hidden] {
+    display: none;
+}
+
+.rp-notifications__icon-btn,
+.rp-notifications__text-btn {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: var(--radius-xs);
+    background: none;
+    font-family: var(--font-body);
+    cursor: pointer;
+    transition:
+        background var(--transition-fast),
+        color var(--transition-fast),
+        box-shadow var(--transition-fast);
+}
+
+.rp-notifications__icon-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    color: var(--color-text-secondary);
+}
+
+.rp-notifications__icon-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+.rp-notifications__text-btn {
+    gap: 6px;
+    height: 30px;
+    padding: 0 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-brand-navy);
+    white-space: nowrap;
+}
+
+.rp-notifications__text-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.rp-notifications__icon-btn:hover,
+.rp-notifications__text-btn:hover {
+    background: var(--color-surface-subtle);
+    color: var(--color-text-primary);
+}
+
+.rp-notifications__text-btn:disabled {
+    background: none;
+    color: var(--color-text-secondary);
+    opacity: 0.55;
+    cursor: default;
+}
+
+.rp-notifications__icon-btn:focus-visible,
+.rp-notifications__text-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-navy);
+}
+
+/* ── List ─────────────────────────────────────────────────── */
+.rp-notifications__body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-bottom: 6px;
+    scrollbar-width: thin;
+}
+
+/* The day stays in view while its rows scroll under it */
+.rp-notifications__group-label {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    margin: 0;
+    padding: 10px 16px 6px;
+    background: var(--color-surface-white);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--color-text-secondary);
+}
+
+.rp-notifications__list {
+    margin: 0;
+    padding: 0 6px;
+    list-style: none;
+}
+
+/* ── One notification ─────────────────────────────────────── */
+.rp-notification {
+    position: relative;
+    border-radius: var(--radius-sm);
+    transition: background var(--transition-fast);
+}
+
+.rp-notification:hover,
+.rp-notification:focus-within {
+    background: var(--color-surface-inset);
+}
+
+.rp-notification__link {
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr);
+    column-gap: 12px;
+    width: 100%;
+    padding: 10px 10px 10px 18px;
+    border: 0;
+    border-radius: inherit;
+    background: none;
+    font: inherit;
+    text-align: left;
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.rp-notification__link:hover {
+    color: inherit;
+    text-decoration: none;
+}
+
+.rp-notification__link:focus-visible {
+    outline: 2px solid var(--color-brand-navy);
+    outline-offset: -2px;
+}
+
+/* Unread: a navy dot in the gutter and a heavier title */
+.rp-notification__dot {
+    position: absolute;
+    top: 23px;
+    left: 6px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-brand-navy);
+    opacity: 0;
+    transform: scale(0.4);
+    pointer-events: none;
+    transition:
+        opacity var(--transition-fast),
+        transform var(--transition-fast);
+}
+
+.rp-notification--unread .rp-notification__dot {
+    opacity: 1;
+    transform: none;
+}
+
+.rp-notification__icon {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-subtle);
+    color: var(--color-brand-navy);
+}
+
+.rp-notification__icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+.rp-notification__icon--good {
+    background: var(--good-bg);
+    color: var(--good-ink);
+}
+
+.rp-notification__icon--warn {
+    background: var(--warn-bg);
+    color: var(--warn-ink);
+}
+
+.rp-notification__icon--bad {
+    background: var(--bad-bg);
+    color: var(--bad-ink);
+}
+
+.rp-notification__icon--quiet {
+    background: var(--quiet-bg);
+    color: var(--quiet-ink);
+}
+
+.rp-notification__main {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    padding-top: 1px;
+}
+
+.rp-notification__line {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    min-width: 0;
+}
+
+.rp-notification__title {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 13.5px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--color-text-muted);
+}
+
+.rp-notification--unread .rp-notification__title {
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.rp-notification__time {
+    flex: 0 0 auto;
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-notification--unread .rp-notification__line .rp-notification__time {
+    font-weight: 500;
+    color: var(--color-brand-navy);
+}
+
+.rp-notification__detail {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 12.5px;
+    line-height: 1.45;
+    color: var(--color-text-secondary);
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.rp-notification__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.rp-notification__chip {
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
+    padding: 0 8px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    background: var(--color-surface-white);
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-notification__chip--warn {
+    border-color: var(--warn-border);
+    background: var(--warn-bg);
+    color: var(--warn-ink);
+}
+
+.rp-notification__chip--good {
+    border-color: var(--good-border);
+    background: var(--good-bg);
+    color: var(--good-ink);
+}
+
+/* ── Row actions: on hover with a mouse, behind ⋯ on touch ── */
+.rp-notification__actions {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    display: flex;
+    gap: 2px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-fast);
+}
+
+.rp-notification:hover .rp-notification__actions,
+.rp-notification:focus-within .rp-notification__actions {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* The buttons take the time's place; opacity, not visibility, so a screen reader still hears it */
+.rp-notification__line > .rp-notification__time {
+    transition: opacity var(--transition-fast);
+}
+
+.rp-notification:hover .rp-notification__line > .rp-notification__time,
+.rp-notification:focus-within .rp-notification__line > .rp-notification__time {
+    opacity: 0;
+}
+
+.rp-notification__action,
+.rp-notification__more {
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-xs);
+    background: none;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition:
+        background var(--transition-fast),
+        color var(--transition-fast);
+}
+
+.rp-notification__action {
+    width: 28px;
+    height: 28px;
+}
+
+.rp-notification__action svg {
+    width: 15px;
+    height: 15px;
+}
+
+.rp-notification__action:hover {
+    background: var(--color-surface-subtle);
+    color: var(--color-text-primary);
+}
+
+.rp-notification__action--remove {
+    color: var(--color-status-danger);
+}
+
+.rp-notification__action--remove:hover {
+    background: var(--color-status-danger-bg);
+    color: var(--color-status-danger);
+}
+
+.rp-notification__action:focus-visible,
+.rp-notification__more:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-navy);
+}
+
+.rp-notification__more {
+    display: none;
+    position: absolute;
+    top: 4px;
+    right: 2px;
+    width: 40px;
+    height: 40px;
+}
+
+.rp-notification__more svg {
+    width: 18px;
+    height: 18px;
+}
+
+@media (hover: none) {
+    .rp-notification__actions {
+        display: none;
+    }
+
+    .rp-notification__more {
+        display: grid;
+    }
+
+    .rp-notification__link {
+        padding-right: 42px;
+    }
+
+    /* No hover here, so the time always shows */
+    .rp-notification:focus-within .rp-notification__line > .rp-notification__time {
+        opacity: 1;
+    }
+
+    /* Fingers need 40px targets */
+    .rp-notifications__icon-btn {
+        width: 40px;
+        height: 40px;
+    }
+
+    .rp-notifications__text-btn {
+        height: 40px;
+    }
+
+    .rp-notification__stack {
+        min-height: 40px;
+        margin-top: -10px;
+        margin-bottom: 2px;
+    }
+}
+
+/* ── A job's earlier reminders or invitations, folded ─────── */
+.rp-notification__stack {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin: -4px 0 8px 58px;
+    padding: 4px 8px 4px 4px;
+    border: 0;
+    border-radius: var(--radius-xs);
+    background: none;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-link);
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.rp-notification__stack:hover {
+    background: var(--color-surface-subtle);
+}
+
+.rp-notification__stack:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-navy);
+}
+
+.rp-notification__stack svg {
+    width: 14px;
+    height: 14px;
+    transition: transform var(--transition-fast);
+}
+
+.rp-notification__stack[aria-expanded="true"] svg {
+    transform: rotate(180deg);
+}
+
+.rp-notification__earlier {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin: 0 12px 12px 62px;
+    padding: 2px 0 2px 12px;
+    border-left: 2px solid var(--color-border);
+    list-style: none;
+}
+
+.rp-notification__earlier[hidden] {
+    display: none;
+}
+
+.rp-notification__earlier-item {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 12.5px;
+    line-height: 1.4;
+    color: var(--color-text-secondary);
+}
+
+.rp-notification__earlier-item.is-unread > span {
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.rp-notification__earlier-item .rp-notification__time {
+    font-size: 11.5px;
+}
+
+/* ── Arriving and leaving ─────────────────────────────────── */
+.rp-notification.is-fresh {
+    animation:
+        rp-notification-in 0.35s ease,
+        rp-notification-glow 2.6s ease;
+}
+
+.rp-notification.is-leaving {
+    pointer-events: none;
+    animation: rp-notification-out 0.18s ease forwards;
+}
+
+@keyframes rp-notification-in {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+}
+
+@keyframes rp-notification-glow {
+    0%,
+    45% {
+        background: var(--color-surface-gold-pale);
+    }
+}
+
+@keyframes rp-notification-out {
+    to {
+        opacity: 0;
+        transform: translateX(16px);
+    }
+}
+
+/* ── Loading older rows, and the end of them ──────────────── */
+.rp-notifications__tail {
+    min-height: 1px;
+    padding: 0 6px;
+}
+
+.rp-notifications__skeleton {
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr);
+    column-gap: 12px;
+    padding: 10px 10px 10px 18px;
+}
+
+.rp-notifications__bones {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 4px;
+}
+
+.rp-notifications__bone {
+    display: block;
+    height: 10px;
+    border-radius: 6px;
+    background: linear-gradient(90deg, var(--color-surface-subtle) 25%, var(--color-surface-inset) 50%, var(--color-surface-subtle) 75%);
+    background-size: 200% 100%;
+    animation: rp-notification-bone 1.2s linear infinite;
+}
+
+.rp-notifications__bone--icon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+}
+
+.rp-notifications__bone--short {
+    width: 60%;
+}
+
+@keyframes rp-notification-bone {
+    to {
+        background-position: -200% 0;
+    }
+}
+
+.rp-notifications__end {
+    margin: 8px 0 10px;
+    font-size: 12px;
+    text-align: center;
+    color: var(--color-text-secondary);
+}
+
+/* ── Nothing to show ──────────────────────────────────────── */
+.rp-notifications__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 40px 24px 44px;
+    text-align: center;
+}
+
+.rp-notifications__empty-icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 6px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-subtle);
+    color: var(--color-brand-navy);
+}
+
+.rp-notifications__empty-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.rp-notifications__empty-title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.rp-notifications__empty-note {
+    max-width: 260px;
+    margin: 0;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--color-text-secondary);
+}
+
+/* ── ⋯ menu on touch screens ──────────────────────────────── */
+.rp-notifications__menu {
+    position: absolute;
+    z-index: 5;
+    min-width: 184px;
+    padding: 4px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-white);
+    box-shadow: var(--shadow-md);
+    animation: rp-dropdown-enter 0.14s ease;
+}
+
+.rp-notifications__menu[hidden] {
+    display: none;
+}
+
+.rp-notifications__menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 40px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: var(--radius-xs);
+    background: none;
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    font-weight: 500;
+    text-align: left;
+    color: var(--color-text-primary);
+    cursor: pointer;
+}
+
+.rp-notifications__menu-item svg {
+    width: 16px;
+    height: 16px;
+    color: var(--color-text-secondary);
+}
+
+.rp-notifications__menu-item:hover,
+.rp-notifications__menu-item:focus-visible {
+    outline: none;
+    background: var(--color-surface-subtle);
+}
+
+.rp-notifications__menu-item--danger,
+.rp-notifications__menu-item--danger svg {
+    color: var(--color-status-danger);
+}
+
+.rp-notifications__menu-item--danger:hover,
+.rp-notifications__menu-item--danger:focus-visible {
+    background: var(--color-status-danger-bg);
+}
+
+/* ── Undo, after a removal or Mark all as read ────────────── */
+.rp-notifications__undo {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
+    z-index: 6;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 8px 8px 14px;
+    border-radius: var(--radius-sm);
+    background: var(--color-brand-navy);
+    box-shadow: var(--shadow-md);
+    font-size: 13px;
+    font-weight: 500;
+    color: #fff;
+    animation: rp-notification-in 0.2s ease;
+}
+
+.rp-notifications__undo[hidden] {
+    display: none;
+}
+
+.rp-notifications__undo button {
+    height: 30px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: var(--radius-xs);
+    background: rgba(255, 255, 255, 0.12);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.rp-notifications__undo button:hover {
+    background: rgba(255, 255, 255, 0.22);
+}
+
+.rp-notifications__undo button:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 1px;
+}
+
+/* ── Settings ─────────────────────────────────────────────── */
+.rp-notifications__settings {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 4px 16px 8px;
+}
+
+.rp-nset {
+    padding: 12px 0 14px;
+}
+
+.rp-nset + .rp-nset {
+    border-top: 1px solid var(--color-border);
+}
+
+.rp-nset__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.rp-nset__title svg {
+    width: 16px;
+    height: 16px;
+    color: var(--color-brand-navy);
+}
+
+/* The whole row toggles: a 36px switch alone is a small target */
+.rp-nset__switch {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 40px;
+    cursor: pointer;
+}
+
+.rp-nset__switch:has(.rp-nset__input:disabled) {
+    cursor: default;
+}
+
+.rp-nset__input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+
+.rp-nset__track {
+    position: relative;
+    flex: 0 0 auto;
+    width: 36px;
+    height: 20px;
+    border-radius: var(--radius-full);
+    background: #d4d4d8;
+    transition:
+        background var(--transition-fast),
+        box-shadow var(--transition-fast);
+}
+
+.rp-nset__thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-white);
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition-fast);
+}
+
+.rp-nset__input:checked + .rp-nset__track {
+    background: var(--color-brand-navy);
+}
+
+.rp-nset__input:checked + .rp-nset__track .rp-nset__thumb {
+    transform: translateX(16px);
+}
+
+.rp-nset__input:focus-visible + .rp-nset__track {
+    box-shadow: var(--focus-ring-navy);
+}
+
+.rp-nset__input:disabled + .rp-nset__track {
+    opacity: 0.45;
+}
+
+.rp-nset__label {
+    font-size: 13.5px;
+    line-height: 1.4;
+    color: var(--color-text-primary);
+}
+
+.rp-nset__volume {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 4px;
+    padding-left: 48px;
+    transition: opacity var(--transition-fast);
+}
+
+.rp-nset__volume.is-off {
+    opacity: 0.5;
+}
+
+.rp-nset__volume-icon {
+    display: grid;
+    flex: 0 0 auto;
+    color: var(--color-text-secondary);
+}
+
+.rp-nset__volume-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.rp-nset__range {
+    flex: 1 1 auto;
+    min-width: 0;
+    accent-color: var(--color-brand-navy);
+    cursor: pointer;
+}
+
+.rp-nset__range:disabled {
+    cursor: default;
+}
+
+.rp-nset__value {
+    flex: 0 0 auto;
+    width: 36px;
+    font-size: 12.5px;
+    text-align: right;
+    color: var(--color-text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-nset__state {
+    margin: 4px 0 0 48px;
+    font-size: 12.5px;
+    line-height: 1.45;
+    color: var(--color-status-warning);
+}
+
+.rp-notifications__foot {
+    flex: 0 0 auto;
+    padding: 12px 16px;
+    border-top: 1px solid var(--color-border);
+    background: var(--color-surface-inset);
+}
+
+.rp-notifications__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    height: 40px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-white);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    transition:
+        background var(--transition-fast),
+        box-shadow var(--transition-fast);
+}
+
+.rp-notifications__btn svg {
+    width: 16px;
+    height: 16px;
+    color: var(--color-brand-navy);
+}
+
+.rp-notifications__btn:hover {
+    background: var(--color-surface-subtle);
+}
+
+.rp-notifications__btn:disabled {
+    opacity: 0.7;
+    cursor: default;
+}
+
+.rp-notifications__btn:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring-navy);
+}
+
+.rp-notifications__sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ── Phones: a sheet across the topbar, like the availability panel ── */
+@media (max-width: 600px) {
+    .rp-bell {
+        position: static;
+    }
+
+    .rp-notifications {
+        top: calc(100% + 6px);
+        right: 12px;
+        left: 12px;
+        width: auto;
+        max-width: none;
+        max-height: calc(100vh - var(--layout-cu_topbar-height) - 24px);
+        max-height: calc(100dvh - var(--layout-cu_topbar-height) - 24px);
+    }
+}
+
+@media (max-width: 360px) {
+    .rp-notifications__head {
+        padding-left: 12px;
+    }
+
+    .rp-notification__link {
+        padding-left: 16px;
+        column-gap: 10px;
+    }
+
+    .rp-notification__stack {
+        margin-left: 54px;
+    }
+
+    .rp-notification__earlier {
+        margin-left: 58px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rp-notifications,
+    .rp-notifications__menu,
+    .rp-notifications__undo,
+    .rp-notifications__bone,
+    .rp-notification.is-fresh,
+    .rp-notification.is-leaving,
+    .rp-bell.is-ringing .rp-bell__btn > svg,
+    .rp-bell.is-ringing .rp-topbar__icon-badge {
+        animation: none;
+    }
+}

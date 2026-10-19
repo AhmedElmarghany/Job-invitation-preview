@@ -157,15 +157,19 @@
             "</span>" +
             "</div>" +
             '<div class="rp-topbar__right">' +
-            '<button class="rp-topbar__icon-btn" type="button" title="Notifications" aria-label="Notifications" data-demo="Notifications">' +
+            /* notifications.js builds the panel inside #rpBell and counts the badge from RP.NOTIFICATIONS */
+            '<div class="rp-bell" id="rpBell">' +
+            '<button class="rp-topbar__icon-btn rp-bell__btn" id="rpBellBtn" type="button" title="Notifications" aria-label="Notifications" aria-haspopup="dialog" aria-expanded="false" aria-controls="rpNotifications">' +
             icon("notifications") +
-            '<span class="rp-topbar__icon-badge">' +
-            user.notifications +
-            "</span>" +
+            '<span class="rp-topbar__icon-badge" id="rpBellBadge" hidden></span>' +
             "</button>" +
-            '<button class="rp-topbar__icon-btn" type="button" title="Messages" aria-label="Messages" data-demo="Messaging">' +
+            "</div>" +
+            /* messenger.js opens its panel from here as well as from its bubble, and keeps the badge */
+            '<button class="rp-topbar__icon-btn" id="rpMessagesBtn" type="button" title="Messages" aria-label="Messages" aria-controls="rpMessengerPanel">' +
             icon("messages") +
-            '<span class="rp-topbar__icon-badge">' +
+            '<span class="rp-topbar__icon-badge" id="rpMessagesBadge"' +
+            (user.messages ? "" : " hidden") +
+            ">" +
             user.messages +
             "</span>" +
             "</button>" +

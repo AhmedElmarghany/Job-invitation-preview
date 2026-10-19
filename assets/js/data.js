@@ -19,7 +19,6 @@
         currency: "NZD",
         balance: "1,284.60",
         balanceUsd: "778.35",
-        notifications: 5,
         messages: 2
     };
 
@@ -2810,6 +2809,237 @@
 
         RP.PRO.emails = RP.PRO.emails.concat(more);
     })();
+
+    /* ============================================================
+       NOTIFICATIONS — what the topbar bell lists (notifications.js).
+       A real pages_notification row is a type, a type_id and a
+       sentence; these carry the same type plus the id of what it is
+       about, and the panel looks the rest up in the rows above, so
+       every notification opens something that exists in the preview.
+       read: true for what the resource has opened already.
+       ============================================================ */
+    RP.NOTIFICATIONS = (function () {
+        var list = [];
+        var seq = 52010;
+
+        function add(when, type, fields, read) {
+            list.push(Object.assign({
+                id: seq--,
+                type: type,
+                at: when instanceof Date ? when : new Date(NOW - when * HOUR),
+                read: !!read
+            }, fields));
+        }
+
+        function invite(jobId, read, hoursEarlier) {
+            var row = RP.INVITATIONS.filter(function (r) {
+                return r.jobId === jobId;
+            })[0];
+            var at = hoursEarlier ? new Date(row.invitedAt.getTime() - hoursEarlier * HOUR) : row.invitedAt;
+            add(at, row.type === "bid" ? "job_bid_invitation" : "job_invitation", { job: row.id }, read);
+        }
+
+        /* Delivery reminders go out on a schedule, so one job collects several (J-10719 had six) */
+        add(0.05, "job_delivery_reminder", { job: "J-47947", dueIn: -4 });
+        add(2, "job_delivery_reminder", { job: "J-47947", dueIn: -2 });
+        add(3, "job_delivery_reminder", { job: "J-47947", dueIn: -1 });
+        add(4, "job_delivery_reminder", { job: "J-47947", dueIn: 0 });
+        add(9, "job_delivery_reminder", { job: "J-47947", dueIn: 5 }, true);
+        add(0.2, "job_delivery_reminder", { job: "J-47975", dueIn: 6 });
+        add(6, "job_delivery_reminder", { job: "J-47975", dueIn: 12 }, true);
+        add(18, "job_delivery_reminder", { job: "J-47975", dueIn: 24 }, true);
+        add(6, "job_delivery_reminder", { job: "J-47982", dueIn: 24 }, true);
+
+        /* Invitations, at the moment each one was sent */
+        invite(48198);
+        invite(48088);
+        invite(48210, true);
+        invite(48119, true);
+        invite(48180, true);
+        invite(48207);
+        invite(48207, true, 24);
+        invite(48176, true);
+        invite(48203, true);
+        invite(48170, true);
+        invite(48159, true);
+        invite(48101, true);
+        invite(48188, true);
+        invite(48191, true);
+        invite(48166, true);
+        invite(48124, true);
+        invite(48136, true);
+        invite(48152, true);
+        invite(48130, true);
+        invite(48106, true);
+        invite(48112, true);
+        invite(48147, true);
+
+        /* Assigned work, when each job reached the resource (acceptedAgo): the newest one
+           and the hand-written rows of My Jobs, not every generated filler row */
+        ["J-47358", "J-48002", "J-47996", "J-47991", "J-47968", "J-47987", "J-47960", "J-47984",
+            "J-47982", "J-47990", "J-47953", "J-47975", "J-47947", "J-47639"].forEach(function (id) {
+            var job = RP.JOBS.filter(function (row) {
+                return row.id === id;
+            })[0];
+            add(job.acceptedAt, "job_assign", { job: id }, job.acceptedAgo > 2.5);
+        });
+
+        /* The dashboard's Recent activity tells the same story: lost J-48163, approved J-47094, paid B-2201 */
+        add(26, "job_cancel", { job: "J-48163", project: "Mining safety manual", source: "English", target: "Arabic" }, true);
+        add(52, "job_approved", { job: "J-47094" }, true);
+        add(PAID_AT, "bill_paid", { bill: RP.BILLS[1].id }, true);
+        add(new Date(RP.BILLS[0].issued.getTime() + 9 * HOUR), "bill_issued", { bill: RP.BILLS[0].id }, true);
+
+        /* Professional profile: the certificates and the price list behind these */
+        add(20, "certificate_verification", { cert: 334, result: "rejected" });
+        add(98, "certificate_verification", { cert: 318, result: "approved" }, true);
+        add(13 * 24, "certificate_expiring", { cert: 318 }, true);
+        add(78, "language_pair_approval", { price: 706 }, true);
+        add(RP.PROFILE.terms.updatedOn, "terms_updated", { version: RP.PROFILE.terms.version });
+
+        return list.sort(function (a, b) {
+            return b.at - a.at || b.id - a.id;
+        });
+    })();
+
+    /* ============================================================
+       MESSAGES — the conversations behind the chat bubble (messenger.js).
+       chat_conversation is one-to-one or a group, and a group can be a
+       job's chat (job_id). The job chats here are RP.jobDetail()'s own
+       chat, so the job page and the messenger show the same thread.
+       readAt: when the resource last read it; later messages are unread.
+       replies: what the other side answers when the resource writes,
+       so the preview can show typing, receipts and a reply arriving.
+       ============================================================ */
+    var MIN = 60 * 1000;
+
+    RP.PEOPLE = {
+        sara: { name: PM.sara.name, role: "Project manager", status: "online" },
+        daniel: { name: PM.daniel.name, role: "Project manager", status: "online" },
+        tane: { name: PM.tane.name, role: "Project manager", status: "away", lastSeen: new Date(NOW - 40 * MIN) },
+        mei: { name: PM.mei.name, role: "Project manager", status: "offline", lastSeen: new Date(NOW - 74 * HOUR) },
+        leah: { name: RP.PRO.vendorManager.name, role: "Vendor manager", status: "offline", lastSeen: new Date(NOW - 19 * HOUR) },
+        leila: { name: PEERS[0], role: "Translator", status: "online" },
+        priya: { name: PEERS[2], role: "Translator", status: "offline", lastSeen: new Date(NOW - 5 * HOUR) }
+    };
+
+    RP.CONVERSATIONS = (function () {
+        function ago(hours) {
+            return new Date(NOW - hours * HOUR);
+        }
+
+        function pmKey(pm) {
+            return Object.keys(PM).filter(function (key) {
+                return PM[key] === pm;
+            })[0];
+        }
+
+        /* A job's chat, straight from the job page's own data */
+        function jobChat(id, extra) {
+            var job = RP.JOBS.filter(function (row) {
+                return row.id === id;
+            })[0];
+            var key = pmKey(job.pm);
+            var messages = RP.jobDetail(job).chat.map(function (m, i) {
+                return {
+                    id: id + "-" + (i + 1),
+                    from: m.from === "me" ? "me" : key,
+                    at: new Date(m.at),
+                    text: m.text || "",
+                    files: m.file ? [{ name: m.file.name, size: m.file.size }] : [],
+                    voice: m.voice || null
+                };
+            });
+            return Object.assign({ id: "c-" + id.toLowerCase(), kind: "job", job: id, with: key, readAt: new Date(NOW), messages: messages }, extra);
+        }
+
+        function msg(id, from, hours, text, more) {
+            return Object.assign({ id: id, from: from, at: ago(hours), text: text || "", files: [] }, more);
+        }
+
+        return [
+            {
+                id: "c-sara",
+                kind: "direct",
+                with: "sara",
+                pinned: true,
+                readAt: ago(0.83),
+                messages: [
+                    msg("s1", "sara", 72.2, "Hi " + RP.USER.firstName + ", I've added you to the Medical team chat for Q4 — termbase updates will go there from now on."),
+                    msg("s2", "me", 72, "Great, thanks Sara!", { edited: true }),
+                    msg("s3", "sara", 26, "The cardiac monitor client loved the last batch 👏", { reactions: [{ emoji: "🎉", by: ["me"] }] }),
+                    msg("s4", "me", 25.8, "", { deleted: true }),
+                    msg("s5", "sara", 0.66, "Are you free for a rush job tomorrow? About 3,000 words, English → Arabic, medical device labelling."),
+                    msg("s6", "sara", 0.2, "No pressure — I just need to know by 5 pm so I can line someone up.")
+                ],
+                replies: [
+                    "Perfect, thank you! I'll send the invitation shortly — you'll see it under Invitations.",
+                    "Great — talk soon."
+                ]
+            },
+            jobChat("J-47947", {
+                readAt: ago(2),
+                replies: ["Thanks for the update. I'll tell the client — upload what you have so far if it helps."]
+            }),
+            {
+                id: "c-leah",
+                kind: "direct",
+                with: "leah",
+                readAt: new Date(NOW),
+                messages: [
+                    msg("l1", "leah", 20.2, "Hi " + RP.USER.firstName + " — I've reviewed your Court Interpreter Licence. The scan is cut off at the bottom, so the expiry date can't be read."),
+                    msg("l2", "leah", 20.1, "Could you upload the whole page again? This guide shows how to scan it.", {
+                        files: [{ name: "certificate-scanning-guide.pdf", size: "320 KB" }]
+                    }),
+                    msg("l3", "me", 19, "Thanks Leah, I'll rescan it tonight and upload it again.", { reactions: [{ emoji: "👍", by: ["leah"] }] })
+                ],
+                replies: ["Thanks — I'll check it as soon as it's in."]
+            },
+            jobChat("J-47975", { replies: ["Sounds good, thanks!"] }),
+            {
+                id: "c-medical",
+                kind: "group",
+                name: "Medical team — Q4",
+                members: ["sara", "leila", "priya"],
+                admin: "sara",
+                readAt: new Date(NOW),
+                messages: [
+                    msg("g1", "sara", 72.3, "Sara Whitfield created the group and added you, Leila Haddad and Priya Raman", { system: true }),
+                    msg("g2", "sara", 72.25, "Welcome! The updated cardiology termbase is attached — please use it from today.", {
+                        files: [{ name: "cardiology-termbase-q4.xlsx", size: "1.2 MB" }],
+                        reactions: [{ emoji: "❤️", by: ["leila", "priya"] }, { emoji: "👍", by: ["me"] }]
+                    }),
+                    msg("g3", "leila", 70, "Thanks Sara. @" + RP.USER.firstName + " did you see the note about the device model numbers?"),
+                    msg("g4", "me", 69.5, "Yes — they stay untranslated, exactly as in the IFU.", { replyTo: "g3", reactions: [{ emoji: "👍", by: ["leila"] }] }),
+                    msg("g5", "priya", 30, "", { voice: "0:18" }),
+                    msg("g6", "sara", 29, "Reminder: the Q4 style guide review is on Friday.")
+                ],
+                replies: [{ from: "leila", text: "Makes sense 👍" }]
+            },
+            jobChat("J-47990"),
+            jobChat("J-48002"),
+            {
+                id: "c-mei",
+                kind: "direct",
+                with: "mei",
+                archived: true,
+                readAt: new Date(NOW),
+                messages: [
+                    msg("m1", "mei", 290, "Thanks for the quick turnaround on the annual report section!"),
+                    msg("m2", "me", 289, "Anytime 🙂")
+                ]
+            }
+        ];
+    })();
+
+    /* Delivered while the preview is open, once a tab, so the bubble's arrival can be seen */
+    RP.MESSAGE_DEMO = { conversation: "c-j-47975", from: "daniel", after: 30, text: "Quick check — are you still on track for the deadline? The client is asking." };
+
+    RP.USER.messages = RP.CONVERSATIONS.reduce(function (sum, c) {
+        return sum + c.messages.filter(function (m) {
+            return m.from !== "me" && !m.system && m.at > c.readAt;
+        }).length;
+    }, 0);
 
     /* The sidebar badge counts what still needs a decision. */
     RP.USER.invitationCount = RP.INVITATIONS.filter(function (row) {

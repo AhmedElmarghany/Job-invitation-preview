@@ -1000,7 +1000,14 @@
         var pm = first(job.pm.name);
         return (
             '<section class="rp-card" id="chat">' +
-            cardHead("messages", "Chat with " + esc(pm), d.chat.length) +
+            cardHead(
+                "messages",
+                "Chat with " + esc(pm),
+                d.chat.length,
+                RP.messenger
+                    ? '<button class="rp-button rp-button--outline rp-button--sm" type="button" data-open-messenger>' + icon("messages") + "Open in Messages</button>"
+                    : ""
+            ) +
             '<div class="rp-chat__thread" id="rpChatThread" aria-live="polite">' +
             threadMarkup() +
             "</div>" +
@@ -1508,21 +1515,38 @@
         RP.toast("Delivered — " + first(job.pm.name) + " has been notified.", "success");
     }
 
-    function sendMessage(input) {
-        var text = input.value.trim();
-        if (!text) return;
+    /* This chat is the messenger's conversation for the job, so the two always show the same thread */
+    function syncChat() {
+        var shared = RP.messenger && RP.messenger.jobThread(job.id);
+        if (shared) d.chat = shared;
+    }
 
-        d.chat.push({ from: "me", at: Date.now(), text: text });
-        input.value = "";
-        autosize(input);
-
-        document.getElementById("rpChatThread").innerHTML = threadMarkup();
+    function refreshChat() {
+        var thread = document.getElementById("rpChatThread");
+        if (!thread) return;
+        syncChat();
+        thread.innerHTML = threadMarkup();
         [document.querySelector("#chat .rp-card__count"), els.tabs.querySelector('[data-section="chat"] .navigation-tabs-badge')]
             .filter(Boolean)
             .forEach(function (el) {
                 el.textContent = d.chat.length;
             });
         scrollThreadToEnd();
+    }
+
+    function sendMessage(input) {
+        var text = input.value.trim();
+        if (!text) return;
+        input.value = "";
+        autosize(input);
+
+        /* The messenger's rp:message event redraws the thread */
+        if (RP.messenger && RP.messenger.jobThread(job.id)) {
+            RP.messenger.sendToJob(job.id, text);
+        } else {
+            d.chat.push({ from: "me", at: Date.now(), text: text });
+            refreshChat();
+        }
     }
 
     function scrollThreadToEnd() {
@@ -1636,6 +1660,14 @@
             sendMessage(document.getElementById("rpChatInput"));
         });
 
+        document.addEventListener("rp:message", function (e) {
+            if (e.detail && e.detail.job === job.id) refreshChat();
+        });
+
+        document.addEventListener("click", function (e) {
+            if (e.target.closest("[data-open-messenger]") && RP.messenger) RP.messenger.openJob(job.id);
+        });
+
         document.addEventListener("keydown", function (e) {
             if (e.key === "Escape") closeModal();
 
@@ -1692,6 +1724,7 @@
         }
 
         d = RP.jobDetail(job);
+        syncChat();
         renderAll();
         watchGeneration();
 

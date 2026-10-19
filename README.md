@@ -42,8 +42,8 @@ Nothing inside the folder refers to the folder name, so renaming is safe.
 | `professional-profile.html` | **Built.** Professional Profile — services and rates by language pair with their certificates, specialities, billing details, payment methods and emails. |
 | `account.html` | **Built.** User Account — the resource's own profile, opened from their name and photo in the sidebar. |
 
-The sidebar, topbar, availability control, profile menu and logout modal are **final** and shared
-by every page, so a new page only needs its own content.
+The sidebar, topbar, availability control, notifications panel, profile menu and logout modal are
+**final** and shared by every page, so a new page only needs its own content.
 
 ---
 
@@ -52,7 +52,7 @@ by every page, so a new page only needs its own content.
 ```
 resource portal preview/
 ├── index.html                  redirect → invitations.html
-├── invitations.html            built page
+├── invitations.html            built page — ?invited_job_id=48198 opens that invitation
 ├── jobs.html                   built page
 ├── job.html                    built page — one job, ?id=J-…
 ├── account.html                built page — the resource's own profile (User Account)
@@ -66,6 +66,7 @@ resource portal preview/
     │   ├── base.css            app shell, icons, toasts, segmented filter, placeholders
     │   ├── sidebar.css         rp-sidebar
     │   ├── topbar.css          rp-topbar, availability pill + dropdown, profile menu
+    │   ├── notifications.css   the bell and its panel: rows, folds, settings, undo, phone sheet
     │   ├── toolbar.css         copied from config/static/css/cu_table_toolbar.css
     │   ├── table.css           copied from config/static/tables/table.css
     │   ├── status.css          copied from config/static/css/status.css
@@ -86,6 +87,7 @@ resource portal preview/
     │   ├── icons.js            inline Lucide set — RP.icon('name')
     │   ├── data.js             the dummy records and the signed-in resource
     │   ├── layout.js           renders sidebar + topbar + modals into #rp-layout
+    │   ├── notifications.js    the bell's panel: list, folds, read / remove, settings, arrivals
     │   ├── columns-modal.js    reusable "Customize Columns" modal
     │   ├── navigation-tabs.js  copied from config/static/js/navigation-tabs.js
     │   ├── invitations.js      table render, search, sort, expand, paginate
@@ -647,6 +649,94 @@ totals strip goes two a row with Total Earned across the bottom, and the chart d
 
 ---
 
+## Notifications (the topbar bell)
+
+Replaces the old bell in `templates/partials/_header.html` and `assets/notifications/notification.js`.
+On every page; built by `assets/js/notifications.js` inside `#rpBell`, which `layout.js` renders.
+
+- **The badge counts unread rows** (`9`, capped at `9+`), not a red/gold dot, and the button says it
+  to screen readers ("Notifications, 9 unread").
+- **A popover under the bell**, 400px, the availability and profile menus' sibling. On phones
+  (≤600px) it is a sheet 12px from each edge, as the availability panel is.
+- **Header:** *All / Unread* (with the count), *Mark all as read*, and a gear for settings.
+- **Rows** read like the dashboard's Recent activity: a round icon, a title written per type, the
+  time at the end of the first line, and what it is about under it (project · language pair, the
+  bill's amount, the certificate). The icon's tone carries urgency: red for overdue or rejected,
+  amber for due soon or expiring, green for paid, verified or approved, grey for a job that went
+  to someone else. Unread rows have a navy dot and a heavier title.
+- **Invitations show their countdown** ("Expires in 2h 23m", amber under 3 hours) or *Bid sent*.
+- **Day groups** (Today, Yesterday, Last 7 days, Older) keep their heading in view while
+  scrolling. Times are relative today, then the clock under a heading that already names the day.
+- **Repeats fold into one row per job.** User 1146's real data had six reminders for one job in
+  ten hours and the same bid invitation three times; here the latest shows, with "4 earlier
+  reminders" opening the rest.
+- **The whole row opens what it is about** and marks it read: the job page, the invitation (opened
+  and flashed on its page), the bill on My Earnings, the certificate on Professional Profile, the
+  Terms card. Ctrl/Cmd-click opens a new tab and only marks it read.
+- **Row actions:** with a mouse, Mark as read / unread and Remove appear on hover in place of the
+  time; on touch screens a `⋯` button opens the same two (40px rows). Remove and Mark all as read
+  can be undone from the bar at the bottom of the panel.
+- **No "View all" page:** older rows load as the list scrolls, 12 at a time, with a skeleton
+  while they load and "No older notifications" at the end.
+- **Settings** (the gear): the sound on or off, its volume with a Test button, and desktop alerts,
+  which ask the browser's permission and only fire when the tab is in the background (in the
+  page, the toast does that job). The old mute + slider strip is gone from the list.
+  *Send a test notification* delivers one two seconds later: the bell swings, the count pops, the
+  row slides in on top with a gold glow, the chime plays, and a desktop alert shows if the tab is
+  hidden by then.
+- **Keyboard:** the panel takes focus when it opens, `↑` / `↓` / `Home` / `End` move between rows,
+  `Esc` closes it (the `⋯` menu first) and returns focus to the bell.
+
+**State in the preview:** read and removed rows last for the browser tab (`sessionStorage`
+`rp_notifications`), so a new tab starts the demo again; sound and desktop-alert settings last for
+the browser (`localStorage` `rp_notification_prefs`). The chime is generated with Web Audio, so no
+sound file ships.
+
+**Data:** `RP.NOTIFICATIONS` in `data.js`. Each one carries a real type and the id of what it is
+about; the panel looks everything else up in the other records, so every row matches the page it
+opens: the overdue J-47947 and the due-soon J-47975 of My Jobs, the invitations at their own
+invitation times, B-2201 paid by Wise 30 hours ago and B-2209 pending (the balance), certificate
+334's rejection reason, and the dashboard's lost J-48163 and approved J-47094.
+
+| Type (`pages_notification.type`) | Title in the panel | Icon · tone | Opens |
+| --- | --- | --- | --- |
+| `job_invitation` | New invitation for J-… (*Interpreting invitation* for interpreting) | invitations · navy | `invitations.html?invited_job_id=…` |
+| `job_bid_invitation` | Bid request for J-… | bid · navy | the same |
+| `job_assign` | J-… was assigned to you | jobs · navy | `job.html?id=J-…` |
+| `job_delivery_reminder` | J-… is due in N hours · is due now · is N hours overdue | clock · amber / clock-alert · red | `job.html?id=J-…` |
+| `job_cancel` | J-… went to another resource | bid · grey | `invitations.html` |
+| `certificate_verification` | Certificate verified / Certificate rejected, with the reason | badge-check · green / circle-alert · red | `professional-profile.html?highlight_cert=…` |
+| `language_pair_approval` *new for resources* | Language pair approved | languages · green | `professional-profile.html#services` |
+| `payment_method_verified` | Payment method verified | wallet · green | `professional-profile.html#payment` |
+| `job_approved` *new* | J-… was approved | check-check · navy | `job.html?id=J-…` |
+| `bill_issued` *new* | Bill B-… was issued | receipt · navy | `earnings.html?bill=B-…` |
+| `bill_paid` *new* | Bill B-… was paid | credit-card-check · green | `earnings.html?bill=B-…` |
+| `certificate_expiring` *new* | Certificate expiring soon | calendar-clock · amber | `professional-profile.html?highlight_cert=…` |
+| `terms_updated` *new* | Terms and conditions updated, *Action needed* | shield-check · navy | `account.html#terms` |
+
+The *new* types are not sent by the system today; each needs a `CreateNotificationObject` call
+where the event happens. `language_pair_approval` exists, but only tells the Vendor Manager a pair is
+waiting; nothing tells the resource it was approved.
+
+**Porting it to Django:**
+
+- Bell + panel shell as `templates/resource_portal/partials/notifications.html` (replacing
+  `partials/legacy/notifications.html`), `resource-portal/css/notifications.css` and
+  `resource-portal/js/notifications.js`. The class names (`rp-bell`, `rp-notifications__*`,
+  `rp-notification__*`, `rp-nset__*`) carry over.
+- The server builds each row's title, detail, icon, tone, chip and link per type, and folds the
+  repeats (reminders and invitations by job), so the page shows what it receives. `description`
+  stays the fallback for a type it does not know.
+- Endpoints: one page of rows (`?page=&filter=unread`, newest first, with the unread count), mark
+  read / unread by ids, mark all read, and remove (the existing `dismiss` flag). The `active`
+  red-dot flag is no longer needed: the badge is the unread count.
+- `read` is barely set today (all 25 of user 1146's are unread); opening a row or *Mark all as read*
+  sets it.
+- The WebSocket push (`ws/notify/`) calls what `arrive()` does here: toast when the panel is closed,
+  the bell swing, the chime, and a desktop alert only when the tab is hidden.
+
+---
+
 ## Adding the next page
 
 1. Copy a page's shell (e.g. `account.html`) and set `data-page` / `data-title` on `#rp-layout`.
@@ -758,8 +848,9 @@ toast repeats what was typed (*Bid of USD 280.00*), and the Bid Sent card reads
 | Key | Does |
 | --- | --- |
 | `/` | Jump to the search field; on Professional Profile, the services search |
-| `Esc` | Leave the search field, close any modal, the availability dropdown or the mobile drawer; on User Account and Professional Profile, close the Delete popover first; on My Earnings, close the period picker first; on Productivity, the Columns popover, the Export menu or the period picker |
+| `Esc` | Leave the search field, close any modal, the notifications panel (its `⋯` menu first), the availability dropdown or the mobile drawer; on User Account and Professional Profile, close the Delete popover first; on My Earnings, close the period picker first; on Productivity, the Columns popover, the Export menu or the period picker |
 | `Enter` | Submit a bid, when the bid field has focus; send a chat message on the job page (`Shift+Enter` for a new line); in Add services' rate, add the service to the list |
+| `↑` / `↓`, `Home` / `End` in the notifications panel | Move between notifications |
 | `↑` / `↓` | Move between statuses in the availability dropdown; on Productivity, `↓` on Columns or Export opens it, and the arrows move between the Export formats |
 | `←` / `→`, `Home` / `End` | On Productivity's chart, move between the periods; `Enter` opens the one in focus in the table |
 | `Enter` in Technology's search | Pick the first match, or add what was typed as your own tool |
